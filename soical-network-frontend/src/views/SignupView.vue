@@ -2,7 +2,7 @@
         <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
                 <div class="main-left col-span-1">
                     <div class="p-12 bg-white border border-gray-200 rounded-lg">
-                        <h1 class="mb-6 text-2xl">Log in</h1>
+                        <h1 class="mb-6 text-2xl">Signup</h1>
 
                         <p class="mb-6 text-gray-500">
                             Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
@@ -10,7 +10,7 @@
                         </p>
 
                         <p class="font-bold">
-                            Already have an account? Click here to log in!
+                            Already have an account? <RouterLink :to="{'name': 'login'}" class="underline">Click here</RouterLink> to log in!
                         </p>
                     </div>
                 </div>
