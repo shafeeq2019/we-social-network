@@ -16,7 +16,7 @@
         </div>
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-2 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-lg ">
+            <div class="bg-white border border-gray-200 rounded-lg">
                 <div class="p-4">
                     <textarea class="p-4 w-full bg-gray-100 rounded-lg"
                         placeholder="What are you thinking about?"></textarea>
