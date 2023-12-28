@@ -17,28 +17,85 @@
 
             <div class="main-right col-span-1">
                 <div class="p-12 bg-white border border-gray-200 rounded-lg">
-                    <form class="space-y-6">
+                    <form class="space-y-6" @submit.prevent="submitForm">
                         <div>
                             <label>E-mail</label><br>
-                            <input type="email" placeholder="Your e-mail address" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                            <input type="email" placeholder="Your e-mail address" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg" v-model="form.email">
                         </div>
 
                         <div>
                             <label>Password</label><br>
-                            <input type="password" placeholder="Your password" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                            <input type="password" placeholder="Your password" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg" v-model="form.password">
                         </div>
 
+                        <template v-if="errors.length > 0">
+                            <div class="bg-red-300 text-white rounded-lg p-6">
+                                 <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
+                            </div>
+                        </template>
+
                         <div>
-                            <button class="py-4 px-6 bg-purple-600 text-white rounded-lg">Log in</button>
+                            <button class="py-4 px-6 bg-purple-600 text-white rounded-lg" >Log in</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 </template>
-<script>
-export default {
 
+<script>
+import axios from 'axios'
+import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
+
+export default {
+    setup() {
+        const userStore = useUserStore();
+        return {
+            userStore
+        }
+    },
+    data() {
+        return {
+            form: {
+                email: "",
+                password: "",
+
+            },
+            errors: []
+        }
+    },
+    methods: {
+        async submitForm() {
+            if (this.form.email === '') {
+                this.errors.push('Your e-mail is missing')
+            }
+
+            if (this.form.password === '') {
+                this.errors.push('Your password is missing')
+            }
+
+
+            if (this.errors.length === 0) {
+                await axios.post('/api/login/', this.form)
+                    .then(response => {
+                        console.log(response)
+                        this.userStore.setToken(response.data)
+                        axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
+                    })
+                    .catch(error => {
+                        console.log('error', error)
+                    })
+
+                await axios.get("/api/me/")
+                    .then(response => {
+                        this.$router.push('/feed');
+                    }).catch(error => {
+                        console.log(error)
+                    })
+            }
+        }
+    }
 }
 </script>
 <style lang="">

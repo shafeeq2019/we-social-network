@@ -6,7 +6,7 @@
           <a href="#" class="text-xl">Social Network</a>
         </div>
 
-        <div class="menu-center flex space-x-12">
+        <div class="menu-center flex space-x-12" v-if="userStore.user.isAuthenticated">
           <RouterLink to="/feed" class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
@@ -41,12 +41,21 @@
             </svg>
           </RouterLink>
         </div>
+        <template v-if="userStore.user.isAuthenticated">
+          <div class="menu-right">
+            <a href="#">
+              <img src="https://i.pravatar.cc/40?img=57" class="rounded-full">
+            </a>
+          </div>
+        </template>
 
-        <div class="menu-right">
-          <a href="#">
-            <img src="https://i.pravatar.cc/40?img=57" class="rounded-full">
-          </a>
-        </div>
+        <template v-else>
+          <div class="menu-right">
+            <RouterLink class="py-4 px-6 bg-gray-500 text-white rounded-lg mr-4" to="/login">Log in</RouterLink>
+            <RouterLink class="py-4 px-6 bg-purple-600  text-white rounded-lg" to="/signup">Sign up</RouterLink>
+          </div>
+        </template>
+
       </div>
     </div>
   </nav>
@@ -58,9 +67,28 @@
 
 <script>
 import Toast from '@/components/Toast.vue'
+import { useUserStore } from '@/stores/user'
+import axios from 'axios'
+
 export default {
+  setup() {
+    const userStore = useUserStore();
+    return {
+      userStore
+    }
+  },
   components: {
     Toast
+  },
+  beforeCreate() {
+    this.userStore.initStore();
+    const token = this.userStore.user.access;
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+    }
+    else {
+      axios.defaults.headers.common["Authorization"] = "";
+    }
   }
 }
 </script>

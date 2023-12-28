@@ -60,7 +60,6 @@
 
 <script>
 import axios from 'axios'
-
 import { useToastStore } from '@/stores/toast'
 
 export default {
