@@ -7,6 +7,7 @@
 </template>
 
 <script setup>
+// This is a composition API Component
 import { useToastStore } from '@/stores/toast'
 
 const store = useToastStore()
