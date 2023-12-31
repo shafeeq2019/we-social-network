@@ -7,7 +7,7 @@
         </div>
 
         <div class="menu-center flex space-x-12" v-if="userStore.user.isAuthenticated">
-          <RouterLink to="/feed" class="text-purple-700">
+          <RouterLink to="/feed" active-class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -15,7 +15,7 @@
             </svg>
           </RouterLink>
 
-          <RouterLink to="/messages">
+          <RouterLink to="/messages" active-class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -24,7 +24,7 @@
             </svg>
           </RouterLink>
 
-          <RouterLink to="/notifications">
+          <RouterLink to="/notifications" active-class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -33,7 +33,7 @@
             </svg>
           </RouterLink>
 
-          <RouterLink to="/search">
+          <RouterLink to="/search" active-class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"
