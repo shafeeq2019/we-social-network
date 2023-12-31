@@ -5,7 +5,6 @@ from django.utils.timesince import timesince
 from datetime import datetime, timezone
 
 
-
 # class PostSerializer(serializers.ModelSerializer):
 #     created_by = UserSerializer(read_only=True)
 #     created_at_ago = serializers.SerializerMethodField()
@@ -24,10 +23,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'body', 'created_at', 'created_ago','created_by']
+        fields = ['id', 'body', 'created_at', 'created_ago', 'created_by']
 
     def __init__(self, *args, show_created_by=False, **kwargs):
-        super(PostSerializer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if show_created_by:
             self.fields['created_by'] = UserSerializer(read_only=True)
