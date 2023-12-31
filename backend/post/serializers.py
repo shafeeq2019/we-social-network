@@ -20,10 +20,14 @@ from datetime import datetime, timezone
 
 
 class PostSerializer(serializers.ModelSerializer):
-    created_by = UserSerializer(read_only=True)
+    # Du kannst das created_by Feld hier entfernen, da wir es dynamisch in der __init__ Methode setzen werden.
 
     class Meta:
         model = Post
-        fields = ['id', 'body', 'created_by', 'created_at', 'created_ago']
+        fields = ['id', 'body', 'created_at', 'created_ago','created_by']
 
+    def __init__(self, *args, show_created_by=False, **kwargs):
+        super(PostSerializer, self).__init__(*args, **kwargs)
 
+        if show_created_by:
+            self.fields['created_by'] = UserSerializer(read_only=True)

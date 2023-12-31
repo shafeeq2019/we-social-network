@@ -89,9 +89,10 @@ export default {
 
                 await axios.get("/api/me/")
                     .then(response => {
+                        this.userStore.setUserInfo(response.data);
                         this.$router.push('/feed');
                     }).catch(error => {
-                        console.log(error)
+                        console.log('error', error)
                     })
             }
         }
