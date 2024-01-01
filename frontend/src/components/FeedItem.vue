@@ -10,7 +10,7 @@
                 </div>
             </router-link>
 
-            <p class="text-gray-600">{{post.created_ago}}</p>
+            <p class="text-gray-600">{{ /^0\s+minutes$/.test(post.created_ago) ? 'Just now' : post.created_ago}}</p>
         </div>
 
         <p> {{post.body}} </p>
@@ -53,12 +53,12 @@
     </div>
 </template>
 <script>
-    export default {
-        props: {
-            post: "",
-            user: {}
-        }
+export default {
+    props: {
+        post: "",
+        user: {}
     }
+}
 </script>
 <style lang="">
 
