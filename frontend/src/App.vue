@@ -51,8 +51,8 @@
 
         <template v-else>
           <div class="menu-right">
-            <RouterLink class="py-4 px-6 bg-gray-500 text-white rounded-lg mr-4" to="/login">Log in</RouterLink>
-            <RouterLink class="py-4 px-6 bg-purple-600  text-white rounded-lg" to="/signup">Sign up</RouterLink>
+            <RouterLink class="py-2 px-4 bg-gray-500 text-white rounded-md mr-4 text-sm" to="/login">Log in</RouterLink>
+            <RouterLink class="py-2 px-4 bg-purple-600  text-white rounded-md text-sm" to="/signup">Sign up</RouterLink>
           </div>
         </template>
 
