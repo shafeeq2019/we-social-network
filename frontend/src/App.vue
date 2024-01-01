@@ -1,5 +1,5 @@
 <template>
-  <nav class="py-10 px-8 border-b border-gray-200 bg-white">
+  <nav class="py-3 px-8 border-b border-gray-200 bg-white fixed w-full top-0">
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="menu-left">
@@ -59,7 +59,7 @@
       </div>
     </div>
   </nav>
-  <main class="px-10 py-6">
+  <main class="px-10 py-6 mt-14">
     <RouterView />
   </main>
   <Toast />
@@ -93,4 +93,5 @@ export default {
 }
 </script>
  
-<style scoped></style>
+<style scoped>
+</style>
