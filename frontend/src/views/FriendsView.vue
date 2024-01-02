@@ -17,9 +17,9 @@
 
         <div class="main-center lg:col-span-2 space-y-4">
             <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friendshipRequests.length > 0">
-                <h2 class="text-xl mb-6">friendship requests</h2>
+                <h2 class="text-xl mb-6">Friendship Requests</h2>
                 <div class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg" v-for="friendshipRequest in friendshipRequests">
+                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="friendshipRequest in friendshipRequests">
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
                             <img src="https://i.pravatar.cc/300?img=70" class="mb-6 mx-auto rounded-full">
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
