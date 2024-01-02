@@ -40,7 +40,7 @@ def signup(request):
 
 @api_view(['get'])
 def friends(request):
-    requests = FriendshipRequest.objects.filter(created_for=request.user)
+    requests = FriendshipRequest.objects.filter(created_for=request.user, status=FriendshipRequest.SENT)
     
     return JsonResponse({'friends': UserSerializer(request.user.friends, many=True).data,
                          'user': UserSerializer(request.user).data,
@@ -57,3 +57,17 @@ def send_friendship_request(request, id):
     friendship_request.save()
 
     return JsonResponse({'message': "friendship request created"})
+
+@api_view(['POST'])
+def handle_request(request, friendshipRequestId, status):
+    
+    user = request.user
+    
+    friendshipRequestest = FriendshipRequest.objects.get(id=friendshipRequestId)
+    friendshipRequestest.status = status
+    friendshipRequestest.save()
+    
+    user.friends.add(friendshipRequestest.created_by)
+    user.save()
+    
+    return JsonResponse({'message': "friendship request updated"})

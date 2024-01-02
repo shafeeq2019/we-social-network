@@ -13,7 +13,7 @@
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
 
-                <div class="mt-6">
+                <div class="mt-6" v-if="user.id != userStore.user.id">
                     <button class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg text-xs" @click="sendFriendshipRequest"> Send friendship
                         request</button>
                 </div>
