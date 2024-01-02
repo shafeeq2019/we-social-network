@@ -9,8 +9,13 @@
 
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <p class="text-xs text-gray-500">182 friends</p>
+                    <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">182 friends</router-link>
                     <p class="text-xs text-gray-500">120 posts</p>
+                </div>
+
+                <div class="mt-6">
+                    <button class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg text-xs" @click="sendFriendshipRequest"> Send friendship
+                        request</button>
                 </div>
             </div>
         </div>
@@ -44,64 +49,71 @@
     </div>
 </template>
 <script>
-    import axios from 'axios';
-    import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-    import Trends from '../components/Trends.vue'
-    import {
-        useUserStore
-    } from '@/stores/user'
-    import FeedItem from '../components/FeedItem.vue'
-    import {
-        ref,
-        watch,
-        onMounted
-    } from 'vue';
-    export default {
-        async beforeRouteUpdate(to, from) {
-            // react to route changes...
-            await this.getFeeds(to.params.id);
-        },
-        setup() {
-            const userStore = useUserStore();
-            return {
-                userStore
-            }
-        },
-        components: {
-            PeopleYouMayKnow,
-            Trends,
-            FeedItem
-        },
-        data() {
-            return {
-                posts: [],
-                user: {},
-                body: ''
-            }
-        },
-        methods: {
-            async getFeeds(userId) {
-                await axios.get(`/api/post/profile/${userId}/`).then(response => {
-                    this.posts = response.data.posts;
-                    this.user = response.data.user
-                }).catch(error => {
-                    console.log(error);
-                })
-            },
-            async submitForm() {
-                axios.post("/api/post/create/", {
-                    "body": this.body
-                }).then(response => {
-                    this.body = '';
-                    this.posts = [response.data, ...this.posts];
-                }).catch(error => {
-                    console.log(error);
-                })
-            }
-        },
-        created() {
-            this.getFeeds(this.$route.params.id);
+import axios from 'axios';
+import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+import Trends from '../components/Trends.vue'
+import {
+    useUserStore
+} from '@/stores/user'
+import FeedItem from '../components/FeedItem.vue'
+import {
+    ref,
+    watch,
+    onMounted
+} from 'vue';
+export default {
+    async beforeRouteUpdate(to, from) {
+        // react to route changes...
+        await this.getFeeds(to.params.id);
+    },
+    setup() {
+        const userStore = useUserStore();
+        return {
+            userStore
         }
-    };
+    },
+    components: {
+        PeopleYouMayKnow,
+        Trends,
+        FeedItem
+    },
+    data() {
+        return {
+            posts: [],
+            user: {},
+            body: ''
+        }
+    },
+    methods: {
+        async getFeeds(userId) {
+            await axios.get(`/api/post/profile/${userId}/`).then(response => {
+                this.posts = response.data.posts;
+                this.user = response.data.user
+            }).catch(error => {
+                console.log(error);
+            })
+        },
+        async submitForm() {
+            axios.post("/api/post/create/", {
+                "body": this.body
+            }).then(response => {
+                this.body = '';
+                this.posts = [response.data, ...this.posts];
+            }).catch(error => {
+                console.log(error);
+            })
+        },
+        async sendFriendshipRequest() {
+            axios.post(`/api/friends/request/${this.$route.params.id}`).then(response => {
+                console.log(response);
+            }).catch(error => {
+                console.log(error);
+            })
+        }
+    },
+    created() {
+        this.getFeeds(this.$route.params.id);
+    }
+};
 </script>
 <style lang=""></style>
