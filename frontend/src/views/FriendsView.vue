@@ -30,12 +30,12 @@
                         </router-link>
                         <div class="mt-6 space-y-2 grid grid-rows-2">
                             <div row-span-1>
-                                <button class="py-1 px-1 bg-purple-600 text-white rounded-md text-xs w-full ">
+                                <button class="py-1 px-1 bg-purple-600 text-white rounded-md text-xs w-full">
                                     Accept
                                 </button>
                             </div>
                             <div row-span-1>
-                                <button class="py-1 px-1 bg-gray-600 text-white rounded-md text-xs w-full row-span-1">
+                                <button class="py-1 px-1 bg-gray-600 text-white rounded-md text-xs w-full">
                                     Reject
                                 </button>
                             </div>
