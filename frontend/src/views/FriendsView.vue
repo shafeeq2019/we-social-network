@@ -108,7 +108,7 @@ export default {
     },
     methods: {
         async getFriends() {
-            await axios.get(`/api/friends/`).then(response => {
+            await axios.get(`/api/friends/${this.$route.params.id}/`).then(response => {
                 console.log(response)
                 this.friendshipRequests = response.data.requests;
                 this.friends = response.data.friends;
@@ -118,7 +118,7 @@ export default {
             })
         },
         async handleRequest(status, friendshipRequestId) {
-            axios.post(`/api/friends/${friendshipRequestId}/${status}`).then(
+            axios.post(`/api/friends/${friendshipRequestId}/${status}/`).then(
                 async response => await this.getFriends()
             ).catch(error => {
                 console.log(error);

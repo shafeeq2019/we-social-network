@@ -39,11 +39,12 @@ def signup(request):
 
 
 @api_view(['get'])
-def friends(request):
+def friends(request, id):
     requests = FriendshipRequest.objects.filter(created_for=request.user, status=FriendshipRequest.SENT)
+    user = User.objects.get(pk=id)
     
-    return JsonResponse({'friends': UserSerializer(request.user.friends, many=True).data,
-                         'user': UserSerializer(request.user).data,
+    return JsonResponse({'friends': UserSerializer(user.friends, many=True).data,
+                         'user': UserSerializer(user).data,
                          'requests': FriendshipRequestSerializer(requests, many=True).data},
                         safe=False)
 
@@ -67,6 +68,7 @@ def handle_request(request, friendshipRequestId, status):
     friendshipRequestest.status = status
     friendshipRequestest.save()
     
+    # add the user to friends list
     user.friends.add(friendshipRequestest.created_by)
     user.save()
     

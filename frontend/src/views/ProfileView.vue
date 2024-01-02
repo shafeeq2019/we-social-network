@@ -104,7 +104,7 @@ export default {
             })
         },
         async sendFriendshipRequest() {
-            axios.post(`/api/friends/request/${this.$route.params.id}`).then(response => {
+            axios.post(`/api/friends/request/${this.$route.params.id}/`).then(response => {
                 console.log(response);
             }).catch(error => {
                 console.log(error);
