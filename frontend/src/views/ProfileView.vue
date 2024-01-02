@@ -9,7 +9,7 @@
 
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">182 friends</router-link>
+                    <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">{{user.friends_count}} friends</router-link>
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
 
