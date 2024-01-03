@@ -40,10 +40,11 @@ def signup(request):
 
 @api_view(['get'])
 def friends(request, id):
-
-    requests = FriendshipRequest.objects.filter(
-        created_for=request.user, status=FriendshipRequest.SENT)
+    requests = []
     user = User.objects.get(pk=id)
+    if user == request.user:
+        requests = FriendshipRequest.objects.filter(
+            created_for=user, status=FriendshipRequest.SENT)
 
     return JsonResponse({'friends': UserSerializer(user.friends, many=True).data,
                          'user': UserSerializer(user).data,
@@ -53,13 +54,22 @@ def friends(request, id):
 
 @api_view(['POST'])
 def send_friendship_request(request, id):
-
     user = User.objects.get(pk=id)
-    friendship_request = FriendshipRequest(
-        created_for=user, created_by=request.user)
-    friendship_request.save()
 
-    return JsonResponse({'message': "friendship request created"})
+    check1 = FriendshipRequest.objects.filter(
+        created_for=request.user, created_by=user, status=FriendshipRequest.SENT)
+    check2 = FriendshipRequest.objects.filter(
+        created_for=user, created_by=request.user, status=FriendshipRequest.SENT)
+
+    if not check1 and not check2:
+
+        friendship_request = FriendshipRequest(
+            created_for=user, created_by=request.user)
+        friendship_request.save()
+
+        return JsonResponse({'message': "friendship request created"})
+    else:
+        return JsonResponse({'message': "friendship request already sent"})
 
 
 @api_view(['POST'])

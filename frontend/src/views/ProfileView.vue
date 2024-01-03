@@ -13,7 +13,7 @@
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
 
-                <div class="mt-6" v-if="user.id != userStore.user.id">
+                <div class="mt-6" v-if="user.id != userStore.user.id && can_send_friendship_request">
                     <button class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg text-xs" @click="sendFriendshipRequest"> Send friendship
                         request</button>
                 </div>
@@ -56,11 +56,8 @@ import {
     useUserStore
 } from '@/stores/user'
 import FeedItem from '../components/FeedItem.vue'
-import {
-    ref,
-    watch,
-    onMounted
-} from 'vue';
+import { useToastStore } from "@/stores/toast";
+
 export default {
     async beforeRouteUpdate(to, from) {
         // react to route changes...
@@ -68,8 +65,10 @@ export default {
     },
     setup() {
         const userStore = useUserStore();
+        const toastStore = useToastStore();
         return {
-            userStore
+            userStore,
+            toastStore
         }
     },
     components: {
@@ -81,7 +80,8 @@ export default {
         return {
             posts: [],
             user: {},
-            body: ''
+            body: '',
+            can_send_friendship_request: false
         }
     },
     methods: {
@@ -89,6 +89,7 @@ export default {
             await axios.get(`/api/post/profile/${userId}/`).then(response => {
                 this.posts = response.data.posts;
                 this.user = response.data.user
+                this.can_send_friendship_request = response.data.can_send_friendship_request
             }).catch(error => {
                 console.log(error);
             })
@@ -105,7 +106,10 @@ export default {
         },
         async sendFriendshipRequest() {
             axios.post(`/api/friends/request/${this.$route.params.id}/`).then(response => {
-                console.log(response);
+                if (response.data.message == "friendship request created") {
+                    this.can_send_friendship_request = false
+                    this.toastStore.showToast(5000, "The request was sent!", "bg-emerald-300");
+                }
             }).catch(error => {
                 console.log(error);
             })

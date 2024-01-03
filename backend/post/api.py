@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
 from post.models import Post
-from account.models import User
+from account.models import FriendshipRequest, User
 from account.serializers import UserSerializer
 from .serializers import PostSerializer
 from .forms import PostForm
@@ -43,11 +43,24 @@ def post_create(request):
 def post_list_profile(request, id):
     posts = Post.objects.filter(created_by_id=id)
     user = User.objects.get(pk=id)
-
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
 
+    check_if_friends = user.friends.filter(id=request.user.id).exists()
+    can_send_friendship_request = False
+
+    if not check_if_friends:
+        check_if_freqeust_sent_1 = FriendshipRequest.objects.filter(
+            created_for=request.user, created_by=user, status=FriendshipRequest.SENT).exists()
+        print("check_if_freqeust_sent_1=", check_if_freqeust_sent_1)
+        check_if_freqeust_sent_2 = FriendshipRequest.objects.filter(
+            created_for=user, created_by=request.user, status=FriendshipRequest.SENT).exists()
+        print("check_if_freqeust_sent_2=", check_if_freqeust_sent_2)
+        if not check_if_freqeust_sent_1 and not check_if_freqeust_sent_2:
+            can_send_friendship_request = True
+
     return JsonResponse({
         "posts": post_serializer.data,
-        "user": user_serializer.data},
+        "user": user_serializer.data,
+        "can_send_friendship_request": can_send_friendship_request},
         safe=False)
