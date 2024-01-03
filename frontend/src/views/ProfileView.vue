@@ -9,13 +9,18 @@
 
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">{{user.friends_count}} friends</router-link>
+                    <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">
+                        {{user.friends_count}} friends</router-link>
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
 
-                <div class="mt-6" v-if="user.id != userStore.user.id && can_send_friendship_request">
-                    <button class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg text-xs" @click="sendFriendshipRequest"> Send friendship
-                        request</button>
+                <div class="mt-6" v-if="(user.id == userStore.user.id ) || (user.id != userStore.user.id && can_send_friendship_request)">
+                    <button v-if="user.id != userStore.user.id && can_send_friendship_request"
+                        class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg text-xs"
+                        @click="sendFriendshipRequest"> Send friendship request</button>
+                    <button v-if="userStore.user.id && user.id == userStore.user.id"
+                        class="py-1 px-1 bg-red-600 text-white rounded-md text-xs w-full"
+                        @click="logout"> Logut  </button>
                 </div>
             </div>
         </div>
@@ -56,8 +61,9 @@ import {
     useUserStore
 } from '@/stores/user'
 import FeedItem from '../components/FeedItem.vue'
-import { useToastStore } from "@/stores/toast";
-
+import {
+    useToastStore
+} from "@/stores/toast";
 export default {
     async beforeRouteUpdate(to, from) {
         // react to route changes...
@@ -113,6 +119,10 @@ export default {
             }).catch(error => {
                 console.log(error);
             })
+        },
+        logout() {
+            this.userStore.removeToken();
+            this.$router.push("/login")
         }
     },
     created() {
