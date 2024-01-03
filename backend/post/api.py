@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from post.models import Post
 from account.models import FriendshipRequest, User
 from account.serializers import UserSerializer
+from django.db.models import Q
+
 from .serializers import PostSerializer
 from .forms import PostForm
 
@@ -11,10 +13,17 @@ from .forms import PostForm
 
 @api_view(['GET'])
 def post_list(request):
-    posts = Post.objects.all()
-    # print(posts)
+    user_friends = request.user.friends.all()
+    query = Q()
+
+    # Add user's friends in the query
+    for friend in user_friends:
+        query |= Q(created_by=friend)
+    # Add request user in the query
+    query |= Q(created_by=request.user)
+
+    posts = Post.objects.filter(query)
     serializer = PostSerializer(posts, many=True, show_created_by=True)
-    # print(serialzer)
 
     return JsonResponse({'data': serializer.data})
 
