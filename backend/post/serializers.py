@@ -23,7 +23,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'body', 'created_at', 'created_ago', 'created_by']
+        fields = ['id', 'body', 'created_at', 'created_ago', 'created_by','likes_count']
 
     def __init__(self, *args, show_created_by=False, **kwargs):
         super().__init__(*args, **kwargs)

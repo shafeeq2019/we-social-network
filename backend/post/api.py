@@ -23,6 +23,7 @@ def post_list(request):
     query |= Q(created_by=request.user)
 
     posts = Post.objects.filter(query)
+
     serializer = PostSerializer(posts, many=True, show_created_by=True)
 
     return JsonResponse({'data': serializer.data})
@@ -73,3 +74,10 @@ def post_list_profile(request, id):
         "user": user_serializer.data,
         "can_send_friendship_request": can_send_friendship_request},
         safe=False)
+
+
+@api_view(['POST'])
+def post_like(request, post_id):
+    post = Post.objects.get(id=post_id)
+    result = post.add_like(request.user)
+    return JsonResponse({'message': result})
