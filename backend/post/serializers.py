@@ -20,10 +20,12 @@ from datetime import datetime, timezone
 
 class PostSerializer(serializers.ModelSerializer):
     # Du kannst das created_by Feld hier entfernen, da wir es dynamisch in der __init__ Methode setzen werden.
+    post_liked = serializers.BooleanField(required=False)
 
     class Meta:
         model = Post
-        fields = ['id', 'body', 'created_at', 'created_ago', 'created_by','likes_count']
+        fields = ['id', 'body', 'created_at', 'created_ago',
+                  'created_by', 'likes_count', 'post_liked']
 
     def __init__(self, *args, show_created_by=False, **kwargs):
         super().__init__(*args, **kwargs)

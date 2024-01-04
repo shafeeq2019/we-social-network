@@ -15,8 +15,9 @@ def search(request):
     posts = Post.objects.filter(body__icontains=query)
 
     user_serializer = UserSerializer(users, many=True)
+    for post in posts:
+        post.post_liked = post.likes.filter(created_by=request.user).exists()
     post_serializer = PostSerializer(posts, show_created_by=True, many=True)
-    print('query', query)
 
     return JsonResponse(
         {

@@ -23,7 +23,8 @@ def post_list(request):
     query |= Q(created_by=request.user)
 
     posts = Post.objects.filter(query)
-
+    for post in posts:
+        post.post_liked = post.likes.filter(created_by=request.user).exists()
     serializer = PostSerializer(posts, many=True, show_created_by=True)
 
     return JsonResponse({'data': serializer.data})
@@ -53,6 +54,10 @@ def post_create(request):
 def post_list_profile(request, id):
     posts = Post.objects.filter(created_by_id=id)
     user = User.objects.get(pk=id)
+
+    for post in posts:
+        post.post_liked = post.likes.filter(created_by=request.user).exists()
+
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
 
