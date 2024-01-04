@@ -36,7 +36,7 @@
                         </path>
                     </svg>
 
-                    <span class="text-gray-500 text-xs">3 comments</span>
+                    <RouterLink :to="{name: 'postview', params: {id: post.id}}" class="text-gray-500 text-xs">{{ post.comments_count }} comments</RouterLink>
                 </div>
             </div>
 
@@ -56,13 +56,13 @@
 import axios from 'axios';
 export default {
     props: {
-        post: {},
-        user: {}
+        post: Object,
+        user: Object
     },
     methods: {
         likePost() {
             axios.post(`/api/post/${this.post.id}/like/`).then(response => {
-                if (response.data.message == 'post liked') {
+                if (response.data.message == 'post liked successfully') {
                     this.post.likes_count += 1;
                     this.post.post_liked = true
                 } else {
@@ -73,6 +73,8 @@ export default {
                 console.log(e)
             })
         }
+    },
+    created() {
     }
 }
 </script>

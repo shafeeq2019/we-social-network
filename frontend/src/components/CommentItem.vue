@@ -1,0 +1,26 @@
+<template lang="">
+    <div class="mb-6 flex items-center justify-between">
+        <router-link :to="{ name: 'profile', params: { 'id': comment.created_by.id } }">
+            <div class="flex items-center space-x-3">
+                <img src="https://i.pravatar.cc/300?img=47" class="w-[40px] rounded-full">
+
+                <p><strong>{{comment.created_by.name}}</strong></p>
+            </div>
+        </router-link>
+
+        <p class="text-gray-600">{{ /^0\s+minutes$/.test(comment.created_ago) ? 'Just now' : comment.created_ago}}</p>
+    </div>
+    <p> {{ comment.comment}} </p>
+</template>
+<script>
+    export default {
+        props: {
+            comment: Object
+        },
+        methods: {},
+        created() {}
+    }
+</script>
+<style lang="">
+
+</style>

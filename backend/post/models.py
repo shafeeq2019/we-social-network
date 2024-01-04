@@ -19,6 +19,7 @@ class Post(models.Model):
     body = models.TextField(blank=True, null=True)
     attachments = models.ManyToManyField(PostAttachment, blank=True)
     likes_count = models.IntegerField(default=0)
+    comments_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, related_name='posts', on_delete=models.CASCADE)
@@ -36,13 +37,19 @@ class Post(models.Model):
             like_to_delete.delete()
             self.likes_count -= 1
             self.save()
-            return "post disliked"
+            return "post disliked successfully"
 
         else:
             Like.objects.create(post=self, created_by=user)
             self.likes_count += 1
             self.save()
-            return "post liked"
+            return "post liked successfully"
+
+    def add_comment(self, user, comment):
+        Comment.objects.create(created_by=user, post=self, comment=comment)
+        self.comments_count +=1
+        self.save()
+        return 'post commented successfully'
 
 
 class Like(models.Model):
@@ -55,3 +62,19 @@ class Like(models.Model):
 
     class Meta:
         unique_together = ('created_by', 'post')
+
+
+class Comment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    post = models.ForeignKey(Post, related_name='comments',
+                             on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_by = models.ForeignKey(
+        User, related_name='comments', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def created_ago(self):
+        return timesince(self.created_at)
+    
+    class Meta:
+        ordering = ('created_at',)

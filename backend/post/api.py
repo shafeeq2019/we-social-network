@@ -1,11 +1,11 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.http import JsonResponse
-from post.models import Post
+from post.models import Post, Comment
 from account.models import FriendshipRequest, User
 from account.serializers import UserSerializer
 from django.db.models import Q
 
-from .serializers import PostSerializer
+from .serializers import PostSerializer, PostDetailSerializer
 from .forms import PostForm
 
 # Create your views here.
@@ -67,10 +67,8 @@ def post_list_profile(request, id):
     if not check_if_friends:
         check_if_freqeust_sent_1 = FriendshipRequest.objects.filter(
             created_for=request.user, created_by=user, status=FriendshipRequest.SENT).exists()
-        print("check_if_freqeust_sent_1=", check_if_freqeust_sent_1)
         check_if_freqeust_sent_2 = FriendshipRequest.objects.filter(
             created_for=user, created_by=request.user, status=FriendshipRequest.SENT).exists()
-        print("check_if_freqeust_sent_2=", check_if_freqeust_sent_2)
         if not check_if_freqeust_sent_1 and not check_if_freqeust_sent_2:
             can_send_friendship_request = True
 
@@ -86,3 +84,20 @@ def post_like(request, post_id):
     post = Post.objects.get(id=post_id)
     result = post.add_like(request.user)
     return JsonResponse({'message': result})
+
+
+@api_view(['GET'])
+def post_detail(request, post_id):
+    post = Post.objects.get(id=post_id)
+    post.post_liked = post.likes.filter(created_by=request.user).exists()
+    return JsonResponse({'post': PostDetailSerializer(post).data}, safe=False)
+
+
+@api_view(['POST'])
+def post_create_comment(request, post_id):
+    post = Post.objects.get(id=post_id)
+    comment = request.data.get('comment')
+    result = post.add_comment(request.user, comment)
+
+    print(comment)
+    return JsonResponse({'message': result}, safe=False)
