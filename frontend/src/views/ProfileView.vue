@@ -14,13 +14,18 @@
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
 
-                <div class="mt-6" v-if="(user.id == userStore.user.id ) || (user.id != userStore.user.id && can_send_friendship_request)">
+                <div class="mt-6 space-y-2">
                     <button v-if="user.id != userStore.user.id && can_send_friendship_request"
-                        class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg text-xs"
+                        class="inline-block py-2 px-1 bg-purple-600 text-white rounded-md text-xs w-full"
                         @click="sendFriendshipRequest"> Send friendship request</button>
+                    <button v-if="user.id != userStore.user.id"
+                        class="inline-block py-2 px-1 bg-purple-600 text-white rounded-md text-xs w-full"
+                        @click="sendDirectMessage"> Send direct message</button>
                     <button v-if="userStore.user.id && user.id == userStore.user.id"
-                        class="py-1 px-1 bg-red-600 text-white rounded-md text-xs w-full"
-                        @click="logout"> Logut  </button>
+                        class="inline-block py-2 px-1 bg-red-600 text-white rounded-md text-xs w-full" @click="logout">
+                        Logut
+                    </button>
+
                 </div>
             </div>
         </div>
@@ -64,6 +69,7 @@ import FeedItem from '../components/FeedItem.vue'
 import {
     useToastStore
 } from "@/stores/toast";
+
 export default {
     async beforeRouteUpdate(to, from) {
         // react to route changes...
@@ -91,6 +97,20 @@ export default {
         }
     },
     methods: {
+        async sendDirectMessage() {
+            axios.get(`/api/chat/get-or-create/${this.$route.params.id}/`).then(
+                response => {
+                    this.$router.push({
+                        name: 'messages',
+                        params: {
+                            user_id: this.$route.params.id
+                        }
+                    });
+                }
+            ).catch(error => {
+                console.log(error);
+            })
+        },
         async getFeeds(userId) {
             await axios.get(`/api/post/profile/${userId}/`).then(response => {
                 this.posts = response.data.posts;

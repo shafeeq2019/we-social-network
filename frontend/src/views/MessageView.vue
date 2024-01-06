@@ -1,106 +1,164 @@
+/**
+ TODO:
+  - scroll to the end of the chat automatically when open it
+  - delete message Button
+  - dont show empty conversation
+*/ 
+
 <template lang="">
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4" v-if="conversations.length > 0">
         <div class="main-left col-span-1">
-            <div class="bg-white border border-gray-200 rounded-lg text-center p-4">
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between">
+            <div class="bg-white border border-gray-200 rounded-lg text-center shadow-md">
+                <div>
+                    <div class="flex items-center justify-between cursor-pointer pl-4 py-2"
+                        v-for="conversation in conversations" @click="openConversation(conversation)"
+                        :key="conversation.id" :class="{ 'bg-gray-300': activeConversation.id == conversation.id, 
+                        ' shadow-md' : conversation.id == conversations[conversations.length-1].id  ,
+                        'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
                         <div class="flex items-center space-x-2">
                             <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
 
-                            <p class="text-xs"><strong>Sarah</strong></p>
+                            <p class="text-xs font-bold"> {{conversation.users[0].name}} </p>
                         </div>
 
-                        <span class="text-xs text-gray-500">18 minutes ago</span>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
-
-                            <p class="text-xs"><strong>Mary</strong></p>
-                        </div>
-
-                        <span class="text-xs text-gray-500">18 minutes ago</span>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
-
-                            <p class="text-xs"><strong>John</strong></p>
-                        </div>
-
-                        <span class="text-xs text-gray-500">18 minutes ago</span>
+                        <span class="text-xs text-gray-500">{{conversation.modifed_ago}}</span>
                     </div>
                 </div>
             </div>
-
         </div>
-        <div class="main-center col-span-3 space-y-4 ">
-            <div class="bg-white border border-gray-200 rounded-lg ">
+        <div class="main-center col-span-3 space-y-4">
+            <div class="bg-white border border-gray-200 rounded-lg">
                 <div class="flex flex-col flex-grow p-4 h-[calc(100vh-339px)] overflow-auto">
-                    <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
-                        <div>
-                            <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
-                                <p class="text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod.</p>
+                    <template v-for="message in activeConversation.messages" :key="message.id">
+                        <!--sent messages-->
+                        <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end"
+                            v-if="message.created_by.id == userStore.user.id">
+                            <div>
+                                <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
+                                    <p class="text-sm"> {{message.message}}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
                             </div>
-                            <span class="text-xs text-gray-500 leading-none">2 min ago</span>
-                        </div>
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
-                        </div>
-                    </div>
-                    <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
-                        <div>
-                            <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
-                                <p class="text-sm">Lorem ipsum dolor sit amet asfsaf.</p>
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
+                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
                             </div>
-                            <span class="text-xs text-gray-500 leading-none">2 min ago</span>
                         </div>
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
-                        </div>
-                    </div>
-                    <div class="flex w-full mt-2 space-x-3 max-w-md">
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
-                        </div>
-                        <div>
-                            <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
-                                <p class="text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <!--received messages-->
+                        <div class="flex w-full mt-2 space-x-3 max-w-md"
+                            v-if="message.created_by.id != userStore.user.id">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
+                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
                             </div>
-                            <span class="text-xs text-gray-500 leading-none">2 min ago</span>
-                        </div>
-                    </div>
-                    <div class="flex w-full mt-2 space-x-3 max-w-md">
-                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
-                        </div>
-                        <div>
-                            <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
-                                <p class="text-sm">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                    eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <div>
+                                <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
+                                    <p class="text-sm"> {{message.message}}</p>
+                                </div>
+                                <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
                             </div>
-                            <span class="text-xs text-gray-500 leading-none">2 min ago</span>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg">
-                <div class="p-4">
-                    <textarea class="w-full bg-gray-100 rounded-lg p-4 resize-none"
-                        placeholder="What do you want to say?" rows="" cols=""></textarea>
-                </div>
-                <div class="mb-2 border-t border-gray-100 p-4 flex justify-between">
-                    <a href="#" class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Send</a>
-                </div>
+                <form @submit.prevent="submitForm">
+                    <div class="p-4">
+                        <textarea class="w-full bg-gray-100 rounded-lg p-4 resize-none" v-model="messageText"
+                            @keydown.enter.prevent="submitForm" placeholder="What do you want to say?" rows=""
+                            cols=""></textarea>
+                    </div>
+                    <div class="mb-2 border-t border-gray-100 p-4 flex justify-between">
+                        <button href="#"
+                            class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Send</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+    <div v-else class="max-w-lg mx-auto bg-white shadow-md sm:rounded-lg p-6">
+        <div class="text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
+                stroke="currentColor" class="h-40 w-40 text-purple-600 mx-auto ">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                    d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+            </svg>
+            <p class="mt-2 text-xl font-semibold text-gray-700">You don't have any messages</p>
+        </div>
+    </div>
+
 </template>
 <script>
-export default {}
+import axios from 'axios';
+
+import {
+    useUserStore
+} from '@/stores/user';
+export default {
+    props: ['user_id'],
+    setup() {
+        const userStore = useUserStore()
+        return {
+            userStore
+        }
+    },
+    data() {
+        return {
+            conversations: [],
+            activeConversation: {},
+            messageText: ''
+        }
+    },
+    methods: {
+        async getConversationsList() {
+            axios.get('/api/chat/').then(async response => {
+                for (let c of response.data.conversations) {
+                    c.users = c.users.filter(user => {
+                        return user.id != this.userStore.user.id
+                    })
+                }
+                this.conversations = response.data.conversations;
+                if (this.conversations.length > 0 && this.user_id) {
+                    await this.getMessages(this.user_id)
+                } else if (this.conversations.length > 0 && !this.user_id) {
+                    this.activeConversation = this.conversations[0]
+                    await this.openConversation(this.conversations[0])
+                }
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+        async getMessages(user_id) {
+            axios.get(`/api/chat/${user_id}/`).then(response => {
+                this.activeConversation = response.data.conversation
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+        async submitForm() {
+            if (this.messageText.replace(/\s/g, '').length > 0) {
+                axios.post(`/api/chat/${this.activeConversation.id}/message/`, {
+                    message: this.messageText
+                }).then(async response => {
+                    this.messageText = ''
+                    //this.activeConversation.messages.push(response.data.message)
+                    await this.getMessages(this.user_id)
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
+        },
+        async openConversation(conversation) {
+            await this.$router.push({
+                name: 'messages',
+                params: {
+                    user_id: conversation.users[0].id
+                }
+            });
+            await this.getMessages(this.user_id);
+        }
+    },
+    created() {
+        this.getConversationsList()
+    }
+}
 </script>

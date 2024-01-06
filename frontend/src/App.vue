@@ -15,7 +15,7 @@
             </svg>
           </RouterLink>
 
-          <RouterLink to="/messages" active-class="text-purple-700">
+          <RouterLink :to="{ name: 'messages', params: { id: null } }" active-class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"

@@ -2,8 +2,6 @@ from .models import Post, Comment
 from rest_framework import serializers
 from account.serializers import UserSerializer
 from django.utils.timesince import timesince
-from datetime import datetime, timezone
-
 
 # class PostSerializer(serializers.ModelSerializer):
 #     created_by = UserSerializer(read_only=True)

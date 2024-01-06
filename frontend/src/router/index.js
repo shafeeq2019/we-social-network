@@ -27,9 +27,10 @@ const router = createRouter({
       component: FeedView
     },
     {
-      path: '/messages',
+      path: '/messages/:user_id?',
       name: 'messages',
-      component: MessageView
+      component: MessageView,
+      props: true
     },
     {
       path: '/search',
