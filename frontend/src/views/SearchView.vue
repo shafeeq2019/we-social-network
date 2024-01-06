@@ -24,7 +24,7 @@
                         <p><strong>{{user.name}}</strong></p>
                         <div class="mt-6 flex space-x-8 justify-around">
                             <p class="text-xs text-gray-500">{{user.friends_count}} friends</p>
-                            <p class="text-xs text-gray-500">120 posts</p>
+                            <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
                         </div>
                     </div>
                 </router-link>
@@ -41,37 +41,38 @@
     </div>
 </template>
 <script>
-    import axios from 'axios';
-    import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-    import Trends from '../components/Trends.vue'
-    import FeedItem from '../components/FeedItem.vue';
-    export default {
-        components: {
-            PeopleYouMayKnow,
-            Trends,
-            FeedItem
-        },
-        data() {
-            return {
-                query: '',
-                users: [],
-                posts: []
-            }
-        },
-        methods: {
-            submitForm() {
-                axios.post('api/search/', {
-                    query: this.query
-                }).then(response => {
-                    console.log(response.data)
-                    this.users = response.data.users;
-                    this.posts = response.data.posts
-                }).catch(e => {
-                    console.log("error", e);
-                })
-            }
+import axios from 'axios';
+import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+import Trends from '../components/Trends.vue'
+import FeedItem from '../components/FeedItem.vue';
+
+export default {
+    components: {
+        PeopleYouMayKnow,
+        Trends,
+        FeedItem
+    },
+    data() {
+        return {
+            query: '',
+            users: [],
+            posts: []
+        }
+    },
+    methods: {
+        submitForm() {
+            axios.post('api/search/', {
+                query: this.query
+            }).then(response => {
+                console.log(response.data)
+                this.users = response.data.users;
+                this.posts = response.data.posts
+            }).catch(e => {
+                console.log("error", e);
+            })
         }
     }
+}
 </script>
 <style lang="">
 

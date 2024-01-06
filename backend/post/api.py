@@ -33,6 +33,7 @@ def post_list(request):
 @api_view(['POST'])
 def post_create(request):
     data = request.data
+    user = request.user
 
     form = PostForm({
         'body': data.get('body'),
@@ -41,12 +42,12 @@ def post_create(request):
 
     if form.is_valid():
         post = form.save()
-        print(post)
+        user.posts_count += 1
+        user.save()
         serializer = PostSerializer(post)
         return JsonResponse(serializer.data, safe=False)
     else:
         message = form.errors.as_json()
-        print(message)
         return JsonResponse({'error': message})
 
 

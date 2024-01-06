@@ -37,8 +37,7 @@ def conversation_send_message(request, covnersation_id):
 
 @api_view(['GET'])
 def conversation_get_or_create(request, user_id):
-    from django.db.models import Q
-
+    
     request_user = request.user
     message_user = User.objects.get(id=user_id)
 

@@ -10,7 +10,7 @@
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
                     <p class="text-xs text-gray-500">{{user.friends_count}} friends</p>
-                    <p class="text-xs text-gray-500">120 posts</p>
+                    <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
                             <div class="mt-6 flex space-x-8 justify-around">
                                 <p class="text-xs text-gray-500">182 friends</p>
-                                <p class="text-xs text-gray-500">120 posts</p>
+                                <p class="text-xs text-gray-500">{{friendshipRequest.created_by.posts_count}} posts</p>
                             </div>
                         </router-link>
                         <div class="mt-6 space-y-2 grid grid-rows-2">
@@ -55,7 +55,7 @@
                             <p><strong>{{friend.name}}</strong></p>
                             <div class="mt-6 flex space-x-8 justify-around">
                                 <p class="text-xs text-gray-500">{{friend.friends_count}} friends</p>
-                                <p class="text-xs text-gray-500">120 posts</p>
+                                <p class="text-xs text-gray-500">{{friend.posts_count}} posts</p>
                             </div>
                         </router-link>
                     </div>

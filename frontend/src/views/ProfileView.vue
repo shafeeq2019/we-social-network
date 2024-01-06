@@ -1,3 +1,8 @@
+/**
+ TODO:
+  - update posts count without refreshing the page when posting a new post
+*/ 
+
 <template lang="">
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- User on the left -->
@@ -11,7 +16,7 @@
                 <div class="mt-6 flex space-x-8 justify-around">
                     <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">
                         {{user.friends_count}} friends</router-link>
-                    <p class="text-xs text-gray-500">120 posts</p>
+                    <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
                 </div>
 
                 <div class="mt-6 space-y-2">
