@@ -76,7 +76,7 @@
             </div>
         </div>
     </div>
-    <div v-else class="max-w-lg mx-auto bg-white shadow-md sm:rounded-lg p-6">
+    <div v-else-if="!loading" class="max-w-lg mx-auto bg-white shadow-md sm:rounded-lg p-6">
         <div class="text-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                 stroke="currentColor" class="h-40 w-40 text-purple-600 mx-auto ">
@@ -99,7 +99,8 @@ export default {
     setup() {
         const userStore = useUserStore()
         return {
-            userStore
+            userStore,
+            loading: true
         }
     },
     data() {
@@ -124,8 +125,10 @@ export default {
                     this.activeConversation = this.conversations[0]
                     await this.openConversation(this.conversations[0])
                 }
+                this.loading = false;
             }).catch(error => {
-                console.log(error)
+                this.loading = false;
+                console.log(error);
             })
         },
         async getMessages(user_id) {
