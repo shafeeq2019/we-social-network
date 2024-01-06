@@ -3,6 +3,7 @@
   - scroll to the end of the chat automatically when open it
   - delete message Button
   - dont show empty conversation
+  - real time messaging
 */ 
 
 <template lang="">
