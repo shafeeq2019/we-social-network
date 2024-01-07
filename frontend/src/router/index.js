@@ -7,6 +7,7 @@ import SearchView from '../views/SearchView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import FriendsView from '../views/FriendsView.vue'
 import PostView from '../views/PostView.vue'
+import TrendsView from '../views/TrendsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +52,12 @@ const router = createRouter({
       path: '/:id',
       name: 'postview',
       component: PostView
+    },
+    {
+      path: '/trends/:hashtag',
+      name: 'TrendsView',
+      component: TrendsView,
+      props: true
     },
     {
       path: '/about',

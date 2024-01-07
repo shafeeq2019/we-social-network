@@ -13,18 +13,25 @@ from .forms import PostForm
 
 @api_view(['GET'])
 def post_list(request):
-    user_friends = request.user.friends.all()
-    query = Q()
+    posts = []
+    trend = request.GET.get('trend', '')
+    if (trend):
+        posts = Post.objects.filter(body__icontains='#'+trend)
+    else:
+        user_friends = request.user.friends.all()
+        query = Q()
 
-    # Add user's friends in the query
-    for friend in user_friends:
-        query |= Q(created_by=friend)
-    # Add request user in the query
-    query |= Q(created_by=request.user)
+        # Add user's friends in the query
+        for friend in user_friends:
+            query |= Q(created_by=friend)
+        # Add request user in the query
+        query |= Q(created_by=request.user)
 
-    posts = Post.objects.filter(query)
+        posts = Post.objects.filter(query)
+
     for post in posts:
         post.post_liked = post.likes.filter(created_by=request.user).exists()
+        
     serializer = PostSerializer(posts, many=True, show_created_by=True)
 
     return JsonResponse({'data': serializer.data})
@@ -107,5 +114,4 @@ def post_create_comment(request, post_id):
 @api_view(['GET'])
 def get_trends(request):
     trends = Trend.objects.all()
-    print(trends)
     return JsonResponse(TrendSerializer(trends, many=True).data, safe=False)

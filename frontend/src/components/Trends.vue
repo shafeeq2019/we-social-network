@@ -1,3 +1,8 @@
+/**
+ TODO:
+  - update the posts count when adding a new post to a trend
+*/ 
+
 <template lang="">
     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md">
         <h3 class="mb-6 text-xl">Trends</h3>
@@ -7,7 +12,7 @@
                     <strong>#{{trend.hashtag}}</strong><br>
                     <span class="text-gray-500">{{trend.occurences}} posts</span>
                 </p>
-                <a href="#" class="py-2 px-3 bg-purple-600 text-white text-xs rounded-lg">Explore</a>
+                <router-link :to="{ name: 'TrendsView', params: { 'hashtag': trend.hashtag } }" class="py-2 px-3 bg-purple-600 text-white text-xs rounded-lg">Explore</router-link>
             </div>
         </div>
     </div>
