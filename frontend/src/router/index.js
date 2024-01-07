@@ -55,7 +55,7 @@ const router = createRouter({
     },
     {
       path: '/trends/:hashtag',
-      name: 'TrendsView',
+      name: 'trendsview',
       component: TrendsView,
       props: true
     },

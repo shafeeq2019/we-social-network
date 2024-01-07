@@ -12,7 +12,7 @@
                     <strong>#{{trend.hashtag}}</strong><br>
                     <span class="text-gray-500">{{trend.occurences}} posts</span>
                 </p>
-                <router-link :to="{ name: 'TrendsView', params: { 'hashtag': trend.hashtag } }" class="py-2 px-3 bg-purple-600 text-white text-xs rounded-lg">Explore</router-link>
+                <router-link :to="{ name: 'trendsview', params: { 'hashtag': trend.hashtag } }" class="py-2 px-3 bg-purple-600 text-white text-xs rounded-lg">Explore</router-link>
             </div>
         </div>
     </div>
@@ -30,7 +30,6 @@ export default {
         getTrends() {
             axios.get('/api/post/trends/')
                 .then(response => {
-                    console.log(response)
                     this.trends = response.data
                 }).catch(error => {
                     console.log(error)
