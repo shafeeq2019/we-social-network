@@ -1,4 +1,4 @@
-from .models import Post, Comment
+from .models import Post, Comment, Trend
 from rest_framework import serializers
 from account.serializers import UserSerializer
 from django.utils.timesince import timesince
@@ -49,3 +49,9 @@ class PostDetailSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'body', 'created_at', 'created_ago', 'created_by',
                   'likes_count', 'post_liked', 'comments_count', 'comments']
+
+
+class TrendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Trend
+        fields = ['id', 'hashtag', 'occurences']

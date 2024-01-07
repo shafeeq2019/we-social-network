@@ -47,7 +47,7 @@ class Post(models.Model):
 
     def add_comment(self, user, comment):
         Comment.objects.create(created_by=user, post=self, comment=comment)
-        self.comments_count +=1
+        self.comments_count += 1
         self.save()
         return 'post commented successfully'
 
@@ -75,6 +75,12 @@ class Comment(models.Model):
 
     def created_ago(self):
         return timesince(self.created_at)
-    
+
     class Meta:
         ordering = ('created_at',)
+
+
+class Trend(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    hashtag = models.CharField(max_length=255)
+    occurences = models.IntegerField()
