@@ -16,7 +16,7 @@ def post_list(request):
     posts = []
     trend = request.GET.get('trend', '')
     if (trend):
-        posts = Post.objects.filter(body__icontains='#'+trend)
+        posts = Post.objects.filter(body__iregex=f'\B#{trend}')
     else:
         user_friends = request.user.friends.all()
         query = Q()
@@ -31,7 +31,7 @@ def post_list(request):
 
     for post in posts:
         post.post_liked = post.likes.filter(created_by=request.user).exists()
-        
+
     serializer = PostSerializer(posts, many=True, show_created_by=True)
 
     return JsonResponse({'data': serializer.data})

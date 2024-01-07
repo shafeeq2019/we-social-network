@@ -13,7 +13,7 @@
             <p class="text-gray-600">{{ /^0\s+minutes$/.test(post.created_ago) ? 'Just now' : post.created_ago}}</p>
         </div>
 
-        <p> {{post.body}} </p>
+        <p v-html="formatHashtags(post.body)">  </p>
 
         <div class="my-6 flex justify-between">
             <div class="flex space-x-6"> 
@@ -72,6 +72,11 @@ export default {
             }).catch(e => {
                 console.log(e)
             })
+        },
+        formatHashtags(text) {
+            const escapeHTML = text => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            const escapedText = escapeHTML(text);
+            return escapedText.replace(/\B#(\w+)/g, '<a class="text-blue-700" href="/trends/$1">#$1</a>');
         }
     },
     created() {
