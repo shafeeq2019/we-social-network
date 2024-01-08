@@ -2,7 +2,7 @@
     <div class="mb-6 flex items-center justify-between">
         <router-link :to="{ name: 'profile', params: { 'id': comment.created_by.id } }">
             <div class="flex items-center space-x-3">
-                <img src="https://i.pravatar.cc/300?img=47" class="w-[40px] rounded-full">
+                <img :src="comment.created_by.avatar_link" class="w-[40px] h-[39px] rounded-full">
 
                 <p><strong>{{comment.created_by.name}}</strong></p>
             </div>

@@ -33,7 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255, blank=True, default='', null=True)
-    avatar = models.ImageField(upload_to='avatars', blank=True, null=True)
+    avatar = models.ImageField(upload_to='avatars', blank=True, null=True, default='avatars/default-user-icon.png')
     friends = models.ManyToManyField('self')
     friends_count = models.IntegerField(default=0)
     posts_count = models.IntegerField(default=0)
@@ -50,6 +50,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+    def avatar_link(self):
+        if self.avatar:
+            return 'http://127.0.0.1:8000' + self.avatar.url
+        else:
+            return ''
 
 
 class FriendshipRequest(models.Model):

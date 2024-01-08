@@ -4,7 +4,7 @@
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
                 <div class="flex items-center justify-center">
-                    <img src="https://i.pravatar.cc/200?img=57" class="mb-6 rounded-full" />
+                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full" />
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
@@ -22,7 +22,7 @@
                     <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
                         v-for="friendshipRequest in friendshipRequests">
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
-                            <img src="https://i.pravatar.cc/300?img=70" class="mb-6 mx-auto rounded-full">
+                            <img :src="friendshipRequest.created_by.avatar_link" class="mb-6 mx-auto rounded-full w-40 h-40">
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
                             <div class="mt-6 flex space-x-8 justify-around">
                                 <p class="text-xs text-gray-500">182 friends</p>
@@ -51,7 +51,7 @@
                     <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
                         v-for="friend in friends">
                         <router-link :to="{ name: 'profile', params: { 'id': friend.id } }">
-                            <img src="https://i.pravatar.cc/300?img=70" class="mb-6 mx-auto rounded-full">
+                            <img :src="friend.avatar_link" class="mb-6 mx-auto rounded-full w-40 h-40">
                             <p><strong>{{friend.name}}</strong></p>
                             <div class="mt-6 flex space-x-8 justify-around">
                                 <p class="text-xs text-gray-500">{{friend.friends_count}} friends</p>

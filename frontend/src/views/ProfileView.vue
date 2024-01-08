@@ -8,29 +8,32 @@
         <!-- User on the left -->
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-                <div class="flex items-center justify-center">
-                    <img src="https://i.pravatar.cc/200?img=57" class="mb-6 rounded-full" />
+                <div class="flex items-center justify-center"> 
+                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full"/>
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <router-link :to="{name:'friends', params:{id: user.id} }" class="text-xs text-gray-500">
+                    <router-link :to="{name:'friends', params:{id: user.id}}" class="text-xs text-gray-500">
                         {{user.friends_count}} friends</router-link>
                     <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
                 </div>
 
                 <div class="mt-6 space-y-2">
+                    <router-link v-if="user.id == userStore.user.id" :to="{name:'editprofile'}"
+                        class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full">
+                        Edit profile
+                    </router-link>
                     <button v-if="user.id != userStore.user.id && can_send_friendship_request"
-                        class="inline-block py-2 px-1 bg-purple-600 text-white rounded-md text-xs w-full"
+                        class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full"
                         @click="sendFriendshipRequest"> Send friendship request</button>
                     <button v-if="user.id != userStore.user.id"
-                        class="inline-block py-2 px-1 bg-purple-600 text-white rounded-md text-xs w-full"
+                        class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full"
                         @click="sendDirectMessage"> Send direct message</button>
                     <button v-if="userStore.user.id && user.id == userStore.user.id"
-                        class="inline-block py-2 px-1 bg-red-600 text-white rounded-md text-xs w-full" @click="logout">
+                        class="inline-block p-1 bg-red-600 text-white rounded-md text-xs w-full" @click="logout">
                         Logut
                     </button>
-
                 </div>
             </div>
         </div>

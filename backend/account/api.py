@@ -1,9 +1,12 @@
 from django.http import JsonResponse
 # To override the settings in setting.py
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from .forms import SignupForm
+from .forms import SignupForm, EditProfileForm
 from .models import FriendshipRequest, User
 from .serializers import UserSerializer, FriendshipRequestSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -11,7 +14,8 @@ def me(request):
     return JsonResponse({
         'id': request.user.id,
         'name': request.user.name,
-        'email': request.user.email
+        'email': request.user.email,
+        'avatar_link': request.user.avatar_link()
     })
 
 
@@ -92,3 +96,24 @@ def handle_request(request, friendshipRequestId, status):
         request_user.save()
 
     return JsonResponse({'message': "friendship request updated"})
+
+
+@api_view(['POST'])
+def edit_profile(request):
+    user = request.user
+    data = request.data
+    response = {'message': 'success'}
+
+    form = EditProfileForm(data, request.FILES, instance=user)
+
+    if form.is_valid():
+        user = form.save()
+        updated_user = User.objects.get(id=user.id)
+        response['updated_user'] = UserSerializer(updated_user).data
+        logger.info(f"Profile edited successfully for user {user.id}")
+    else:
+        response['message'] = form.errors.as_json()
+        logger.error(f"Error editing profile for user {
+                     user.id}: {response['message']}")
+
+    return JsonResponse(response)

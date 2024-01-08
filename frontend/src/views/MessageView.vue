@@ -17,7 +17,7 @@
                         ' shadow-md' : conversation.id == conversations[conversations.length-1].id  ,
                         'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
                         <div class="flex items-center space-x-2">
-                            <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
+                            <img :src="conversation.users[0].avatar_link" class="w-[40px] rounded-full">
 
                             <p class="text-xs font-bold"> {{conversation.users[0].name}} </p>
                         </div>
@@ -41,14 +41,14 @@
                                 <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
                             </div>
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
+                                <img :src="message.created_by.avatar_link" class="w-[40px] rounded-full">
                             </div>
                         </div>
                         <!--received messages-->
                         <div class="flex w-full mt-2 space-x-3 max-w-md"
                             v-if="message.created_by.id != userStore.user.id">
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
+                                <img :src="message.created_by.avatar_link" class="w-[40px] rounded-full">
                             </div>
                             <div>
                                 <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">

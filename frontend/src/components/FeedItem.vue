@@ -4,7 +4,7 @@
         <div class="mb-6 flex items-center justify-between">
             <router-link :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
                 <div class="flex items-center space-x-3">
-                    <img src="https://i.pravatar.cc/300?img=47" class="w-[40px] rounded-full">
+                    <img :src="post.created_by.avatar_link ? post.created_by.avatar_link : user.avatar_link" class="w-[40px] h-[39px] rounded-full">
 
                     <p><strong>{{post.created_by.name ? post.created_by.name : user.name }}</strong></p>
                 </div>
