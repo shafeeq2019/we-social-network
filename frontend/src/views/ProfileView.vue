@@ -1,8 +1,3 @@
-/**
- TODO:
-  - update posts count without refreshing the page when posting a new post
-*/ 
-
 <template lang="">
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- User on the left -->
@@ -134,6 +129,7 @@ export default {
             }).then(response => {
                 this.body = '';
                 this.posts = [response.data, ...this.posts];
+                this.user.posts_count += 1;
             }).catch(error => {
                 console.log(error);
             })
