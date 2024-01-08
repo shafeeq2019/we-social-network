@@ -45,7 +45,6 @@
 
 <script>
 import axios from 'axios'
-import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 
 export default {
@@ -67,6 +66,7 @@ export default {
     },
     methods: {
         async submitForm() {
+            this.errors = [];
             if (this.form.email === '') {
                 this.errors.push('Your e-mail is missing')
             }
@@ -75,25 +75,25 @@ export default {
                 this.errors.push('Your password is missing')
             }
 
-
             if (this.errors.length === 0) {
                 await axios.post('/api/login/', this.form)
-                    .then(response => {
-                        console.log(response)
+                    .then(async response => {
                         this.userStore.setToken(response.data)
                         axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
+
+                        await axios.get("/api/me/")
+                            .then(response => {
+                                this.userStore.setUserInfo(response.data);
+                                this.$router.push('/feed');
+                            }).catch(error => {
+                                throw error;
+                            })
                     })
                     .catch(error => {
-                        console.log('error', error)
+                        console.log('error', error);
+                        this.errors.push('The email or password is incorrect');
                     })
 
-                await axios.get("/api/me/")
-                    .then(response => {
-                        this.userStore.setUserInfo(response.data);
-                        this.$router.push('/feed');
-                    }).catch(error => {
-                        console.log('error', error)
-                    })
             }
         }
     }
