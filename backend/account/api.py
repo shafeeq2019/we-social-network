@@ -1,7 +1,10 @@
+from django.contrib.auth import authenticate
 from django.http import JsonResponse
 # To override the settings in setting.py
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .forms import SignupForm, EditProfileForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from .models import FriendshipRequest, User
 from .serializers import UserSerializer, FriendshipRequestSerializer
 import logging
@@ -117,3 +120,17 @@ def edit_profile(request):
                      user.id}: {response['message']}")
 
     return JsonResponse(response)
+
+
+@api_view(['POST'])
+def edit_password(request):
+    user = request.user
+    form = PasswordChangeForm(request.user, request.data)
+    if form.is_valid():
+        user = form.save()
+        update_session_auth_hash(request, user)  # Important!
+        return JsonResponse({"message": "success"})
+    else:
+        message = form.errors.as_json()
+        print(message)
+        return JsonResponse({'message': message}, safe=False)

@@ -1,14 +1,16 @@
+/**
+TODOS:
+    - Error handling for Sing up and change password
+ */
 <template>
     <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
         <div class="main-left col-span-1">
             <div class="p-12 bg-white border border-gray-200 rounded-lg">
-                <h1 class="mb-6 text-2xl">Edit profile</h1>
+                <h1 class="mb-6 text-2xl">Edit password</h1>
 
                 <p class="mb-6 text-gray-500">
-                    Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
-                    Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
+                    Here you can change your password
                 </p>
-                <router-link to="/profile/edit/password" class="underline"> Edit password</router-link>
             </div>
         </div>
 
@@ -16,20 +18,24 @@
             <div class="p-12 bg-white border border-gray-200 rounded-lg">
                 <form class="space-y-6" v-on:submit.prevent="submitForm">
                     <div>
-                        <label>Name</label><br>
-                        <input type="text" v-model="form.name" placeholder="Your full name"
+                        <label>Old password</label><br>
+                        <input type="password" v-model="form.old_password" placeholder="Your old password"
+                            class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                    </div>
+
+
+                    <div>
+                        <label>New password</label><br>
+                        <input type="password" v-model="form.new_password1" placeholder="Enter your new password"
                             class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
                     <div>
-                        <label>E-mail</label><br>
-                        <input type="email" v-model="form.email" placeholder="Your e-mail address"
+                        <label>Repeat new password</label><br>
+                        <input type="password" v-model="form.new_password2" placeholder="Repeat your new password"
                             class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
-                    <div>
-                        <label>ِAvatar</label><br>
-                        <input type="file" ref="file" accept="image/*">
-                    </div>
+
                     <template v-if="errors.length > 0">
                         <div class="bg-red-300 text-white rounded-lg p-6">
                             <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
@@ -63,9 +69,9 @@ export default {
     data() {
         return {
             form: {
-                email: this.userStore.user.email,
-                name: this.userStore.user.name,
-                avatar: null
+                old_password: '',
+                new_password1: '',
+                new_password2: ''
             },
             errors: [],
         }
@@ -74,31 +80,17 @@ export default {
         submitForm() {
             this.errors = []
 
-            if (this.form.email === '') {
-                this.errors.push('Your e-mail is missing')
+            if (this.form.password1 !== this.form.password2) {
+                this.errors.push('The password does not match')
             }
 
-            if (this.form.name === '') {
-                this.errors.push('Your name is missing')
-            }
             if (this.errors.length === 0) {
-                let formData = new FormData()
-                formData.append("avatar", this.$refs.file.files[0])
-                formData.append("email", this.form.email)
-                formData.append("name", this.form.name)
                 axios
-                    .post('/api/editprofile/', formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data"
-                        }
-                    })
+                    .post('/api/editpassword/',this.form)
                     .then(response => {
                         if (response.data.message === 'success') {
-                            this.toastStore.showToast(5000, 'The information was saved.', 'bg-emerald-500')
-                            this.userStore.setUserInfo(response.data.updated_user);
-                            this.form.email = this.userStore.user.email
-                            this.form.name = this.userStore.user.name
-                            this.$router.back()
+                            this.toastStore.showToast(5000, 'Your password was successfully updated!', 'bg-emerald-500')
+                            this.$router.push(`/profile/${this.userStore.user.id}`)
                         } else {
                             const data = JSON.parse(response.data.message)
                             for (const key in data) {
