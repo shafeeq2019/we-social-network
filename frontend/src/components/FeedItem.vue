@@ -52,11 +52,22 @@
         </div>
     </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
-export default {
+import { Post } from '../interfaces.ts'
+import { defineProps } from 'vue';
+import type { PropType } from 'vue'
+
+export default defineComponent({
+    setup() {
+
+    },
     props: {
-        post: Object,
+        post: {
+            type: Object as PropType<Post>,
+            required: true
+        },
         user: Object
     },
     methods: {
@@ -73,15 +84,16 @@ export default {
                 console.log(e)
             })
         },
-        formatHashtags(text) {
-            const escapeHTML = text => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        formatHashtags(text: string): string {
+            const escapeHTML = (text: string) => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const escapedText = escapeHTML(text);
             return escapedText.replace(/\B#(\w+)/g, '<a class="text-blue-700" href="/trends/$1">#$1</a>');
         }
     },
     created() {
+
     }
-}
+})
 </script>
 <style lang="">
 

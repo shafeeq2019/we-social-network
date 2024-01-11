@@ -61,7 +61,8 @@
 
     </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
@@ -72,8 +73,9 @@ import FeedItem from '../components/FeedItem.vue'
 import {
     useToastStore
 } from "@/stores/toast";
+import { User } from '../interfaces';
 
-export default {
+export default defineComponent({
     async beforeRouteUpdate(to, from) {
         // react to route changes...
         await this.getFeeds(to.params.id);
@@ -93,8 +95,8 @@ export default {
     },
     data() {
         return {
-            posts: [],
-            user: {},
+            posts: [] as object[],
+            user: {} as User,
             body: '',
             can_send_friendship_request: false
         }
@@ -114,7 +116,7 @@ export default {
                 console.log(error);
             })
         },
-        async getFeeds(userId) {
+        async getFeeds(userId: string | string[]) {
             await axios.get(`/api/post/profile/${userId}/`).then(response => {
                 this.posts = response.data.posts;
                 this.user = response.data.user
@@ -152,6 +154,6 @@ export default {
     created() {
         this.getFeeds(this.$route.params.id);
     }
-};
+});
 </script>
 <style lang=""></style>

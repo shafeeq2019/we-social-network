@@ -30,17 +30,18 @@
 
     </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import CommentItem from '../components/CommentItem.vue'
 
-export default {
+export default defineComponent({
     async beforeRouteUpdate(to, from) {
         // react to route changes...
-        await this.getPost(to.params.id);
+        await this.getPost();
     },
     components: {
         PeopleYouMayKnow,
@@ -79,6 +80,6 @@ export default {
     created() {
         this.getPost()
     }
-};
+});
 </script>
 <style lang=""></style>

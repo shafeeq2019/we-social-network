@@ -72,7 +72,8 @@
 
     </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
@@ -85,7 +86,7 @@ import {
     watch,
     onMounted
 } from 'vue';
-export default {
+export default defineComponent({
     async beforeRouteUpdate(to, from) {
         // react to route changes...
     },
@@ -117,7 +118,7 @@ export default {
                 console.log(error);
             })
         },
-        async handleRequest(status, friendshipRequestId) {
+        async handleRequest(status: string, friendshipRequestId: string) {
             axios.post(`/api/friends/${friendshipRequestId}/${status}/`).then(
                 async response => await this.getFriends()
             ).catch(error => {
@@ -129,6 +130,6 @@ export default {
     created() {
         this.getFriends()
     }
-};
+});
 </script>
 <style lang=""></style>

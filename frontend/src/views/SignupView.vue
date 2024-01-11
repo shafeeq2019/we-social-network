@@ -58,11 +58,12 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios'
 import { useToastStore } from '@/stores/toast'
 
-export default {
+export default defineComponent({
     setup() {
         const toastStore = useToastStore()
 
@@ -79,7 +80,7 @@ export default {
                 password1: '',
                 password2: ''
             },
-            errors: [],
+            errors: [] as string[],
         }
     },
 
@@ -129,5 +130,5 @@ export default {
             }
         }
     }
-}
+})
 </script>

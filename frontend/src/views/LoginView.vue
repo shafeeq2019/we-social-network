@@ -43,11 +43,11 @@
         </div>
 </template>
 
-<script>
+<script lang="ts">
 import axios from 'axios'
 import { useUserStore } from '@/stores/user'
-
-export default {
+import { defineComponent } from 'vue'
+export default defineComponent({
     setup() {
         const userStore = useUserStore();
         return {
@@ -57,11 +57,11 @@ export default {
     data() {
         return {
             form: {
-                email: "",
-                password: "",
+                email: "" as string,
+                password: "" as string,
 
             },
-            errors: []
+            errors: [] as string[]
         }
     },
     methods: {
@@ -97,7 +97,7 @@ export default {
             }
         }
     }
-}
+})
 </script>
 <style lang="">
 

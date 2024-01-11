@@ -18,38 +18,39 @@
 
     </div>
 </template>
-<script>
-    import axios from 'axios';
-    import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-    import Trends from '../components/Trends.vue'
-    import FeedItem from '../components/FeedItem.vue'
-    export default {
-        props: ['hashtag'],
-        async beforeRouteUpdate(to, from) {
-            await this.getFeeds(to.params.hashtag);
-        },
-        components: {
-            PeopleYouMayKnow,
-            Trends,
-            FeedItem
-        },
-        data() {
-            return {
-                posts: []
-            }
-        },
-        methods: {
-            async getFeeds(hashtag) {
-                await axios.get(`/api/post?trend=${hashtag}`).then(response => {
-                    this.posts = response.data.data;
-                }).catch(error => {
-                    console.log(error);
-                })
-            },
-        },
-        created() {
-            this.getFeeds(this.hashtag)
+<script lang="ts">
+import { defineComponent } from 'vue'
+import axios from 'axios';
+import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
+import Trends from '../components/Trends.vue'
+import FeedItem from '../components/FeedItem.vue'
+export default defineComponent({
+    props: ['hashtag'],
+    async beforeRouteUpdate(to, from) {
+        await this.getFeeds(to.params.hashtag);
+    },
+    components: {
+        PeopleYouMayKnow,
+        Trends,
+        FeedItem
+    },
+    data() {
+        return {
+            posts: []
         }
-    };
+    },
+    methods: {
+        async getFeeds(hashtag: string | string[]) {
+            await axios.get(`/api/post?trend=${hashtag}`).then(response => {
+                this.posts = response.data.data;
+            }).catch(error => {
+                console.log(error);
+            })
+        },
+    },
+    created() {
+        this.getFeeds(this.hashtag)
+    }
+});
 </script>
 <style lang=""></style>

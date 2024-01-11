@@ -6,7 +6,8 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { defineComponent } from 'vue'
 // This is a composition API Component
 import { useToastStore } from '@/stores/toast'
 

@@ -17,10 +17,11 @@
         </div>
     </div>
 </template>
-<script>
+<script  lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
 
-export default {
+export default defineComponent({
     data() {
         return {
             trends: []
@@ -40,5 +41,5 @@ export default {
     created() {
         this.getTrends()
     }
-}
+}) 
 </script>

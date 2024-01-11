@@ -12,7 +12,8 @@
     </div>
     <p> {{ comment.comment}} </p>
 </template>
-<script>
+<script  lang="ts">
+import { defineComponent } from 'vue'
     export default {
         props: {
             comment: Object

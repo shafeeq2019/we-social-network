@@ -11,8 +11,8 @@ export const useToastStore = defineStore({
     }),
 
     actions: {
-        showToast(ms, message, classes) {
-            this.ms = parseInt(ms)
+        showToast(ms: number, message: string, classes: string) {
+            this.ms = ms
             this.message = message
             this.classes = classes
             this.isVisible = true

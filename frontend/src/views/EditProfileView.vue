@@ -35,7 +35,6 @@
                             <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
                         </div>
                     </template>
-
                     <div>
                         <button class="py-4 px-6 bg-purple-600 text-white rounded-lg">Save changes</button>
                     </div>
@@ -45,29 +44,30 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
+import { mapState } from 'pinia'
 
-export default {
+export default defineComponent({
     setup() {
         const toastStore = useToastStore()
         const userStore = useUserStore()
-
         return {
             toastStore,
-            userStore
+            userStore,
         }
     },
     data() {
         return {
             form: {
-                email: this.userStore.user.email,
-                name: this.userStore.user.name,
+                name: "",
+                email: "",
                 avatar: null
             },
-            errors: [],
+            errors: [] as string[],
         }
     },
     methods: {
@@ -83,7 +83,7 @@ export default {
             }
             if (this.errors.length === 0) {
                 let formData = new FormData()
-                formData.append("avatar", this.$refs.file.files[0])
+                formData.append("avatar", (this.$refs.file as any).files[0])
                 formData.append("email", this.form.email)
                 formData.append("name", this.form.name)
                 axios
@@ -113,6 +113,11 @@ export default {
             }
         }
 
+    },
+    created() {
+        this.form.name = this.userStore.user.name;
+        this.form.email = this.userStore.user.email;
+
     }
-}
+}) 
 </script>

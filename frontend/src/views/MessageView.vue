@@ -88,13 +88,15 @@
     </div>
 
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
-
 import {
     useUserStore
 } from '@/stores/user';
-export default {
+import { Conversation, User } from '../interfaces';
+
+export default defineComponent({
     props: ['user_id'],
     setup() {
         const userStore = useUserStore()
@@ -105,8 +107,8 @@ export default {
     },
     data() {
         return {
-            conversations: [],
-            activeConversation: {},
+            conversations: [] as Conversation[],
+            activeConversation: {} as Conversation,
             messageText: ''
         }
     },
@@ -114,7 +116,7 @@ export default {
         async getConversationsList() {
             axios.get('/api/chat/').then(async response => {
                 for (let c of response.data.conversations) {
-                    c.users = c.users.filter(user => {
+                    c.users = c.users.filter((user: User) => {
                         return user.id != this.userStore.user.id
                     })
                 }
@@ -131,7 +133,7 @@ export default {
                 console.log(error);
             })
         },
-        async getMessages(user_id) {
+        async getMessages(user_id: string) {
             axios.get(`/api/chat/${user_id}/`).then(response => {
                 this.activeConversation = response.data.conversation
             }).catch(error => {
@@ -151,7 +153,7 @@ export default {
                 })
             }
         },
-        async openConversation(conversation) {
+        async openConversation(conversation: Conversation) {
             await this.$router.push({
                 name: 'messages',
                 params: {
@@ -164,5 +166,5 @@ export default {
     created() {
         this.getConversationsList()
     }
-}
-</script>
+})
+</script>../interfaces
