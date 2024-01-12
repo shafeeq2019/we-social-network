@@ -27,8 +27,10 @@
                             class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
                     <div>
-                        <label>ِAvatar</label><br>
-                        <input type="file" ref="file" accept="image/*">
+                        <label class="" for="file-input">Avatar</label>
+                        <input
+                            class="block w-full text-gray-900 border border-gray-200 rounded-lg cursor-pointer mt-2 py-4 px-6"
+                            type="file" ref="file" id="file-input">
                     </div>
                     <template v-if="errors.length > 0">
                         <div class="bg-red-300 text-white rounded-lg p-6">
@@ -121,3 +123,6 @@ export default defineComponent({
     }
 }) 
 </script>
+<style>
+
+</style>
