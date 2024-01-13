@@ -15,6 +15,8 @@
 
         <p v-html="formatHashtags(post.body)">  </p>
 
+        <img :src="post.post_attachments[0].image_link" :key="post.post_attachments[0].id" class="w-full rounded-lg mt-4" v-if="post.post_attachments.length > 0">
+
         <div class="my-6 flex justify-between">
             <div class="flex space-x-6"> 
                 <div class="flex items-center space-x-2">
@@ -56,7 +58,6 @@
 import { defineComponent } from 'vue'
 import axios from 'axios';
 import { Post } from '../interfaces.ts'
-import { defineProps } from 'vue';
 import type { PropType } from 'vue'
 
 export default defineComponent({

@@ -64,8 +64,7 @@ export default defineComponent({
         return {
             form: {
                 name: "",
-                email: "",
-                avatar: null
+                email: ""
             },
             errors: [] as string[],
         }

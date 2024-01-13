@@ -3,8 +3,8 @@
         <!-- User on the left -->
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-                <div class="flex items-center justify-center"> 
-                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full"/>
+                <div class="flex items-center justify-center">
+                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full" />
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
@@ -34,22 +34,7 @@
         </div>
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-2 space-y-4">
-            <form method="post" @submit.prevent="submitForm" v-if="userStore.user.id == user.id">
-                <div class="bg-white border border-gray-200 rounded-lg">
-                    <div class="p-4">
-                        <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"
-                            v-model="body"></textarea>
-                    </div>
-
-                    <div class="p-4 border-t border-gray-100 flex justify-between">
-                        <button href="#" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">Attach
-                            image</button>
-                        <button type="submit"
-                            class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</button>
-                    </div>
-                </div>
-            </form>
-
+            <FeedForm :user="user" v-if="userStore.user.id == user.id"  @getFeeds-event="getFeeds($route.params.id)"/>
             <FeedItem v-for="post in posts" :user="user" :post="post" :key="post.id" />
         </div>
 
@@ -61,19 +46,17 @@
 
     </div>
 </template>
+
 <script lang="ts">
 import { defineComponent } from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
-import {
-    useUserStore
-} from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import FeedItem from '../components/FeedItem.vue'
-import {
-    useToastStore
-} from "@/stores/toast";
+import { useToastStore } from "@/stores/toast";
 import { User } from '../interfaces';
+import FeedForm from '@/components/FeedForm.vue';
 
 export default defineComponent({
     async beforeRouteUpdate(to, from) {
@@ -91,14 +74,15 @@ export default defineComponent({
     components: {
         PeopleYouMayKnow,
         Trends,
-        FeedItem
+        FeedItem,
+        FeedForm
     },
     data() {
         return {
             posts: [] as object[],
             user: {} as User,
-            body: '',
-            can_send_friendship_request: false
+            can_send_friendship_request: false,
+
         }
     },
     methods: {
@@ -125,17 +109,6 @@ export default defineComponent({
                 console.log(error);
             })
         },
-        async submitForm() {
-            axios.post("/api/post/create/", {
-                "body": this.body
-            }).then(response => {
-                this.body = '';
-                this.posts = [response.data, ...this.posts];
-                this.user.posts_count += 1;
-            }).catch(error => {
-                console.log(error);
-            })
-        },
         async sendFriendshipRequest() {
             axios.post(`/api/friends/request/${this.$route.params.id}/`).then(response => {
                 if (response.data.message == "friendship request created") {
@@ -156,4 +129,3 @@ export default defineComponent({
     }
 });
 </script>
-<style lang=""></style>
