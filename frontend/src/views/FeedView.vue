@@ -39,7 +39,6 @@ export default defineComponent({
         async getFeeds() {
             await axios.get('/api/post').then(response => {
                 this.posts = response.data.data;
-                console.log(this.posts)
             }).catch(error => {
                 console.log(error);
             })

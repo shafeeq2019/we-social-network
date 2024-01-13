@@ -51,6 +51,8 @@ def post_create(request):
         post = form.save()
         user.posts_count += 1
         user.save()
+        if data.get('image'):
+            user.post_attachments.create(image=data.get('image'), post=post)
         serializer = PostSerializer(post)
         return JsonResponse(serializer.data, safe=False)
     else:
