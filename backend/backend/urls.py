@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.conf import settings
+from account.views import activate_email
 
 urlpatterns = [
     path('api/', include('account.urls')),
@@ -26,5 +27,6 @@ urlpatterns = [
     path('api/search/', include('search.urls')),
     path('api/chat/', include('chat.urls')),
     path('admin/', admin.site.urls),
+    path('activateemail/', activate_email, name='activate_email'),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

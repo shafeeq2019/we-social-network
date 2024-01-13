@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from .forms import SignupForm, EditProfileForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
 from .models import FriendshipRequest, User
 from .serializers import UserSerializer, FriendshipRequestSerializer
 import logging
@@ -33,11 +34,20 @@ def signup(request):
         'email': data.get('email'),
         'name': data.get('name'),
         'password1': data.get('password1'),
-        'password2': data.get('password2'),
+        'password2': data.get('password2')
     })
 
     if form.is_valid():
         user = form.save()
+        
+        url = f'http://127.0.0.1:8000/activateemail/?email={user.email}&id={user.id}'
+        send_mail(
+            "Please verify your email",
+            f"The url for activating your accout is: {url}",
+            "noreply@we.com",
+            [user.email],
+            fail_silently=False,
+        )
     else:
         message = form.errors.as_json()
     print(message)
