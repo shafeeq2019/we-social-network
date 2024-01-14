@@ -34,7 +34,7 @@
         </div>
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-2 space-y-4">
-            <FeedForm :user="user" v-if="userStore.user.id == user.id"  @getFeeds-event="getFeeds($route.params.id)"/>
+            <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts"/>
             <FeedItem v-for="post in posts" :user="user" :post="post" :key="post.id" />
         </div>
 
@@ -55,7 +55,7 @@ import Trends from '../components/Trends.vue'
 import { useUserStore } from '@/stores/user'
 import FeedItem from '../components/FeedItem.vue'
 import { useToastStore } from "@/stores/toast";
-import { User } from '../interfaces';
+import { User, Post } from '../interfaces';
 import FeedForm from '@/components/FeedForm.vue';
 
 export default defineComponent({
@@ -79,9 +79,11 @@ export default defineComponent({
     },
     data() {
         return {
-            posts: [] as object[],
+            posts: [] as Post[],
             user: {} as User,
             can_send_friendship_request: false,
+            currentPage: 1,
+            hasNext: true
 
         }
     },
@@ -101,10 +103,13 @@ export default defineComponent({
             })
         },
         async getFeeds(userId: string | string[]) {
-            await axios.get(`/api/post/profile/${userId}/`).then(response => {
-                this.posts = response.data.posts;
-                this.user = response.data.user
-                this.can_send_friendship_request = response.data.can_send_friendship_request
+            await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
+                if (!response.data.next) {
+                    this.hasNext = false
+                }
+                this.posts = [...this.posts, ...response.data.results.posts];
+                this.user = response.data.results.user
+                this.can_send_friendship_request = response.data.results.can_send_friendship_request
             }).catch(error => {
                 console.log(error);
             })
@@ -124,8 +129,16 @@ export default defineComponent({
             this.$router.push("/login")
         }
     },
-    created() {
+    mounted() {
         this.getFeeds(this.$route.params.id);
+        window.onscroll = () => {
+            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+            if (bottomOfWindow && this.hasNext) {
+                console.log(this.currentPage)
+                this.currentPage += 1;
+                this.getFeeds(this.$route.params.id)
+            }
+        }
     }
 });
 </script>

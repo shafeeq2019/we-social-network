@@ -57,7 +57,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import axios from 'axios';
-import { Post } from '../interfaces.ts'
+import { Post, User } from '../interfaces.ts'
 import type { PropType } from 'vue'
 
 export default defineComponent({
@@ -69,7 +69,7 @@ export default defineComponent({
             type: Object as PropType<Post>,
             required: true
         },
-        user: Object
+        user: Object as PropType<User>
     },
     methods: {
         likePost() {
@@ -91,9 +91,7 @@ export default defineComponent({
             return escapedText.replace(/\B#(\w+)/g, '<a class="text-blue-700" href="/trends/$1">#$1</a>');
         }
     },
-    created() {
-
-    }
+    created() {}
 })
 </script>
 <style lang="">

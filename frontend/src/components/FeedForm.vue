@@ -22,13 +22,17 @@
 import { PropType, defineComponent } from 'vue'
 import axios from 'axios';
 import { useUserStore } from '@/stores/user'
-import { User } from '../interfaces.ts'
+import { User, Post } from '../interfaces.ts'
 
 export default defineComponent({
     props: {
         user: {
             type: Object as PropType<User>,
             required: false
+        },
+        posts: {
+            type: Array as PropType<Post[]>,
+            required: true
         }
     },
     setup() {
@@ -60,8 +64,8 @@ export default defineComponent({
                 this.body = '';
                 (this.$refs.postPhoto as any).value = null;
                 this.url = '';
+                this.posts.unshift(response.data)
                 this.user ? this.user.posts_count += 1 : '';
-                this.$emit('getFeeds-event');
             }).catch(error => {
                 console.log(error);
             })

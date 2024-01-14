@@ -24,6 +24,8 @@ import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
+import { Post } from '../interfaces';
+
 export default defineComponent({
     props: ['hashtag'],
     async beforeRouteUpdate(to, from) {
@@ -36,20 +38,33 @@ export default defineComponent({
     },
     data() {
         return {
-            posts: []
+            posts: [] as Post[],
+            currentPage: 1,
+            hasNext: true
         }
     },
     methods: {
         async getFeeds(hashtag: string | string[]) {
-            await axios.get(`/api/post?trend=${hashtag}`).then(response => {
-                this.posts = response.data.data;
+            await axios.get(`/api/post?trend=${hashtag}&page=${this.currentPage}`).then(response => {
+                if (!response.data.next) {
+                    this.hasNext = false
+                }
+                this.posts = [...this.posts, ...response.data.results];
             }).catch(error => {
                 console.log(error);
             })
         },
     },
-    created() {
-        this.getFeeds(this.hashtag)
+    mounted() {
+        this.getFeeds(this.hashtag);
+        window.onscroll = () => {
+            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+            if (bottomOfWindow && this.hasNext) {
+                console.log(this.currentPage)
+                this.currentPage += 1;
+                this.getFeeds(this.hashtag)
+            }
+        }
     }
 });
 </script>
