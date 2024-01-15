@@ -2,7 +2,6 @@ from django.db import models
 import uuid
 from account.models import User
 from django.utils.timesince import timesince
-from account.models import User
 
 # Create your models here.
 
