@@ -15,6 +15,8 @@
 
         <p v-html="formatHashtags(post.body)">  </p>
 
+        <img :src="post.post_attachments[0].image_link" :key="post.post_attachments[0].id" class="w-full rounded-lg mt-4" v-if="post.post_attachments.length > 0">
+
         <div class="my-6 flex justify-between">
             <div class="flex space-x-6"> 
                 <div class="flex items-center space-x-2">
@@ -52,12 +54,22 @@
         </div>
     </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
-export default {
+import { Post, User } from '../interfaces.ts'
+import type { PropType } from 'vue'
+
+export default defineComponent({
+    setup() {
+
+    },
     props: {
-        post: Object,
-        user: Object
+        post: {
+            type: Object as PropType<Post>,
+            required: true
+        },
+        user: Object as PropType<User>
     },
     methods: {
         likePost() {
@@ -73,15 +85,14 @@ export default {
                 console.log(e)
             })
         },
-        formatHashtags(text) {
-            const escapeHTML = text => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        formatHashtags(text: string): string {
+            const escapeHTML = (text: string) => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             const escapedText = escapeHTML(text);
             return escapedText.replace(/\B#(\w+)/g, '<a class="text-blue-700" href="/trends/$1">#$1</a>');
         }
     },
-    created() {
-    }
-}
+    created() {}
+})
 </script>
 <style lang="">
 

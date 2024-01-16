@@ -1,23 +1,15 @@
 from django.db import models
 import uuid
 from account.models import User
+
 from django.utils.timesince import timesince
-from account.models import User
 
 # Create your models here.
-
-
-class PostAttachment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    image = models.ImageField(upload_to='post_attachments')
-    created_by = models.ForeignKey(
-        to=User, related_name='post_attachments', on_delete=models.CASCADE)
 
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     body = models.TextField(blank=True, null=True)
-    attachments = models.ManyToManyField(PostAttachment, blank=True)
     likes_count = models.IntegerField(default=0)
     comments_count = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -42,14 +34,33 @@ class Post(models.Model):
         else:
             Like.objects.create(post=self, created_by=user)
             self.likes_count += 1
-            self.save()
+            self.save() 
+            self.notifications.create_notification(
+                created_by=user, created_for=self.created_by, type_of_notification='post_like')
             return "post liked successfully"
 
     def add_comment(self, user, comment):
         Comment.objects.create(created_by=user, post=self, comment=comment)
         self.comments_count += 1
         self.save()
+        self.notifications.create_notification(
+        created_by=user, created_for=self.created_by, type_of_notification='post_comment')
         return 'post commented successfully'
+
+
+class PostAttachment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    image = models.ImageField(upload_to='post_attachments')
+    post = models.ForeignKey(
+        Post, related_name='post_attachments', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(
+        to=User, related_name='post_attachments', on_delete=models.CASCADE)
+
+    def image_link(self):
+        if self.image:
+            return 'http://127.0.0.1:8000' + self.image.url
+        else:
+            return ''
 
 
 class Like(models.Model):

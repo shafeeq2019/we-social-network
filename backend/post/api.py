@@ -1,4 +1,5 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.pagination import PageNumberPagination
 from django.http import JsonResponse
 from post.models import Post, Trend
 from account.models import FriendshipRequest, User
@@ -32,9 +33,13 @@ def post_list(request):
     for post in posts:
         post.post_liked = post.likes.filter(created_by=request.user).exists()
 
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    posts = paginator.paginate_queryset(posts, request)
+
     serializer = PostSerializer(posts, many=True, show_created_by=True)
 
-    return JsonResponse({'data': serializer.data})
+    return paginator.get_paginated_response(serializer.data)
 
 
 @api_view(['POST'])
@@ -51,7 +56,9 @@ def post_create(request):
         post = form.save()
         user.posts_count += 1
         user.save()
-        serializer = PostSerializer(post)
+        if data.get('image'):
+            user.post_attachments.create(image=data.get('image'), post=post)
+        serializer = PostSerializer(post, show_created_by=True)
         return JsonResponse(serializer.data, safe=False)
     else:
         message = form.errors.as_json()
@@ -65,6 +72,10 @@ def post_list_profile(request, id):
 
     for post in posts:
         post.post_liked = post.likes.filter(created_by=request.user).exists()
+
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    posts = paginator.paginate_queryset(posts, request)
 
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
@@ -80,11 +91,10 @@ def post_list_profile(request, id):
         if not check_if_freqeust_sent_1 and not check_if_freqeust_sent_2:
             can_send_friendship_request = True
 
-    return JsonResponse({
+    return paginator.get_paginated_response({
         "posts": post_serializer.data,
         "user": user_serializer.data,
-        "can_send_friendship_request": can_send_friendship_request},
-        safe=False)
+        "can_send_friendship_request": can_send_friendship_request},)
 
 
 @api_view(['POST'])

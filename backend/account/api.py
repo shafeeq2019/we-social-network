@@ -5,7 +5,9 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from .forms import SignupForm, EditProfileForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
 from .models import FriendshipRequest, User
+from notification.models import Notification
 from .serializers import UserSerializer, FriendshipRequestSerializer
 import logging
 
@@ -33,11 +35,21 @@ def signup(request):
         'email': data.get('email'),
         'name': data.get('name'),
         'password1': data.get('password1'),
-        'password2': data.get('password2'),
+        'password2': data.get('password2')
     })
 
     if form.is_valid():
         user = form.save()
+
+        url = f'http://127.0.0.1:8000/activateemail/?email={
+            user.email}&id={user.id}'
+        send_mail(
+            "Please verify your email",
+            f"The url for activating your accout is: {url}",
+            "noreply@we.com",
+            [user.email],
+            fail_silently=False,
+        )
     else:
         message = form.errors.as_json()
     print(message)
@@ -69,10 +81,11 @@ def send_friendship_request(request, id):
         created_for=user, created_by=request.user, status=FriendshipRequest.SENT)
 
     if not check1 and not check2:
-
         friendship_request = FriendshipRequest(
             created_for=user, created_by=request.user)
         friendship_request.save()
+        Notification.objects.create_notification(
+            created_for=user, created_by=request.user, type_of_notification=Notification.NEWFRIENDREQUEST)
 
         return JsonResponse({'message': "friendship request created"})
     else:
@@ -98,6 +111,18 @@ def handle_request(request, friendshipRequestId, status):
         request_user.friends_count += 1
         request_user.save()
 
+        # send a notification
+        Notification.objects.create_notification(
+            created_for=request_user, created_by=user, type_of_notification=Notification.ACCEPTEDFRIENDREQUEST)
+        
+        # delete from the suggestion list
+        user.people_you_may_know.remove(request_user)
+        request_user.people_you_may_know.remove(user)
+        
+    else:
+        Notification.objects.create_notification(
+            created_for=request_user, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
+         
     return JsonResponse({'message': "friendship request updated"})
 
 
@@ -134,3 +159,11 @@ def edit_password(request):
         message = form.errors.as_json()
         print(message)
         return JsonResponse({'message': message}, safe=False)
+
+
+@api_view(['GET'])
+def my_friendship_suggestions(request):
+    serializer = UserSerializer(
+        request.user.people_you_may_know.all(), many=True)
+
+    return JsonResponse(serializer.data, safe=False)

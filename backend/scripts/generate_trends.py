@@ -13,7 +13,6 @@ django.setup()
 from account.models import User
 from post.models import Post,Trend
 
-# Definieren Sie ein Muster für Hashtags
 hashtag_pattern = re.compile(r'\B#\w+')
 trends = []
 posts = Post.objects.filter(body__contains='#', created_at__gte=timezone.now() - timedelta(hours=24))

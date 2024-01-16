@@ -1,4 +1,4 @@
-from .models import Post, Comment, Trend
+from .models import Post, Comment, Trend, PostAttachment
 from rest_framework import serializers
 from account.serializers import UserSerializer
 from django.utils.timesince import timesince
@@ -16,14 +16,21 @@ from django.utils.timesince import timesince
 #         return timesince(obj.created_at, now)
 
 
+class PostAttachment(serializers.ModelSerializer):
+    class Meta:
+        model = PostAttachment
+        fields = ['id', 'image_link']
+
+
 class PostSerializer(serializers.ModelSerializer):
     # Du kannst das created_by Feld hier entfernen, da wir es dynamisch in der __init__ Methode setzen werden.
     post_liked = serializers.BooleanField(required=False)
+    post_attachments = PostAttachment(read_only=True, many=True)
 
     class Meta:
         model = Post
         fields = ['id', 'body', 'created_at', 'created_ago',
-                  'created_by', 'likes_count', 'post_liked', 'comments_count']
+                  'created_by', 'likes_count', 'post_liked', 'comments_count', 'post_attachments']
 
     def __init__(self, *args, show_created_by=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -44,11 +51,12 @@ class PostDetailSerializer(serializers.ModelSerializer):
     post_liked = serializers.BooleanField(required=False)
     created_by = UserSerializer(read_only=True)
     comments = CommentSerializer(read_only=True, many=True)
+    post_attachments = PostAttachment(read_only=True, many=True)
 
     class Meta:
         model = Post
         fields = ['id', 'body', 'created_at', 'created_ago', 'created_by',
-                  'likes_count', 'post_liked', 'comments_count', 'comments']
+                  'likes_count', 'post_liked', 'comments_count', 'comments', 'post_attachments']
 
 
 class TrendSerializer(serializers.ModelSerializer):

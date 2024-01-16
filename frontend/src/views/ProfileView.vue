@@ -3,8 +3,8 @@
         <!-- User on the left -->
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-                <div class="flex items-center justify-center"> 
-                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full"/>
+                <div class="flex items-center justify-center">
+                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full" />
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
@@ -34,22 +34,7 @@
         </div>
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-2 space-y-4">
-            <form method="post" @submit.prevent="submitForm" v-if="userStore.user.id == user.id">
-                <div class="bg-white border border-gray-200 rounded-lg">
-                    <div class="p-4">
-                        <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"
-                            v-model="body"></textarea>
-                    </div>
-
-                    <div class="p-4 border-t border-gray-100 flex justify-between">
-                        <button href="#" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">Attach
-                            image</button>
-                        <button type="submit"
-                            class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</button>
-                    </div>
-                </div>
-            </form>
-
+            <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts"/>
             <FeedItem v-for="post in posts" :user="user" :post="post" :key="post.id" />
         </div>
 
@@ -61,19 +46,19 @@
 
     </div>
 </template>
-<script>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
-import {
-    useUserStore
-} from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 import FeedItem from '../components/FeedItem.vue'
-import {
-    useToastStore
-} from "@/stores/toast";
+import { useToastStore } from "@/stores/toast";
+import { User, Post } from '../interfaces';
+import FeedForm from '@/components/FeedForm.vue';
 
-export default {
+export default defineComponent({
     async beforeRouteUpdate(to, from) {
         // react to route changes...
         await this.getFeeds(to.params.id);
@@ -89,14 +74,17 @@ export default {
     components: {
         PeopleYouMayKnow,
         Trends,
-        FeedItem
+        FeedItem,
+        FeedForm
     },
     data() {
         return {
-            posts: [],
-            user: {},
-            body: '',
-            can_send_friendship_request: false
+            posts: [] as Post[],
+            user: {} as User,
+            can_send_friendship_request: false,
+            currentPage: 1,
+            hasNext: true
+
         }
     },
     methods: {
@@ -114,22 +102,14 @@ export default {
                 console.log(error);
             })
         },
-        async getFeeds(userId) {
-            await axios.get(`/api/post/profile/${userId}/`).then(response => {
-                this.posts = response.data.posts;
-                this.user = response.data.user
-                this.can_send_friendship_request = response.data.can_send_friendship_request
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-        async submitForm() {
-            axios.post("/api/post/create/", {
-                "body": this.body
-            }).then(response => {
-                this.body = '';
-                this.posts = [response.data, ...this.posts];
-                this.user.posts_count += 1;
+        async getFeeds(userId: string | string[]) {
+            await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
+                if (!response.data.next) {
+                    this.hasNext = false
+                }
+                this.posts = [...this.posts, ...response.data.results.posts];
+                this.user = response.data.results.user
+                this.can_send_friendship_request = response.data.results.can_send_friendship_request
             }).catch(error => {
                 console.log(error);
             })
@@ -149,9 +129,16 @@ export default {
             this.$router.push("/login")
         }
     },
-    created() {
+    mounted() {
         this.getFeeds(this.$route.params.id);
+        window.onscroll = () => {
+            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+            if (bottomOfWindow && this.hasNext) {
+                console.log(this.currentPage)
+                this.currentPage += 1;
+                this.getFeeds(this.$route.params.id)
+            }
+        }
     }
-};
+});
 </script>
-<style lang=""></style>

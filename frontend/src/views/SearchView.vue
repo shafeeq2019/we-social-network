@@ -40,13 +40,14 @@
 
     </div>
 </template>
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue';
 
-export default {
+export default defineComponent({
     components: {
         PeopleYouMayKnow,
         Trends,
@@ -64,7 +65,6 @@ export default {
             axios.post('api/search/', {
                 query: this.query
             }).then(response => {
-                console.log(response.data)
                 this.users = response.data.users;
                 this.posts = response.data.posts
             }).catch(e => {
@@ -72,7 +72,7 @@ export default {
             })
         }
     }
-}
+})
 </script>
 <style lang="">
 

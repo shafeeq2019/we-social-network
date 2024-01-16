@@ -51,12 +51,13 @@ TODOS:
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import axios from 'axios'
 import { useToastStore } from '@/stores/toast'
 import { useUserStore } from '@/stores/user'
 
-export default {
+export default defineComponent({
     setup() {
         const toastStore = useToastStore()
         const userStore = useUserStore()
@@ -69,24 +70,22 @@ export default {
     data() {
         return {
             form: {
-                old_password: '',
-                new_password1: '',
-                new_password2: ''
+                old_password: '' as string,
+                new_password1: '' as string,
+                new_password2: '' as string
             },
-            errors: [],
+            errors: [] as string[]
         }
     },
     methods: {
         submitForm() {
-            this.errors = []
-
-            if (this.form.password1 !== this.form.password2) {
+            if (this.form.new_password1 !== this.form.new_password2) {
                 this.errors.push('The password does not match')
             }
 
             if (this.errors.length === 0) {
                 axios
-                    .post('/api/editpassword/',this.form)
+                    .post('/api/editpassword/', this.form)
                     .then(response => {
                         if (response.data.message === 'success') {
                             this.toastStore.showToast(5000, 'Your password was successfully updated!', 'bg-emerald-500')
@@ -106,5 +105,5 @@ export default {
         }
 
     }
-}
+})
 </script>
