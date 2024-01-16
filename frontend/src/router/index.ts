@@ -10,6 +10,7 @@ import PostView from '../views/PostView.vue'
 import TrendsView from '../views/TrendsView.vue'
 import EditProfileView from '../views/EditProfileView.vue'
 import EditPasswordView from '../views/EditPasswordView.vue'
+import NotificationsView from '../views/NotificationsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -70,6 +71,11 @@ const router = createRouter({
       name: 'trendsview',
       component: TrendsView,
       props: true
+    },
+    {
+      path: '/notifications',
+      name: 'notifications',
+      component: NotificationsView
     },
     {
       path: '/about',

@@ -3,7 +3,8 @@ export interface User {
     email: string;
     name: string;
     friends_count: number;
-    posts_count: number
+    posts_count: number,
+    avatar_link: string
 }
 
 export interface Conversation {
@@ -39,4 +40,13 @@ export interface Post {
     created_by: User,
     likes_count: number,
     post_liked: Boolean
+
+}
+export interface Notification {
+    id: string,
+    body: string,
+    post_id: string,
+    type_of_notification: string,
+    created_by: User,
+    created_for_id: string
 }

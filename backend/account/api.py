@@ -7,6 +7,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from .models import FriendshipRequest, User
+from notification.models import Notification
 from .serializers import UserSerializer, FriendshipRequestSerializer
 import logging
 
@@ -39,8 +40,9 @@ def signup(request):
 
     if form.is_valid():
         user = form.save()
-        
-        url = f'http://127.0.0.1:8000/activateemail/?email={user.email}&id={user.id}'
+
+        url = f'http://127.0.0.1:8000/activateemail/?email={
+            user.email}&id={user.id}'
         send_mail(
             "Please verify your email",
             f"The url for activating your accout is: {url}",
@@ -79,10 +81,10 @@ def send_friendship_request(request, id):
         created_for=user, created_by=request.user, status=FriendshipRequest.SENT)
 
     if not check1 and not check2:
-
         friendship_request = FriendshipRequest(
             created_for=user, created_by=request.user)
         friendship_request.save()
+        Notification.objects.create_notification(created_for=user, created_by=request.user, type_of_notification=Notification.NEWFRIENDREQUEST)
 
         return JsonResponse({'message': "friendship request created"})
     else:
@@ -107,6 +109,9 @@ def handle_request(request, friendshipRequestId, status):
         user.save()
         request_user.friends_count += 1
         request_user.save()
+        Notification.objects.create_notification(created_for=request_user, created_by=user, type_of_notification=Notification.ACCEPTEDFRIENDREQUEST)
+    else:
+        Notification.objects.create_notification(created_for=request_user, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
 
     return JsonResponse({'message': "friendship request updated"})
 

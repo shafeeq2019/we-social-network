@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/post/', include('post.urls')),
     path('api/search/', include('search.urls')),
     path('api/chat/', include('chat.urls')),
+    path('api/notification/', include('notification.urls')),
     path('admin/', admin.site.urls),
     path('activateemail/', activate_email, name='activate_email'),
 ]

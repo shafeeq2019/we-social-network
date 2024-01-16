@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from account.models import User
+
 from django.utils.timesince import timesince
 
 # Create your models here.
@@ -33,13 +34,17 @@ class Post(models.Model):
         else:
             Like.objects.create(post=self, created_by=user)
             self.likes_count += 1
-            self.save()
+            self.save() 
+            self.notifications.create_notification(
+                created_by=user, created_for=self.created_by, type_of_notification='post_like')
             return "post liked successfully"
 
     def add_comment(self, user, comment):
         Comment.objects.create(created_by=user, post=self, comment=comment)
         self.comments_count += 1
         self.save()
+        self.notifications.create_notification(
+        created_by=user, created_for=self.created_by, type_of_notification='post_comment')
         return 'post commented successfully'
 
 
@@ -50,7 +55,7 @@ class PostAttachment(models.Model):
         Post, related_name='post_attachments', on_delete=models.CASCADE)
     created_by = models.ForeignKey(
         to=User, related_name='post_attachments', on_delete=models.CASCADE)
-    
+
     def image_link(self):
         if self.image:
             return 'http://127.0.0.1:8000' + self.image.url
