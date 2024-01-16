@@ -84,7 +84,8 @@ def send_friendship_request(request, id):
         friendship_request = FriendshipRequest(
             created_for=user, created_by=request.user)
         friendship_request.save()
-        Notification.objects.create_notification(created_for=user, created_by=request.user, type_of_notification=Notification.NEWFRIENDREQUEST)
+        Notification.objects.create_notification(
+            created_for=user, created_by=request.user, type_of_notification=Notification.NEWFRIENDREQUEST)
 
         return JsonResponse({'message': "friendship request created"})
     else:
@@ -109,10 +110,19 @@ def handle_request(request, friendshipRequestId, status):
         user.save()
         request_user.friends_count += 1
         request_user.save()
-        Notification.objects.create_notification(created_for=request_user, created_by=user, type_of_notification=Notification.ACCEPTEDFRIENDREQUEST)
-    else:
-        Notification.objects.create_notification(created_for=request_user, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
 
+        # send a notification
+        Notification.objects.create_notification(
+            created_for=request_user, created_by=user, type_of_notification=Notification.ACCEPTEDFRIENDREQUEST)
+        
+        # delete from the suggestion list
+        user.people_you_may_know.remove(request_user)
+        request_user.people_you_may_know.remove(user)
+        
+    else:
+        Notification.objects.create_notification(
+            created_for=request_user, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
+         
     return JsonResponse({'message': "friendship request updated"})
 
 
@@ -149,3 +159,11 @@ def edit_password(request):
         message = form.errors.as_json()
         print(message)
         return JsonResponse({'message': message}, safe=False)
+
+
+@api_view(['GET'])
+def my_friendship_suggestions(request):
+    serializer = UserSerializer(
+        request.user.people_you_may_know.all(), many=True)
+
+    return JsonResponse(serializer.data, safe=False)
