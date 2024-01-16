@@ -10,7 +10,7 @@
                     <p class="text-xs"><strong>{{ user.name }}</strong></p>
                 </div>
 
-                <RouterLink :to="{ name: 'profile', params: { id: user.id } }"
+                <RouterLink :to="{ name: 'profile', params: { 'id': user.id } }"
                     class="py-2 px-3 bg-purple-600 text-white text-xs rounded-lg">Show</RouterLink>
             </div>
         </div>
@@ -35,8 +35,6 @@ export default {
             axios
                 .get('/api/friends/suggested/')
                 .then(response => {
-                    console.log(response.data)
-
                     this.users = response.data
                 })
                 .catch(error => {

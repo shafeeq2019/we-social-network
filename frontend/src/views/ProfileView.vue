@@ -103,6 +103,7 @@ export default defineComponent({
             })
         },
         async getFeeds(userId: string | string[]) {
+            this.posts = [];
             await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
                 if (!response.data.next) {
                     this.hasNext = false
