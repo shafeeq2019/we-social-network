@@ -50,3 +50,9 @@ export interface Notification {
     created_by: User,
     created_for_id: string
 }
+
+export interface Trend {
+    id: string,
+    hashtag: string,
+    occurences: number
+}
