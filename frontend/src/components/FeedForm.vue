@@ -9,11 +9,20 @@
                 </div>
             </div>
 
-            <div class="p-4 border-t border-gray-100 flex justify-between">
-                <label for="upload" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg cursor-pointer">Attach
+            <div
+                class="p-4 border-t border-gray-100 flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
+                <label for="upload" class="inline-block bg-gray-600 text-white rounded-lg cursor-pointer py-3 px-3">Attach
                     Image</label>
                 <input id="upload" type="file" ref="postPhoto" accept="image/*" @change="onFileChange" hidden />
-                <button type="submit" class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</button>
+                <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
+                    <select id="privacy" v-model="privacy"
+                        class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3">
+                        <option selected value='public'>Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                    <button type="submit"
+                        class="inline-block bg-purple-600 text-white rounded-lg py-3 px-6 ml-0 sm:ml-2">Post</button>
+                </div>
             </div>
         </div>
     </form>
@@ -44,7 +53,8 @@ export default defineComponent({
     data() {
         return {
             body: '',
-            url: ''
+            url: '',
+            privacy: 'public'
         }
     },
     methods: {

@@ -15,6 +15,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         User, related_name='posts', on_delete=models.CASCADE)
+    is_private = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('-created_at',)
@@ -34,7 +35,7 @@ class Post(models.Model):
         else:
             Like.objects.create(post=self, created_by=user)
             self.likes_count += 1
-            self.save() 
+            self.save()
             self.notifications.create_notification(
                 created_by=user, created_for=self.created_by, type_of_notification='post_like')
             return "post liked successfully"
@@ -44,7 +45,7 @@ class Post(models.Model):
         self.comments_count += 1
         self.save()
         self.notifications.create_notification(
-        created_by=user, created_for=self.created_by, type_of_notification='post_comment')
+            created_by=user, created_for=self.created_by, type_of_notification='post_comment')
         return 'post commented successfully'
 
 

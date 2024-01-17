@@ -1,7 +1,7 @@
 <template lang="">
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- New post & feeds on the middle -->
-        <div class="main-center col-span-3 space-y-4">
+        <div class="main-center space-y-4 col-span-4 md:col-span-3">
             <FeedItem :post="post" v-if="post.created_by" />
             <div class="p-4 mx-6 bg-white border border-gray-200 rounded-lg" v-for="comment in post.comments" :key="comment.id">
                 <CommentItem :comment="comment" />
@@ -23,7 +23,7 @@
         </div>
 
         <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4">
+        <div class="main-right col-span-1 space-y-4 hidden md:block">
             <PeopleYouMayKnow />
             <Trends />
         </div>

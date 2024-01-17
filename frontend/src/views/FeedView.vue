@@ -1,26 +1,33 @@
 <template lang="">
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+    <div class="max-w-7xl mx-auto grid md:grid-cols-1 lg:grid-cols-4 gap-4">
         <!-- New post & feeds on the middle -->
-        <div class="main-center col-span-3 space-y-4">
-            <FeedForm :user="null" :posts="posts"/>
-            <FeedItem v-for="post in posts" :post="post" :key="post.id" />
+        <div class="main-center md:col-span-4 lg:col-span-3">
+            <FeedForm :user="null" :posts="posts" />
         </div>
-
         <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4">
+        <div class="main-right md:col-span-4 lg:col-span-1 space-y-4">
             <PeopleYouMayKnow />
             <Trends />
         </div>
+        <!-- Feeds -->
+        <div class="main-center md:col-span-4 lg:col-span-3 space-y-4 ">
+            <FeedItem v-for="post in posts" :post="post" :key="post.id" />
+        </div>
+
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import {
+    defineComponent
+} from 'vue'
 import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import FeedForm from '@/components/FeedForm.vue';
-import { Post } from '../interfaces.ts'
+import {
+    Post
+} from '../interfaces.ts'
 export default defineComponent({
     components: {
         PeopleYouMayKnow,
@@ -51,7 +58,8 @@ export default defineComponent({
     mounted() {
         this.getFeeds();
         window.onscroll = () => {
-            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document
+                .documentElement.offsetHeight
             if (bottomOfWindow && this.hasNext) {
                 console.log(this.currentPage)
                 this.currentPage += 1;

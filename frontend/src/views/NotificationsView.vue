@@ -1,6 +1,6 @@
 <template>
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
-        <div class="main-center col-span-3 space-y-4">
+        <div class="main-center col-span-4 md:col-span-3 space-y-4">
             <div class="p-3 bg-white border border-gray-200 rounded-lg flex justify-start items-center"
                 v-for="notification in notifications" v-bind:key="notification.id" v-if="notifications.length">
                 <router-link :to="{ name: 'profile', params: { 'id': notification.created_by.id } }">
@@ -16,7 +16,7 @@
             </div>
         </div>
         <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4">
+        <div class="main-right col-span-1 space-y-4 hidden md:block">
             <PeopleYouMayKnow />
             <Trends />
         </div>

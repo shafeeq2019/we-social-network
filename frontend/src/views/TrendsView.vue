@@ -4,14 +4,14 @@
             <h2 class="text-xl font-semibold">Trend: #{{hashtag}}</h2>
         </div>
     </div>
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+    <div class="max-w-7xl mx-auto  grid md:grid-cols-1 lg:grid-cols-4 gap-4">
         <!-- New post & feeds on the middle -->
-        <div class="main-center col-span-3 space-y-4">
+        <div class="main-center md:col-span-4 lg:col-span-3 space-y-4">
             <FeedItem v-for="post in posts" :post="post" :key="post.id" />
         </div>
 
         <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4">
+        <div class="main-right md:col-span-4 lg:col-span-1 space-y-4">
             <PeopleYouMayKnow />
             <Trends />
         </div>
