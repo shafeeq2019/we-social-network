@@ -15,11 +15,11 @@
                     Image</label>
                 <input id="upload" type="file" ref="postPhoto" accept="image/*" @change="onFileChange" hidden />
                 <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
-                    <select id="privacy" v-model="privacy"
-                        class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3">
-                        <option selected value='public'>Public</option>
-                        <option value="private">Private</option>
-                    </select>
+                    <select id="privacy" v-model="is_private"
+                        class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3 cursor-pointer">
+                        <option selected value=false>Public</option>
+                        <option value=true>Private</option> 
+                    </select> 
                     <button type="submit"
                         class="inline-block bg-purple-600 text-white rounded-lg py-3 px-6 ml-0 sm:ml-2">Post</button>
                 </div>
@@ -54,7 +54,7 @@ export default defineComponent({
         return {
             body: '',
             url: '',
-            privacy: 'public'
+            is_private: false
         }
     },
     methods: {
@@ -65,13 +65,15 @@ export default defineComponent({
         async submitForm() {
             axios.post("/api/post/create/", {
                 body: this.body,
-                image: (this.$refs.postPhoto as any).files[0]
+                image: (this.$refs.postPhoto as any).files[0],
+                is_private: this.is_private
             }, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
             }).then(response => {
                 this.body = '';
+                this.is_private = false;
                 (this.$refs.postPhoto as any).value = null;
                 this.url = '';
                 this.posts.unshift(response.data)
