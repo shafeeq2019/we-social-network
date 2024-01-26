@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto grid-cols-4 gap-4 hidden md:grid">
         <div class="main-center col-span-3 space-y-4">
             <FeedForm :user="null" :posts="posts" />
-            <FeedItem v-for="post in posts" :post="post" :key="post.id" />
+            <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
         </div>
         <div class="main-right col-span-1 space-y-4">
             <PeopleYouMayKnow />
@@ -14,7 +14,7 @@
         <FeedForm :user="null" :posts="posts" />
         <PeopleYouMayKnow />
         <Trends />
-        <FeedItem v-for="post in posts" :post="post" :key="post.id" />
+        <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
     </div>
 </template>
 <script lang="ts">
@@ -54,6 +54,11 @@ export default defineComponent({
             }).catch(error => {
                 console.log(error);
             })
+        },
+        deletePost(postId: string) {
+            this.posts = this.posts.filter(
+                post => post.id != postId
+            )
         }
     },
     mounted() {

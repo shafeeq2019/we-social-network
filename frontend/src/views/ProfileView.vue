@@ -35,7 +35,7 @@
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-2 space-y-4">
             <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts"/>
-            <FeedItem v-for="post in posts" :user="user" :post="post" :key="post.id" />
+            <FeedItem v-for="post in posts" :user="user" :post="post" :key="post.id" @deletePost="deletePost" />
         </div>
 
         <!-- People you may know -->
@@ -124,6 +124,11 @@ export default defineComponent({
             }).catch(error => {
                 console.log(error);
             })
+        },
+        deletePost(postId: string) {
+            this.posts = this.posts.filter(
+                post => post.id != postId
+            )
         },
         logout() {
             this.userStore.removeToken();

@@ -58,17 +58,38 @@
             </div>
 
             <div>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z">
-                    </path>
-                </svg>
+                <DropdownMenu>
+                    <DropdownMenuTrigger> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z">
+                            </path>
+                        </svg>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                        <DropdownMenuItem class="cursor-pointer" @click="deletePost" v-if="userStore.user.id === post.created_by.id">Delete post</DropdownMenuItem>
+                        <!-- <DropdownMenuSeparator /> -->
+                        <DropdownMenuItem class="cursor-pointer">Report</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-
         </div>
     </div>
+
 </template>
+<script setup lang="ts">
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore();
+
+</script>
 <script lang="ts">
 import {
     defineComponent
@@ -82,7 +103,6 @@ import type {
     PropType
 } from 'vue'
 export default defineComponent({
-    setup() { },
     props: {
         post: {
             type: Object as PropType<Post>,
@@ -109,12 +129,18 @@ export default defineComponent({
             const escapedText = escapeHTML(text);
             return escapedText.replace(/\B#(\w+)/g,
                 '<a class="text-blue-700" href="/trends/$1">#$1</a>');
+        },
+        async deletePost() {
+            axios.delete(`/api/post/${this.post.id}`).then(
+                response => {
+                    console.log(response);
+                    this.$emit('deletePost', this.post.id)
+                }
+            ).catch(e => {
+                console.log(e)
+            })
         }
     },
-    created() {
-    }
+    created() { }
 })
 </script>
-<style lang="">
-
-</style>
