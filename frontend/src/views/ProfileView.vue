@@ -107,7 +107,6 @@ export default defineComponent({
                 if (!response.data.next) {
                     this.hasNext = false
                 }
-                console.log(response.data)
                 this.posts = [...this.posts, ...response.data.results.posts];
                 this.user = response.data.results.user
                 this.can_send_friendship_request = response.data.results.can_send_friendship_request

@@ -19,7 +19,7 @@
         <img :src="post.post_attachments[0].image_link" :key="post.post_attachments[0].id"
             class="w-full rounded-lg mt-4" v-if="post.post_attachments.length > 0">
 
-        <div class="my-6 flex justify-between">
+        <div class="mt-6 mb-1 flex justify-between">
             <div class="flex space-x-6">
                 <div class="flex items-center space-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" :fill="post.post_liked ? 'red' : 'none'" viewBox="0 0 24 24"
