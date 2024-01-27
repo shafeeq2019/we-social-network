@@ -92,6 +92,16 @@ class Comment(models.Model):
         ordering = ('created_at',)
 
 
+class Reports(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    post = models.ForeignKey(
+        Post, related_name='reports', on_delete=models.CASCADE)
+    report = models.TextField()
+    created_by = models.ForeignKey(
+        User, related_name='reports', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class Trend(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     hashtag = models.CharField(max_length=255)

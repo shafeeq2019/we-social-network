@@ -129,7 +129,15 @@ def get_trends(request):
 
 @api_view(['DELETE'])
 def post_delete(request, post_id):
-    post = Post.objects.get(created_by = request.user, id = post_id)
-    post.delete();
-    
+    post = Post.objects.get(created_by=request.user, id=post_id)
+    post.delete()
+
     return JsonResponse({'message': 'Post deleted'})
+
+
+@api_view(['POST'])
+def report_post(request, post_id):
+    post = Post.objects.get(id=post_id)
+    report = request.data.get('reportText')
+    post.reports.create(created_by=request.user, report=report)
+    return JsonResponse({'message': 'Post reported'})

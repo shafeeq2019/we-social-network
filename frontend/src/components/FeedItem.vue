@@ -4,8 +4,7 @@
         <div class="mb-6 flex items-center justify-between">
             <router-link :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
                 <div class="flex items-center space-x-3">
-                    <img :src="post.created_by.avatar_link"
-                        class="w-[40px] h-[39px] rounded-full">
+                    <img :src="post.created_by.avatar_link" class="w-[40px] h-[39px] rounded-full">
 
                     <p><strong>{{post.created_by.name }}</strong></p>
                 </div>
@@ -67,29 +66,38 @@
                         </svg>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuItem class="cursor-pointer" @click="deletePost" v-if="userStore.user.id === post.created_by.id">Delete post</DropdownMenuItem>
+                        <DropdownMenuItem class="cursor-pointer" @click="deletePost"
+                            v-if="userStore.user.id === post.created_by.id">Delete post</DropdownMenuItem>
                         <!-- <DropdownMenuSeparator /> -->
-                        <DropdownMenuItem class="cursor-pointer">Report</DropdownMenuItem>
+                        <DropdownMenuItem v-if="userStore.user.id != post.created_by.id" class="cursor-pointer"
+                            @click="openReportModal = true">Report</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
         </div>
+
+        <Dialog v-model:open="openReportModal" @update:open="reportText = ''">
+            <DialogContent class="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Report a post</DialogTitle>
+                    <DialogDescription>
+                        Please tell us why you want to report this post
+                    </DialogDescription>
+                </DialogHeader>
+                <div class="p-2">
+                    <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="Why should we delete this post?"
+                        v-model="reportText"></textarea>
+                </div>
+                <DialogFooter>
+                    <button @click="reportPost">
+                        Send
+                    </button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     </div>
-
 </template>
-<script setup lang="ts">
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useUserStore } from '@/stores/user'
-const userStore = useUserStore();
 
-</script>
 <script lang="ts">
 import {
     defineComponent
@@ -101,11 +109,63 @@ import {
 import type {
     PropType
 } from 'vue'
+import {
+    useToastStore
+} from '@/stores/toast'
+import {
+    useUserStore
+} from '@/stores/user'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog'
 export default defineComponent({
+    components: {
+        Dialog,
+        DialogContent,
+        DialogDescription,
+        DialogFooter,
+        DialogHeader,
+        DialogTitle,
+        DialogTrigger,
+        DropdownMenu,
+        DropdownMenuContent,
+        DropdownMenuItem,
+        DropdownMenuLabel,
+        DropdownMenuSeparator,
+        DropdownMenuTrigger,
+    },
+    setup() {
+        const userStore = useUserStore();
+        const toastStore = useToastStore();
+        return {
+            userStore,
+            toastStore
+        }
+    },
     props: {
         post: {
             type: Object as PropType<Post>,
             required: true
+        }
+    },
+    data() {
+        return {
+            openReportModal: false,
+            reportText: ''
         }
     },
     methods: {
@@ -132,8 +192,20 @@ export default defineComponent({
             axios.delete(`/api/post/${this.post.id}`).then(
                 response => {
                     this.$emit('deletePost', this.post.id)
+                    this.toastStore.showToast(5000, 'The post was deleted', 'bg-emerald-500')
                 }
             ).catch(e => {
+                console.log(e)
+            })
+        },
+        async reportPost() {
+            axios.post(`/api/post/${this.post.id}/report/`, {
+                reportText: this.reportText
+            }).then(response => {
+                this.openReportModal = false;
+                console.log(response)
+                this.toastStore.showToast(5000, 'The post was reported', 'bg-emerald-500')
+            }).catch(e => {
                 console.log(e)
             })
         }
