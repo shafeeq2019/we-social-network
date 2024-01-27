@@ -14,7 +14,7 @@
         <FeedForm :user="null" :posts="posts" />
         <PeopleYouMayKnow />
         <Trends />
-        <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
+        <FeedItem v-for="post in posts" :post="post"  :key="post.id" @deletePost="deletePost"/>
     </div>
 </template>
 <script lang="ts">

@@ -3,19 +3,6 @@ from rest_framework import serializers
 from account.serializers import UserSerializer
 from django.utils.timesince import timesince
 
-# class PostSerializer(serializers.ModelSerializer):
-#     created_by = UserSerializer(read_only=True)
-#     created_at_ago = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Post
-#         fields = ['id', 'body', 'created_by', 'created_at', 'created_at_ago']
-
-#     def get_created_at_ago(self, obj):
-#         now = datetime.now(timezone.utc)  # Make sure it's also aware
-#         return timesince(obj.created_at, now)
-
-
 class PostAttachment(serializers.ModelSerializer):
     class Meta:
         model = PostAttachment
@@ -26,17 +13,18 @@ class PostSerializer(serializers.ModelSerializer):
     # Du kannst das created_by Feld hier entfernen, da wir es dynamisch in der __init__ Methode setzen werden.
     post_liked = serializers.BooleanField(required=False)
     post_attachments = PostAttachment(read_only=True, many=True)
+    created_by = UserSerializer(read_only=True)
 
     class Meta:
         model = Post
         fields = ['id', 'body', 'created_at', 'created_ago',
                   'created_by', 'likes_count', 'post_liked', 'comments_count', 'post_attachments','is_private']
 
-    def __init__(self, *args, show_created_by=False, **kwargs):
-        super().__init__(*args, **kwargs)
+    # def __init__(self, *args, show_created_by=False, **kwargs):
+    #     super().__init__(*args, **kwargs)
 
-        if show_created_by:
-            self.fields['created_by'] = UserSerializer(read_only=True)
+    #     if show_created_by:
+    #         self.fields['created_by'] = UserSerializer(read_only=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):

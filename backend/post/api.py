@@ -37,7 +37,7 @@ def post_list(request):
     paginator.page_size = 10
     posts = paginator.paginate_queryset(posts, request)
 
-    serializer = PostSerializer(posts, many=True, show_created_by=True)
+    serializer = PostSerializer(posts, many=True)
 
     return paginator.get_paginated_response(serializer.data)
 
@@ -58,7 +58,7 @@ def post_create(request):
         user.save()
         if data.get('image'):
             user.post_attachments.create(image=data.get('image'), post=post)
-        serializer = PostSerializer(post, show_created_by=True)
+        serializer = PostSerializer(post)
         return JsonResponse(serializer.data, safe=False)
     else:
         message = form.errors.as_json()

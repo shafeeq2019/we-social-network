@@ -4,10 +4,10 @@
         <div class="mb-6 flex items-center justify-between">
             <router-link :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
                 <div class="flex items-center space-x-3">
-                    <img :src="post.created_by.avatar_link ? post.created_by.avatar_link : user.avatar_link"
+                    <img :src="post.created_by.avatar_link"
                         class="w-[40px] h-[39px] rounded-full">
 
-                    <p><strong>{{post.created_by.name ? post.created_by.name : user.name }}</strong></p>
+                    <p><strong>{{post.created_by.name }}</strong></p>
                 </div>
             </router-link>
 
@@ -96,8 +96,7 @@ import {
 } from 'vue'
 import axios from 'axios';
 import {
-    Post,
-    User
+    Post
 } from '../interfaces.ts'
 import type {
     PropType
@@ -107,8 +106,7 @@ export default defineComponent({
         post: {
             type: Object as PropType<Post>,
             required: true
-        },
-        user: Object as PropType<User>
+        }
     },
     methods: {
         likePost() {
@@ -133,7 +131,6 @@ export default defineComponent({
         async deletePost() {
             axios.delete(`/api/post/${this.post.id}`).then(
                 response => {
-                    console.log(response);
                     this.$emit('deletePost', this.post.id)
                 }
             ).catch(e => {

@@ -35,7 +35,7 @@
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-2 space-y-4">
             <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts"/>
-            <FeedItem v-for="post in posts" :user="user" :post="post" :key="post.id" @deletePost="deletePost" />
+            <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost" />
         </div>
 
         <!-- People you may know -->
@@ -103,11 +103,11 @@ export default defineComponent({
             })
         },
         async getFeeds(userId: string | string[]) {
-            this.posts = [];
             await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
                 if (!response.data.next) {
                     this.hasNext = false
                 }
+                console.log(response.data)
                 this.posts = [...this.posts, ...response.data.results.posts];
                 this.user = response.data.results.user
                 this.can_send_friendship_request = response.data.results.can_send_friendship_request
