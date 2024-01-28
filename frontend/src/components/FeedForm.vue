@@ -10,8 +10,8 @@
             </div>
 
             <div
-                class="p-4 border-t border-gray-100 flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
-                <label for="upload" class="inline-block bg-gray-600 text-white rounded-lg cursor-pointer py-3 px-3">Attach
+                class="p-4 border-t border-gray-100 flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
+                <label for="upload" class="inline-block bg-gray-600 text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
                     Image</label>
                 <input id="upload" type="file" ref="postPhoto" accept="image/*" @change="onFileChange" hidden />
                 <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
@@ -21,7 +21,7 @@
                         <option value=true>Private</option> 
                     </select>  -->
                     <button type="submit"
-                        class="inline-block bg-purple-600 text-white rounded-lg py-3 px-6 ml-0 sm:ml-2">Post</button>
+                        class="inline-block bg-purple-600 text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
                 </div>
             </div>
         </div>

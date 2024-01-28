@@ -1,10 +1,10 @@
 <template lang="">
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- User on the left -->
-        <div class="main-left col-span-1">
+        <div class="main-left col-span-4 md:col-span-1 order-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-                <div class="flex items-center justify-center">
-                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full" />
+                <div class="flex items-center justify-center ">
+                    <img :src="user.avatar_link" class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
@@ -33,13 +33,13 @@
             </div>
         </div>
         <!-- New post & feeds on the middle -->
-        <div class="main-center col-span-2 space-y-4">
+        <div class="main-center space-y-4 col-span-4 md:col-span-2 order-3 md:order-2">
             <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts"/>
             <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost" />
         </div>
 
         <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4">
+        <div class="main-right space-y-4 col-span-4 md:col-span-1 order-2 md:order-3">
             <PeopleYouMayKnow />
             <Trends />
         </div>
