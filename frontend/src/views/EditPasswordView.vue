@@ -4,7 +4,7 @@ TODOS:
  */
 <template>
     <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
-        <div class="main-left col-span-1">
+        <div class="main-left col-span-2 md:col-span-1">
             <div class="p-12 bg-white border border-gray-200 rounded-lg">
                 <h1 class="mb-6 text-2xl">Edit password</h1>
 
@@ -14,7 +14,7 @@ TODOS:
             </div>
         </div>
 
-        <div class="main-right col-span-1">
+        <div class="main-right col-span-2 md:col-span-1">
             <div class="p-12 bg-white border border-gray-200 rounded-lg">
                 <form class="space-y-6" v-on:submit.prevent="submitForm">
                     <div>
