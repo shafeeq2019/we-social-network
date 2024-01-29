@@ -1,12 +1,12 @@
 <template>
-  <nav class="py-3 px-8 border-b border-gray-200 bg-white fixed w-full top-0">
+  <nav class="py-3 px-4 border-b border-gray-200 bg-white fixed w-full top-0">
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="menu-left">
           <a href="#" class="text-xl">We</a>
         </div>
 
-        <div class="menu-center flex space-x-12" v-if="userStore.user.isAuthenticated">
+        <div class="menu-center flex space-x-9" v-if="userStore.user.isAuthenticated">
           <RouterLink to="/feed" active-class="text-purple-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-6 h-6">
@@ -44,7 +44,7 @@
         <template v-if="userStore.user.isAuthenticated && userStore.user.id">
           <div class="menu-right">
             <RouterLink :to="{ name: 'profile', params: { id: userStore.user.id } }">
-              <img :src="userStore.user.avatar_link" class="rounded-full w-11 h-11" />
+              <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10"/>
             </RouterLink>
           </div>
         </template>
@@ -58,7 +58,7 @@
       </div>
     </div>
   </nav>
-  <main class="px-10 py-6 mt-14">
+  <main class="px-4 py-6 mt-14">
     <RouterView />
   </main>
   <Toast />

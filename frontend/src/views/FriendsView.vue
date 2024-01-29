@@ -4,7 +4,7 @@
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
                 <div class="flex items-center justify-center">
-                    <img :src="user.avatar_link" class="mb-6 rounded-full object-fit:cover h-64 w-full" />
+                    <img :src="user.avatar_link" class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
@@ -22,24 +22,21 @@
                     <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
                         v-for="friendshipRequest in friendshipRequests">
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
-                            <img :src="friendshipRequest.created_by.avatar_link" class="mb-6 mx-auto rounded-full w-40 h-40">
+                            <img :src="friendshipRequest.created_by.avatar_link" class="mb-6 mx-auto w-24 h-24 rounded-full object-cover object-center">
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
-                            <div class="mt-6 flex space-x-8 justify-around">
-                                <p class="text-xs text-gray-500">182 friends</p>
+                            <div class="mt-3 flex space-x-8 justify-around">
+                                <p class="text-xs text-gray-500">{{friendshipRequest.created_by.friends_count}} friends</p>
                                 <p class="text-xs text-gray-500">{{friendshipRequest.created_by.posts_count}} posts</p>
                             </div>
                         </router-link>
-                        <div class="mt-6 space-y-2 grid grid-rows-2">
-                            <div row-span-1>
+                        <div class="mt-3 flex space-x-3 justify-between">
                                 <button class="py-1 px-1 bg-purple-600 text-white rounded-md text-xs w-full" @click="handleRequest('accepted', friendshipRequest.id)">
                                     Accept
                                 </button>
-                            </div>
-                            <div row-span-1>
                                 <button class="py-1 px-1 bg-gray-600 text-white rounded-md text-xs w-full" @click="handleRequest('rejected', friendshipRequest.id)">
                                     Reject
                                 </button>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -47,13 +44,13 @@
 
             <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friends.length > 0">
                 <h2 class="text-xl mb-6">Friendships</h2>
-                <div class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div class=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
                         v-for="friend in friends">
                         <router-link :to="{ name: 'profile', params: { 'id': friend.id } }">
-                            <img :src="friend.avatar_link" class="mb-6 mx-auto rounded-full w-40 h-40">
+                            <img :src="friend.avatar_link" class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
                             <p><strong>{{friend.name}}</strong></p>
-                            <div class="mt-6 flex space-x-8 justify-around">
+                            <div class="mt-3 flex space-x-8 justify-around">
                                 <p class="text-xs text-gray-500">{{friend.friends_count}} friends</p>
                                 <p class="text-xs text-gray-500">{{friend.posts_count}} posts</p>
                             </div>
