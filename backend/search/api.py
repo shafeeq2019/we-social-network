@@ -10,17 +10,20 @@ from post.serializers import PostSerializer
 def search(request):
     data = request.data
     query = data.get('query')
+    query = query.strip()
+    users = []
+    posts = []
 
-    users = User.objects.filter(name__icontains=query)
-    posts = Post.objects.filter(body__icontains=query)
+    if query:
+        users = User.objects.filter(name__icontains=query)
+        posts = Post.objects.filter(body__icontains=query)
 
-    user_serializer = UserSerializer(users, many=True)
-    for post in posts:
-        post.post_liked = post.likes.filter(created_by=request.user).exists()
-    post_serializer = PostSerializer(posts, many=True)
+        for post in posts:
+            post.post_liked = post.likes.filter(
+                created_by=request.user).exists()
 
     return JsonResponse(
         {
-            "users": user_serializer.data,
-            "posts": post_serializer.data
+            "users": UserSerializer(users, many=True).data,
+            "posts": PostSerializer(posts, many=True).data
         }, safe=False)

@@ -24,7 +24,7 @@
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
                             <img :src="friendshipRequest.created_by.avatar_link" class="mb-6 mx-auto w-24 h-24 rounded-full object-cover object-center">
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
-                            <div class="mt-3 flex space-x-8 justify-around">
+                            <div class="mt-3 flex space-x-4 justify-around">
                                 <p class="text-xs text-gray-500">{{friendshipRequest.created_by.friends_count}} friends</p>
                                 <p class="text-xs text-gray-500">{{friendshipRequest.created_by.posts_count}} posts</p>
                             </div>
@@ -50,7 +50,7 @@
                         <router-link :to="{ name: 'profile', params: { 'id': friend.id } }">
                             <img :src="friend.avatar_link" class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
                             <p><strong>{{friend.name}}</strong></p>
-                            <div class="mt-3 flex space-x-8 justify-around">
+                            <div class="mt-3 flex space-x-4 justify-around">
                                 <p class="text-xs text-gray-500">{{friend.friends_count}} friends</p>
                                 <p class="text-xs text-gray-500">{{friend.posts_count}} posts</p>
                             </div>

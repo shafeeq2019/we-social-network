@@ -17,12 +17,12 @@
             </div>
 
             <div v-if="users.length > 0"
-                class="bg-white border border-gray-200 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                class="bg-white border border-gray-200 rounded-lg p-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
                 <router-link :to="{ name: 'profile', params: { 'id': user.id } }" v-for="user in users">
                     <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
-                        <img :src="user.avatar_link" class="mb-6 rounded-full w-44 h-44 mx-auto">
-                        <p><strong>{{user.name}}</strong></p>
-                        <div class="mt-6 flex space-x-8 justify-around">
+                        <img :src="user.avatar_link" class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
+                        <p class="break-all"><strong>{{user.name}}</strong></p>
+                        <div class="mt-6 flex space-x-4 justify-around">
                             <p class="text-xs text-gray-500">{{user.friends_count}} friends</p>
                             <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
                         </div>
