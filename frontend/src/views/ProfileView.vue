@@ -104,8 +104,8 @@ export default defineComponent({
         },
         async getFeeds(userId: string | string[]) {
             await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
-                if (!response.data.next) {
-                    this.hasNext = false
+                if (response.data.next) {
+                    this.hasNext = true
                 }
                 this.posts = [...this.posts, ...response.data.results.posts];
                 this.user = response.data.results.user
@@ -135,15 +135,17 @@ export default defineComponent({
         }
     },
     mounted() {
-        this.getFeeds(this.$route.params.id);
-        window.onscroll = () => {
-            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+        const onScroll = () => {
+            let bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight
             if (bottomOfWindow && this.hasNext) {
-                console.log(this.currentPage)
                 this.currentPage += 1;
+                this.hasNext = false;
                 this.getFeeds(this.$route.params.id)
             }
         }
+        this.getFeeds(this.$route.params.id);
+        window.onscroll = onScroll;
+        window.ontouchmove = onScroll;
     }
 });
 </script>
