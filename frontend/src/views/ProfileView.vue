@@ -128,6 +128,7 @@ export default defineComponent({
             this.posts = this.posts.filter(
                 post => post.id != postId
             )
+            this.user.posts_count -= 1;
         },
         logout() {
             this.userStore.removeToken();

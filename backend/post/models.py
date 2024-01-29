@@ -47,6 +47,12 @@ class Post(models.Model):
         self.notifications.create_notification(
             created_by=user, created_for=self.created_by, type_of_notification='post_comment')
         return 'post commented successfully'
+    
+    def delete_post(self, user):
+        self.delete()
+        user.posts_count -=1
+        user.save()
+        
 
 
 class PostAttachment(models.Model):
