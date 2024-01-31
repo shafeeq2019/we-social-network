@@ -10,21 +10,16 @@
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4" v-if="conversations.length > 0">
         <div class="main-left col-span-1">
             <div class="bg-white border border-gray-200 rounded-lg text-center shadow-md">
-                <div>
-                    <div class="flex items-center justify-between cursor-pointer pl-4 py-2"
+                    <div class="flex items-center justify-center sm:justify-between cursor-pointer pl-0 sm:pl-4 py-2"
                         v-for="conversation in conversations" @click="openConversation(conversation)"
-                        :key="conversation.id" :class="{ 'bg-gray-300': activeConversation.id == conversation.id, 
+                        :key="conversation.id" :class="{ 'bg-gray-300 rounded-lg': activeConversation.id == conversation.id, 
                         ' shadow-md' : conversation.id == conversations[conversations.length-1].id  ,
                         'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
                         <div class="flex items-center space-x-2">
-                            <img :src="conversation.users[0].avatar_link" class="w-[40px] rounded-full">
-
-                            <p class="text-xs font-bold"> {{conversation.users[0].name}} </p>
+                            <img :src="conversation.users[0].avatar_link" class="mx-auto w-12 h-12 rounded-full object-cover object-center">
+                            <p class="text-xs font-bold hidden sm:block"> {{conversation.users[0].name}} </p>
                         </div>
-
-                        <span class="text-xs text-gray-500">{{conversation.modifed_ago}}</span>
                     </div>
-                </div>
             </div>
         </div>
         <div class="main-center col-span-3 space-y-4">
