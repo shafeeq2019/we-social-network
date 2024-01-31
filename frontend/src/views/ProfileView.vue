@@ -60,6 +60,7 @@ import FeedForm from '@/components/FeedForm.vue';
 
 export default defineComponent({
     async beforeRouteUpdate(to, from) {
+        this.posts = [];
         // react to route changes...
         await this.getFeeds(to.params.id);
     },
