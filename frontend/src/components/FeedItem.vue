@@ -193,7 +193,10 @@ export default defineComponent({
             axios.delete(`/api/post/${this.post.id}`).then(
                 response => {
                     this.$emit('deletePost', this.post.id)
-                    this.toastStore.showToast(5000, 'The post was deleted', 'bg-emerald-500')
+                    this.toastStore.showToast(5000, 'The post was deleted', 'bg-emerald-500');
+                    if (this.$route.name == 'postview') {
+                        this.$router.go(-1);
+                    }
                 }
             ).catch(e => {
                 console.log(e)
