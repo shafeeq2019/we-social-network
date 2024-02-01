@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="menu-left">
-          <a href="#" class="text-xl">We</a>
+          <a href="#" class="text-xl font-medium">We</a>
         </div>
 
         <div class="menu-center flex space-x-9" v-if="userStore.user.isAuthenticated">
@@ -43,9 +43,6 @@
         </div>
         <template v-if="userStore.user.isAuthenticated && userStore.user.id">
           <div class="menu-right">
-            <!-- <RouterLink :to="{ name: 'profile', params: { id: userStore.user.id } }">
-              <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10" />
-            </RouterLink> -->
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10" />
@@ -64,7 +61,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
-                    <span class="px-2">Logout</span>
+                    <span class="px-2" @click="logout">Logout</span>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
