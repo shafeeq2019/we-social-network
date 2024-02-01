@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from "@/stores/user";
 import SignupView from '../views/SignupView.vue'
 import LoginView from '../views/LoginView.vue'
 import FeedView from '../views/FeedView.vue'
@@ -12,80 +13,133 @@ import EditProfileView from '../views/EditProfileView.vue'
 import EditPasswordView from '../views/EditPasswordView.vue'
 import NotificationsView from '../views/NotificationsView.vue'
 
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/signup',
       name: 'signup',
-      component: SignupView
+      component: SignupView,
+      meta: {
+        hideForAuth: true,
+      },
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      meta: {
+        hideForAuth: true,
+      },
     },
     {
       path: '/feed',
       name: 'feed',
-      component: FeedView
+      component: FeedView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/messages/:user_id?',
       name: 'messages',
       component: MessageView,
-      props: true
+      props: true,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/search',
       name: 'search',
-      component: SearchView
+      component: SearchView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/profile/:id',
       name: 'profile',
-      component: ProfileView
+      component: ProfileView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/profile/edit',
       name: 'editprofile',
-      component: EditProfileView
+      component: EditProfileView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/profile/edit/password',
       name: 'editpassword',
-      component: EditPasswordView
+      component: EditPasswordView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/profile/:id/friends',
       name: 'friends',
-      component: FriendsView
+      component: FriendsView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/:id',
       name: 'postview',
-      component: PostView
+      component: PostView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/trends/:hashtag',
       name: 'trendsview',
       component: TrendsView,
-      props: true
+      props: true,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/notifications',
       name: 'notifications',
-      component: NotificationsView
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
+      component: NotificationsView,
+      meta: {
+        requiresAuth: true,
+      },
     }
   ]
 })
+
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore();
+
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!userStore.user.isAuthenticated) {
+      next({ path: "/login" });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+
+  if (to.matched.some((record) => record.meta.hideForAuth)) {
+    if (userStore.user.isAuthenticated) {
+      next({ path: "/feed" });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
 
 export default router
