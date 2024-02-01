@@ -43,9 +43,32 @@
         </div>
         <template v-if="userStore.user.isAuthenticated && userStore.user.id">
           <div class="menu-right">
-            <RouterLink :to="{ name: 'profile', params: { id: userStore.user.id } }">
-              <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10"/>
-            </RouterLink>
+            <!-- <RouterLink :to="{ name: 'profile', params: { id: userStore.user.id } }">
+              <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10" />
+            </RouterLink> -->
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent class="font-medium  bg-white rounded-md">
+                <DropdownMenuItem class="cursor-pointer">
+                  <RouterLink :to="{ name: 'profile', params: { id: userStore.user.id } }"
+                    class="flex space-x-2 items-center">
+                    <img :src="userStore.user.avatar_link" class="rounded-full w-8 h-8" />
+                    <span class="px-2">{{ userStore.user.name }}</span>
+                  </RouterLink>
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer">
+                  <div class="flex space-x-2 items-center">
+                    <svg class="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    <span class="px-2">Logout</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </template>
 
@@ -69,6 +92,14 @@ import Toast from "@/components/Toast.vue";
 import {
   useUserStore
 } from "@/stores/user";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import axios from "axios";
 import {
   defineComponent
@@ -84,6 +115,18 @@ export default defineComponent({
   },
   components: {
     Toast,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  },
+  methods: {
+    logout() {
+      this.userStore.removeToken();
+      this.$router.push("/login")
+    }
   },
   created() {
     this.userStore.initStore()

@@ -25,10 +25,6 @@
                     <button v-if="user.id != userStore.user.id"
                         class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full"
                         @click="sendDirectMessage"> Send direct message</button>
-                    <button v-if="userStore.user.id && user.id == userStore.user.id"
-                        class="inline-block p-1 bg-red-600 text-white rounded-md text-xs w-full" @click="logout">
-                        Logut
-                    </button>
                 </div>
             </div>
         </div>
@@ -130,10 +126,6 @@ export default defineComponent({
                 post => post.id != postId
             )
             this.user.posts_count -= 1;
-        },
-        logout() {
-            this.userStore.removeToken();
-            this.$router.push("/login")
         }
     },
     mounted() {
