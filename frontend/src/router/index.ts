@@ -124,22 +124,22 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!userStore.user.isAuthenticated) {
       next({ path: "/login" });
-    } else {
+    }
+    else {
       next();
     }
-  } else {
-    next();
   }
 
   if (to.matched.some((record) => record.meta.hideForAuth)) {
+    console.log("hideForAuth")
     if (userStore.user.isAuthenticated) {
+      console.log(userStore.user.isAuthenticated)
       next({ path: "/feed" });
     } else {
       next();
     }
-  } else {
-    next();
   }
+
 });
 
 export default router
