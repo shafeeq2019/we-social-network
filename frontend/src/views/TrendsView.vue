@@ -7,7 +7,7 @@
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- New post & feeds on the middle -->
         <div class="main-center col-span-4 md:col-span-3 space-y-4">
-            <FeedItem v-for="post in posts" :post="post" :key="post.id" />
+            <FeedItem v-for="post in posts" :post="post" :key="post.id"  @deletePost="deletePost"/>
         </div>
 
         <!-- People you may know -->
@@ -29,6 +29,7 @@ import { Post } from '../interfaces';
 export default defineComponent({
     props: ['hashtag'],
     async beforeRouteUpdate(to, from) {
+        this.posts = [];
         await this.getFeeds(to.params.hashtag);
     },
     components: {
@@ -46,25 +47,33 @@ export default defineComponent({
     methods: {
         async getFeeds(hashtag: string | string[]) {
             await axios.get(`/api/post?trend=${hashtag}&page=${this.currentPage}`).then(response => {
-                if (!response.data.next) {
-                    this.hasNext = false
+                if (response.data.next) {
+                    this.hasNext = true
                 }
                 this.posts = [...this.posts, ...response.data.results];
             }).catch(error => {
                 console.log(error);
             })
         },
+        deletePost(postId: string) {
+            this.posts = this.posts.filter(
+                post => post.id != postId
+            )
+        }
     },
     mounted() {
-        this.getFeeds(this.hashtag);
-        window.onscroll = () => {
-            let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight
+        const onScroll = () => {
+            let bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight
             if (bottomOfWindow && this.hasNext) {
-                console.log(this.currentPage)
                 this.currentPage += 1;
+                this.hasNext = false;
                 this.getFeeds(this.hashtag)
             }
         }
+
+        this.getFeeds(this.hashtag);
+        window.onscroll = onScroll;
+        window.ontouchmove = onScroll;
     }
 });
 </script>
