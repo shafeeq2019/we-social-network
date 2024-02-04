@@ -15,14 +15,18 @@ def conversation_list(request):
     return JsonResponse({"conversations": ConversationSerializer(conversations, many=True).data}, safe=False)
 
 
-@api_view(['GET'])
-def conversation_detail(request, user_id):
+@api_view(['GET', 'DELETE'])
+def get_or_delete(request, id):
     request_user = request.user
-    message_user = User.objects.get(id=user_id)
-    conversation = Conversation.objects.filter(
-        users__in=[request_user]).get(users__in=[message_user])
-    return JsonResponse({"conversation": ConversationDetailSerializer(conversation).data}, safe=False)
-
+    if request.method == "GET":
+        message_user = User.objects.get(id=id)
+        conversation = Conversation.objects.filter(users__in=[request_user]).get(users__in=[message_user])
+        return JsonResponse({"conversation": ConversationDetailSerializer(conversation).data}, safe=False)
+    elif request.method == "DELETE":
+        conversation = request_user.conversations.get(id = id)
+        print(conversation)
+        conversation.delete()
+        return JsonResponse({'message': 'Conversation deleted'})
 
 @api_view(['POST'])
 def conversation_send_message(request, covnersation_id):
@@ -53,3 +57,4 @@ def conversation_get_or_create(request, user_id):
         conversation.users.add(message_user)
 
     return JsonResponse(ConversationSerializer(conversation).data, safe=False)
+

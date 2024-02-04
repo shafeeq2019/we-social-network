@@ -1,25 +1,43 @@
 /**
- TODO:
-  - scroll to the end of the chat automatically when open it
-  - delete message Button
-  - dont show empty conversation
-  - real time messaging
-*/ 
+TODO:
+- scroll to the end of the chat automatically when open it
+- delete message Button
+- dont show empty conversation
+- real time messaging
+*/
 
 <template lang="">
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4" v-if="conversations.length > 0">
         <div class="main-left col-span-1">
             <div class="bg-white border border-gray-200 rounded-lg text-center shadow-md">
-                    <div class="flex items-center justify-center sm:justify-between cursor-pointer pl-0 sm:pl-4 py-2"
-                        v-for="conversation in conversations" @click="openConversation(conversation)"
-                        :key="conversation.id" :class="{ 'bg-gray-300 rounded-lg': activeConversation.id == conversation.id, 
+                <div class="flex items-center justify-between cursor-pointer pl-4 py-2 group"
+                    v-for="conversation in conversations" @click="openConversation(conversation)" :key="conversation.id"
+                    :class="{ 'bg-gray-300 rounded-lg': activeConversation.id == conversation.id, 
                         ' shadow-md' : conversation.id == conversations[conversations.length-1].id  ,
                         'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
-                        <div class="flex items-center space-x-2">
-                            <img :src="conversation.users[0].avatar_link" class="mx-auto w-12 h-12 rounded-full object-cover object-center">
-                            <p class="text-xs font-bold hidden sm:block"> {{conversation.users[0].name}} </p>
-                        </div>
+                    <div class="flex items-center space-x-2">
+                        <img :src="conversation.users[0].avatar_link"
+                            class="mx-auto w-12 h-12 rounded-full object-cover object-center">
+                        <p class="text-xs font-bold hidden sm:block"> {{conversation.users[0].name}} </p>
                     </div>
+                    <div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger class="sm:invisible group-hover:visible hover:bg-gray-400 hover:rounded-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" stroke-width="1.5"
+                                    stroke="currentColor" class="w-8 h-8 block">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z">
+                                    </path>
+                                </svg>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem class="cursor-pointer" @click="deleteConversation">Delete Conversation
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                </div>
             </div>
         </div>
         <div class="main-center col-span-3 space-y-4">
@@ -36,14 +54,16 @@
                                 <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
                             </div>
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                                <img :src="message.created_by.avatar_link" class="mx-auto w-11 h-11 rounded-full object-cover object-center">
+                                <img :src="message.created_by.avatar_link"
+                                    class="mx-auto w-11 h-11 rounded-full object-cover object-center">
                             </div>
                         </div>
                         <!--received messages-->
                         <div class="flex w-full mt-2 space-x-3 max-w-md"
                             v-if="message.created_by.id != userStore.user.id">
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                                <img :src="message.created_by.avatar_link" class="mx-auto w-11 h-11 rounded-full object-cover object-center">
+                                <img :src="message.created_by.avatar_link"
+                                    class="mx-auto w-11 h-11 rounded-full object-cover object-center">
                             </div>
                             <div>
                                 <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
@@ -89,9 +109,25 @@ import axios from 'axios';
 import {
     useUserStore
 } from '@/stores/user';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Conversation, User } from '../interfaces';
 
 export default defineComponent({
+    components: {
+        DropdownMenu,
+        DropdownMenuContent,
+        DropdownMenuItem,
+        DropdownMenuLabel,
+        DropdownMenuSeparator,
+        DropdownMenuTrigger,
+    },
     props: ['user_id'],
     setup() {
         const userStore = useUserStore()
@@ -156,6 +192,15 @@ export default defineComponent({
                 }
             });
             await this.getMessages(this.user_id);
+        },
+        async deleteConversation() {
+            axios.delete(`/api/chat/${this.activeConversation.id}/`).then(async response => {
+                this.activeConversation = {} as Conversation;
+                await this.getConversationsList();
+                await this.$router.push({
+                    name: 'messages',
+                });
+            })
         }
     },
     created() {
