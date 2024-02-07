@@ -11,46 +11,57 @@ from .serializers import ConversationSerializer, ConversationMessageSerializer, 
 
 @api_view(['GET'])
 def conversation_list(request):
-    request_user = request.user
-    conversations = request_user.conversations.filter()  # messages__isnull=False
+    sender_user = request.user
+    conversations = sender_user.conversations.filter()  # messages__isnull=False
     return JsonResponse({"conversations": ConversationSerializer(conversations, many=True).data}, safe=False)
 
 
 @api_view(['GET', 'DELETE', 'POST'])
-def message_controller(request, user_id):
-    request_user = request.user
-    message_user = get_object_or_404(User, id=user_id)
+def conversation_controller(request, user_id):
+    sender_user = request.user
+    receiver_user = get_object_or_404(User, id=user_id)
 
-    if request.method == "GET":
-        try:
-            conversation = request_user.conversations.get(
-                users__in=[message_user])
-        except ObjectDoesNotExist:
-            conversation = request_user.conversations.create()
-            conversation.users.add(message_user)
+    if request.method == "POST":
+        conversation = sender_user.conversations.filter(
+            users__in=[receiver_user])
 
+        if conversation.exists():
+            return JsonResponse({'message': 'Conversation already exists'})
+
+        conversation = sender_user.conversations.create()
+        conversation.users.add(receiver_user)
         return JsonResponse({"conversation": ConversationDetailSerializer(conversation).data}, safe=False)
 
     conversation = get_object_or_404(
-        request_user.conversations, users__in=[message_user])
+        sender_user.conversations, users__in=[receiver_user])
 
-    if request.method == "DELETE":
+    if request.method == "GET":
+        return JsonResponse({"conversation": ConversationDetailSerializer(conversation).data}, safe=False)
+
+    elif request.method == "DELETE":
         conversation.delete()
         return JsonResponse({'message': 'Conversation deleted'})
-    elif request.method == "POST":
-        conversation_2 = message_user.conversations.filter(
-            users__in=[request_user])
 
-        conversation_1_message = conversation.messages.create(message=request.data.get(
-            'message'), created_by=request_user, sent_to=message_user)
+
+@api_view(['POST'])
+def message_controller(request, user_id):
+    if request.method == "POST":
+        sender_user = request.user
+        receiver_user = get_object_or_404(User, id=user_id)
+        sender_conversation = get_object_or_404(
+            sender_user.conversations, users__in=[receiver_user])
+
+        sender_message = sender_conversation.messages.create(message=request.data.get(
+            'message'), created_by=sender_user, sent_to=receiver_user)
+
+        receiver_conversation = receiver_user.conversations.filter(
+            users__in=[sender_user])
 
         # If the receiving user has deleted the conversation:
-        if not conversation_2.exists():
-            conversation = message_user.conversations.create()
-            conversation.users.add(request_user)
+        if not receiver_conversation.exists():
+            receiver_user.conversations.create().users.add(sender_user)
 
-        conversation_2_message = conversation_2[0].messages.create(message=request.data.get(
-            'message'), created_by=request_user, sent_to=message_user)
+        receiver_message = receiver_conversation[0].messages.create(message=request.data.get(
+            'message'), created_by=sender_user, sent_to=receiver_user)
 
-        return JsonResponse({"message": ConversationMessageSerializer(conversation_1_message).data}, safe=False)
-
+    return JsonResponse({"message": ConversationMessageSerializer(sender_message).data}, safe=False)

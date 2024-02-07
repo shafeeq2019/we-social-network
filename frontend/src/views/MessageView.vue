@@ -168,7 +168,7 @@ export default defineComponent({
         },
         async submitForm() {
             if (this.messageText.replace(/\s/g, '').length > 0) {
-                axios.post(`/api/chat/${this.user_id}/`, {
+                axios.post(`/api/chat/${this.user_id}/messages/`, {
                     message: this.messageText
                 }).then(async response => {
                     this.messageText = ''
@@ -202,4 +202,4 @@ export default defineComponent({
         this.getConversationsList()
     }
 })
-</script>../interfaces
+</script>
