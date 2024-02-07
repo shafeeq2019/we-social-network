@@ -86,7 +86,7 @@ export default defineComponent({
     },
     methods: {
         async sendDirectMessage() {
-            axios.get(`/api/chat/get-or-create/${this.$route.params.id}/`).then(
+            axios.get(`/api/chat/${this.$route.params.id}/`).then(
                 response => {
                     this.$router.push({
                         name: 'messages',

@@ -146,11 +146,6 @@ export default defineComponent({
     methods: {
         async getConversationsList() {
             axios.get('/api/chat/').then(async response => {
-                for (let c of response.data.conversations) {
-                    c.users = c.users.filter((user: User) => {
-                        return user.id != this.userStore.user.id
-                    })
-                }
                 this.conversations = response.data.conversations;
                 if (this.conversations.length > 0 && this.user_id) {
                     await this.getMessages(this.user_id)
@@ -173,7 +168,7 @@ export default defineComponent({
         },
         async submitForm() {
             if (this.messageText.replace(/\s/g, '').length > 0) {
-                axios.post(`/api/chat/${this.activeConversation.id}/message/`, {
+                axios.post(`/api/chat/${this.user_id}/`, {
                     message: this.messageText
                 }).then(async response => {
                     this.messageText = ''
@@ -194,7 +189,7 @@ export default defineComponent({
             await this.getMessages(this.user_id);
         },
         async deleteConversation() {
-            axios.delete(`/api/chat/${this.activeConversation.id}/`).then(async response => {
+            axios.delete(`/api/chat/${this.user_id}/`).then(async response => {
                 this.activeConversation = {} as Conversation;
                 await this.getConversationsList();
                 await this.$router.push({
