@@ -16,7 +16,7 @@
         <p v-html="formatHashtags(post.body)"> </p>
 
         <img :src="post.post_attachments[0].image_link" :key="post.post_attachments[0].id"
-            class="w-full rounded-lg mt-4" v-if="post.post_attachments.length > 0">
+            class="w-full rounded-lg mt-4 h-auto max-w-xl mx-auto" v-if="post.post_attachments.length > 0">
 
         <div class="mt-6 mb-1 flex justify-between">
             <div class="flex space-x-6">
