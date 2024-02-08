@@ -5,8 +5,9 @@
                 <h1 class="mb-6 text-2xl">Sign up</h1>
 
                 <p class="mb-6 text-gray-500">
-                    Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
-                    Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
+                    <p class="mb-6 text-gray-500">
+                        <b>We</b> is a social network for sharing news and making new friendships. Log in or join now - it's free
+                    </p>
                 </p>
 
                 <p class="font-bold">
