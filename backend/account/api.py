@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 # To override the settings in setting.py
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from django.conf import settings
 from .forms import SignupForm, EditProfileForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -41,7 +42,7 @@ def signup(request):
     if form.is_valid():
         user = form.save()
 
-        url = f'http://127.0.0.1:8000/activateemail/?email={user.email}&id={user.id}'
+        url = f'{settings.WEBSITE_URL}/activateemail/?email={user.email}&id={user.id}'
         send_mail(
             "Please verify your email",
             f"The url for activating your accout is: {url}",

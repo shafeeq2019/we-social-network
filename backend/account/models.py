@@ -57,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def avatar_link(self):
         if self.avatar:
-            return 'http://127.0.0.1:8000' + self.avatar.url
+            return f'{settings.WEBSITE_URL}' + self.avatar.url
         else:
             return ''
 
