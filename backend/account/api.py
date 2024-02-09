@@ -140,8 +140,7 @@ def edit_profile(request):
         logger.info(f"Profile edited successfully for user {user.id}")
     else:
         response['message'] = form.errors.as_json()
-        logger.error(f"Error editing profile for user {
-                     user.id}: {response['message']}")
+        logger.error(f"Error editing profile for user {user.id}: {response['message']}")
 
     return JsonResponse(response)
 
