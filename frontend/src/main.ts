@@ -7,9 +7,15 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
-axios.defaults.baseURL = "http://127.0.0.1:8000"
-
+axios.interceptors.request.use(config => {
+    config.baseURL = VITE_API_URL;
+    return config;
+  }, error => {
+    return Promise.reject(error);
+  });
+  
 
 const app = createApp(App)
 
