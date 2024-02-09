@@ -1,7 +1,7 @@
 from django.db import models
 import uuid
 from account.models import User
-
+from django.conf import settings
 from django.utils.timesince import timesince
 
 # Create your models here.
@@ -65,7 +65,7 @@ class PostAttachment(models.Model):
 
     def image_link(self):
         if self.image:
-            return 'http://127.0.0.1:8000' + self.image.url
+            return settings.WEBSITE_URL + self.image.url
         else:
             return ''
 
