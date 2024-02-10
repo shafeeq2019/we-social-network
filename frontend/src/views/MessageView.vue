@@ -1,6 +1,5 @@
 /**
 TODO:
-- scroll to the end of the chat automatically when open it
 - real time messaging
 */
 
@@ -15,7 +14,7 @@ TODO:
                         'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
                     <div class="flex items-center space-x-2">
                         <img :src="conversation.users[0].avatar_link"
-                            class="mx-auto w-12 h-12 rounded-full object-cover object-center">
+                            class="mx-auto w-9 h-9  sm:w-12 sm:h-12 rounded-full object-cover object-center">
                         <p class="text-xs font-bold hidden sm:block"> {{conversation.users[0].name}} </p>
                     </div>
                     <div>
@@ -23,7 +22,7 @@ TODO:
                             <DropdownMenuTrigger
                                 class="sm:invisible group-hover:visible hover:bg-gray-400 hover:rounded-lg mx-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" class="w-8 h-8 block">
+                                    stroke="currentColor" class="w-5 h-5 sm:w-8 sm:h-8 block">
                                     <path stroke-linecap="round" stroke-linejoin="round"
                                         d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z">
                                     </path>
@@ -55,14 +54,14 @@ TODO:
         </div>
         <div class="main-center col-span-3 space-y-4">
             <div class="bg-white border border-gray-200 rounded-lg">
-                <div class="flex flex-col flex-grow p-4 h-[calc(100vh-339px)] overflow-auto">
+                <div class="flex flex-col flex-grow p-4 h-[calc(100vh-212px)] overflow-auto" id="conversation">
                     <template v-for="message in activeConversation.messages" :key="message.id">
                         <!--sent messages-->
                         <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end"
                             v-if="message.created_by.id == userStore.user.id">
                             <div>
                                 <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
-                                    <p class="text-sm"> {{message.message}}</p>
+                                    <p class="text-sm text-right"> {{message.message}}</p>
                                 </div>
                                 <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
                             </div>
@@ -91,14 +90,16 @@ TODO:
 
             <div class="bg-white border border-gray-200 rounded-lg">
                 <form @submit.prevent="submitForm">
-                    <div class="p-4">
-                        <textarea class="w-full bg-gray-100 rounded-lg p-4 resize-none" v-model="messageText"
-                            @keydown.enter.prevent="submitForm" placeholder="What do you want to say?" rows=""
-                            cols=""></textarea>
-                    </div>
-                    <div class="mb-2 border-t border-gray-100 p-4 flex justify-between">
-                        <button href="#"
-                            class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Send</button>
+                    <div class="p-4 flex space-x-3">
+                    <input type="text" name="" id="" class="w-full bg-gray-100 rounded-lg p-4 " v-model="messageText"
+                            @keydown.enter.prevent="submitForm" placeholder="What do you want to say?"/>
+                            <button href="#" class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg" @click="submitForm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                            </svg>
+                        </button>
                     </div>
                 </form>
             </div>
@@ -161,7 +162,8 @@ export default defineComponent({
             axios.get('/api/chat/').then(async response => {
                 this.conversations = response.data.conversations;
                 if (this.conversations.length > 0 && this.user_id) {
-                    await this.getMessages(this.user_id)
+                    await this.getMessages(this.user_id);
+                    this.scrollToBottom()
                 } else if (this.conversations.length > 0 && !this.user_id) {
                     this.activeConversation = this.conversations[0]
                     await this.openConversation(this.conversations[0])
@@ -173,8 +175,8 @@ export default defineComponent({
             })
         },
         async getMessages(user_id: string) {
-            axios.get(`/api/chat/${user_id}/`).then(response => {
-                this.activeConversation = response.data.conversation
+            return axios.get(`/api/chat/${user_id}/`).then(response => {
+                this.activeConversation = response.data.conversation;
             }).catch(error => {
                 console.log(error)
             })
@@ -200,6 +202,7 @@ export default defineComponent({
                 }
             });
             await this.getMessages(this.user_id);
+            this.scrollToBottom()
         },
         async deleteConversation() {
             axios.delete(`/api/chat/${this.user_id}/`).then(async response => {
@@ -209,6 +212,12 @@ export default defineComponent({
                     name: 'messages',
                 });
             })
+        },
+        scrollToBottom() {
+            let container = document.getElementById("conversation");
+            if (container) {
+                container.scrollTop = container.scrollHeight;
+            }
         }
     },
     created() {
