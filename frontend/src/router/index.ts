@@ -18,6 +18,14 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
+      path: "/",
+      name: "home",
+      component: FeedView,
+      meta: {
+        requiresAuth: true,
+      }
+    },
+    {
       path: '/signup',
       name: 'signup',
       component: SignupView,
@@ -131,7 +139,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   if (to.matched.some((record) => record.meta.hideForAuth)) {
-    console.log("hideForAuth")
     if (userStore.user.isAuthenticated) {
       console.log(userStore.user.isAuthenticated)
       next({ path: "/feed" });
