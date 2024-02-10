@@ -7,7 +7,7 @@ This project serves as a practical application for learning Python Django, showc
 https://we-social-network.web.app/
 
 ## Config
-You only need to add your web app's Firebase configuration to `./frontend/src/firebase.ts and provide your server URL in ./frontend/.env`
+You only need to add your web app's Firebase configuration to `./frontend/src/firebase.ts` and provide your server URL in `./frontend/.env`
 
 
 ## 📸 Screenshots
