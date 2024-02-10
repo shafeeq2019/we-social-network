@@ -4,8 +4,7 @@ Welcome to We, a vibrant social network designed for sharing news and fostering 
 This project serves as a practical application for learning Python Django, showcasing a range of real-world features and functionalities. Our frontend is crafted using the latest technologies, including Vue.js 3 and Tailwind CSS, ensuring a seamless and dynamic user experience
 
 ## Live Demo
-https://vuetube-1199b.firebaseapp.com/](https://we-social-network.web.app/
-
+https://we-social-network.web.app/
 
 ## Config
 You only need to add your web app's Firebase configuration to `./frontend/src/firebase.ts and provide your server URL in ./frontend/.env`
