@@ -11,7 +11,7 @@ You only need to add your web app's Firebase configuration to `./frontend/src/fi
 
 
 ## 📸 Screenshots
-soon!
+<img src="screenshots/1.png">
 
 ## Build Setup
 ``` bash
