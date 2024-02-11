@@ -9,11 +9,11 @@
                 </div>
             </div>
 
-            <div
-                class="p-4 border-t border-gray-100 flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
-                <label for="upload" class="inline-block bg-gray-600 text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
+            <div class="p-4 border-t border-gray-100 flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
+                <label for="upload-image"
+                    class="inline-block bg-gray-600 text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
                     Image</label>
-                <input id="upload" type="file" ref="postPhoto" accept="image/*" @change="onFileChange" hidden />
+                <input id="upload-image" type="file" ref="postPhoto" accept="image/*" @input="onFileChange" hidden>
                 <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
                     <!-- <select id="privacy" v-model="is_private"
                         class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3 cursor-pointer">
@@ -59,13 +59,14 @@ export default defineComponent({
     },
     methods: {
         onFileChange() {
-            const file = (this.$refs.postPhoto as any).files[0];
-            this.url = URL.createObjectURL(file)
+            const imageInput = document.getElementById("upload-image")! as HTMLInputElement
+            this.url = URL.createObjectURL(imageInput.files![0])
         },
         async submitForm() {
+            const imageInput = document.getElementById("upload-image")! as HTMLInputElement
             axios.post("/api/post/create/", {
                 body: this.body,
-                image: (this.$refs.postPhoto as any).files[0],
+                image: imageInput.files![0],
                 is_private: this.is_private
             }, {
                 headers: {
@@ -74,7 +75,7 @@ export default defineComponent({
             }).then(response => {
                 this.body = '';
                 this.is_private = false;
-                (this.$refs.postPhoto as any).value = null;
+                imageInput.value = "";
                 this.url = '';
                 this.posts.unshift(response.data)
                 this.user ? this.user.posts_count += 1 : '';
