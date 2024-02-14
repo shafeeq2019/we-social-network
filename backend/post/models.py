@@ -98,7 +98,7 @@ class Comment(models.Model):
         ordering = ('created_at',)
 
 
-class Reports(models.Model):
+class Report(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey(
         Post, related_name='reports', on_delete=models.CASCADE)
