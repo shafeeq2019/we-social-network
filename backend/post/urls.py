@@ -8,6 +8,7 @@ urlpatterns = [
     path('<uuid:post_id>/like/', api.post_like, name='post_like'),
     path('<uuid:post_id>/detail/', api.post_detail, name='post_like'),
     path('<uuid:post_id>/comment/', api.post_create_comment, name='post_create_comment'),
+    path('<uuid:post_id>/comment/<uuid:comment_id>/', api.post_delete_comment, name='post_delete_comment'),
     path('<uuid:post_id>/', api.post_delete, name='post_delete'),
     path('<uuid:post_id>/report/', api.report_post, name='report_post'),
     path('trends/', api.get_trends, name='get_trends'),

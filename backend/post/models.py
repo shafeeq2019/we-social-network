@@ -48,6 +48,17 @@ class Post(models.Model):
             created_by=user, created_for=self.created_by, type_of_notification='post_comment')
         return 'post commented successfully'
     
+    def delete_comment(self, user, comment_id):
+        comment = Comment.objects.filter(id=comment_id, created_by=user)
+        if comment.exists():
+            comment[0].delete()
+            self.comments_count -= 1
+            self.save()
+            return 'commented deleted successfully'
+        else:
+            return 'no comment found!'
+            
+
     def delete_post(self, user):
         self.delete()
         user.posts_count -=1

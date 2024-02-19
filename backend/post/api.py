@@ -116,9 +116,17 @@ def post_create_comment(request, post_id):
     post = Post.objects.get(id=post_id)
     comment = request.data.get('comment')
     result = post.add_comment(request.user, comment)
-
-    print(comment)
+    
     return JsonResponse({'message': result}, safe=False)
+
+
+@api_view(['DELETE'])
+def post_delete_comment(request, post_id, comment_id):
+    user = request.user
+    post = Post.objects.get(id=post_id)
+    result = post.delete_comment(user, comment_id)
+
+    return JsonResponse({'message': result})
 
 
 @api_view(['GET'])
