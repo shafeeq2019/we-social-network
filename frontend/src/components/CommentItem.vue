@@ -50,7 +50,9 @@
 
 </template>
 <script lang="ts">
+import { Comment } from '../interfaces'
 import {
+    PropType,
     defineComponent
 } from 'vue'
 import {
@@ -78,8 +80,12 @@ import {
 } from '@/components/ui/dialog'
 import axios from 'axios'
 export default {
+    emits: ["deleteComment"],
     props: {
-        comment: Object
+        comment: {
+            type: Object as PropType<Comment>,
+            required: true
+        },
     },
     components: {
         Dialog,
@@ -108,9 +114,11 @@ export default {
         deleteComment() {
             axios.delete(`/api/post/${this.$route.params.id}/comment/${this.comment?.id}/`).then(
                 response => {
-                    console.log(response)
+                    this.$emit('deleteComment', this.comment.id);
                 }
-            )
+            ).catch(error => {
+                console.log(error);
+            })
         },
         openReportModal() {
 

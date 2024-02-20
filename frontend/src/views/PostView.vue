@@ -4,7 +4,7 @@
         <div class="main-center space-y-4 col-span-4 md:col-span-3">
             <FeedItem :post="post" v-if="post.created_by" />
             <div class="p-4 mx-6 bg-white border border-gray-200 rounded-lg" v-for="comment in post.comments" :key="comment.id">
-                <CommentItem :comment="comment" />
+                <CommentItem :comment="comment" @deleteComment="deleteComment" />
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg" >
@@ -37,6 +37,7 @@ import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import FeedItem from '../components/FeedItem.vue'
 import CommentItem from '../components/CommentItem.vue'
+import { Comment } from '../interfaces'
 
 export default defineComponent({
     async beforeRouteUpdate(to, from) {
@@ -52,7 +53,7 @@ export default defineComponent({
     data() {
         return {
             post: {
-                comments: []
+                comments: [] as Comment[]
             },
             commentText: ''
         }
@@ -66,15 +67,22 @@ export default defineComponent({
             })
         },
         async submitForm() {
-            axios.post(`/api/post/${this.$route.params.id}/comment/`, {
-                "comment": this.commentText
-            }).then(async response => {
-                this.commentText = '';
-                //this.post.comments = [this.post.comments, ...this.commentText];
-                await this.getPost()
-            }).catch(error => {
-                console.log(error);
-            })
+            if (this.commentText.trim().length !== 0) {
+                axios.post(`/api/post/${this.$route.params.id}/comment/`, {
+                    "comment": this.commentText
+                }).then(async response => {
+                    this.commentText = '';
+                    //this.post.comments = [this.post.comments, ...this.commentText];
+                    await this.getPost()
+                }).catch(error => {
+                    console.log(error);
+                })
+            }
+        },
+        deleteComment(commentId: string) {
+            this.post.comments = this.post.comments.filter(
+                comment => comment.id != commentId
+            )
         }
     },
     created() {

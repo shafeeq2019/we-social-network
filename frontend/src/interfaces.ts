@@ -56,3 +56,11 @@ export interface Trend {
     hashtag: string,
     occurences: number
 }
+
+export interface Comment {
+    id: string;
+    comment: string;
+    created_by: User;
+    created_at: string,
+    created_ago: string
+}
