@@ -1,9 +1,9 @@
 <template lang="">
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- New post & feeds on the middle -->
-        <div class="main-center space-y-4 col-span-4 md:col-span-3">
+        <div class="main-center space-y-2 col-span-4 md:col-span-3">
             <FeedItem :post="post" v-if="post.created_by" />
-            <div class="p-4 mx-6 bg-white border border-gray-200 rounded-lg" v-for="comment in post.comments" :key="comment.id">
+            <div class="p-4 w-11/12 bg-white border border-gray-200 rounded-lg " v-for="comment in post.comments" :key="comment.id">
                 <CommentItem :comment="comment" @deleteComment="deleteComment" />
             </div>
 
@@ -16,7 +16,7 @@
 
                     <div class="p-4 border-t border-gray-100 flex justify-between">
                         <button type="submit"
-                            class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Comment</button>
+                            class="inline-block py-2 px-3 bg-purple-600 text-white rounded-lg">Comment</button>
                     </div>
                 </form>
             </div>
