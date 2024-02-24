@@ -3,7 +3,7 @@ from rest_framework.pagination import PageNumberPagination
 from django.http import JsonResponse
 from post.models import Post, Trend
 from account.models import FriendshipRequest, User
-from account.serializers import UserSerializer
+from account.serializers import FriendshipRequestSerializer, UserSerializer
 from django.db.models import Q
 
 from .serializers import PostSerializer, PostDetailSerializer, TrendSerializer
@@ -81,20 +81,27 @@ def post_list_profile(request, id):
     user_serializer = UserSerializer(user)
 
     check_if_friends = user.friends.filter(id=request.user.id).exists()
-    can_send_friendship_request = False
+    friendshipRequest = ''
 
     if not check_if_friends:
-        check_if_freqeust_sent_1 = FriendshipRequest.objects.filter(
-            created_for=request.user, created_by=user, status=FriendshipRequest.SENT).exists()
-        check_if_freqeust_sent_2 = FriendshipRequest.objects.filter(
-            created_for=user, created_by=request.user, status=FriendshipRequest.SENT).exists()
-        if not check_if_freqeust_sent_1 and not check_if_freqeust_sent_2:
-            can_send_friendship_request = True
+        friends = False
+        check_if_freqeust_sent_received = FriendshipRequest.objects.filter(
+            created_for=request.user, created_by=user, status=FriendshipRequest.SENT)
+        check_if_freqeust_sent_sent = FriendshipRequest.objects.filter(
+            created_for=user, created_by=request.user, status=FriendshipRequest.SENT)
+        if check_if_freqeust_sent_received.exists():
+            friendshipRequest = check_if_freqeust_sent_received[0]
+        elif check_if_freqeust_sent_sent.exists():
+            friendshipRequest = check_if_freqeust_sent_sent[0]
+    else:
+        friends = True
 
     return paginator.get_paginated_response({
         "posts": post_serializer.data,
         "user": user_serializer.data,
-        "can_send_friendship_request": can_send_friendship_request},)
+        "friends": friends,
+        "friendship_request": FriendshipRequestSerializer(friendshipRequest).data
+    })
 
 
 @api_view(['POST'])
@@ -116,7 +123,7 @@ def post_create_comment(request, post_id):
     post = Post.objects.get(id=post_id)
     comment = request.data.get('comment')
     result = post.add_comment(request.user, comment)
-    
+
     return JsonResponse({'message': result}, safe=False)
 
 

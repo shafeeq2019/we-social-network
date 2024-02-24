@@ -66,11 +66,13 @@ class FriendshipRequest(models.Model):
     SENT = 'sent'
     ACCEPTED = 'accepted'
     REJECTED = 'rejected'
+    CANCELED = 'canceled'
 
     STATUS_CHOICES = (
         (SENT, 'Sent'),
         (ACCEPTED, 'Accepted'),
-        (REJECTED, 'Rejected')
+        (REJECTED, 'Rejected'),
+        (CANCELED, 'Canceled')
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

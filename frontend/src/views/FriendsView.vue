@@ -4,7 +4,8 @@
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
                 <div class="flex items-center justify-center">
-                    <img :src="user.avatar_link" class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
+                    <img :src="user.avatar_link"
+                        class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
                 </div>
 
                 <p><strong>{{user.name}}</strong></p>
@@ -16,27 +17,30 @@
         </div>
 
         <div class="main-center lg:col-span-2 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friendshipRequests.length > 0">
+            <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friendship_requests.length > 0">
                 <h2 class="text-xl mb-6">Friendship Requests</h2>
                 <div class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
-                        v-for="friendshipRequest in friendshipRequests">
+                        v-for="friendshipRequest in friendship_requests">
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
-                            <img :src="friendshipRequest.created_by.avatar_link" class="mb-6 mx-auto w-24 h-24 rounded-full object-cover object-center">
+                            <img :src="friendshipRequest.created_by.avatar_link"
+                                class="mb-6 mx-auto w-24 h-24 rounded-full object-cover object-center">
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
                             <div class="mt-3 flex space-x-4 justify-around">
-                                <p class="text-xs text-gray-500">{{friendshipRequest.created_by.friends_count}} friends</p>
+                                <p class="text-xs text-gray-500">{{friendshipRequest.created_by.friends_count}} friends
+                                </p>
                                 <p class="text-xs text-gray-500">{{friendshipRequest.created_by.posts_count}} posts</p>
                             </div>
                         </router-link>
                         <div class="mt-3 flex space-x-3 justify-between">
-                                <button class="py-1 px-1 bg-purple-600 text-white rounded-md text-xs w-full" @click="handleRequest('accepted', friendshipRequest.id)">
-                                    Accept
-                                </button>
-                                <button class="py-1 px-1 bg-gray-600 text-white rounded-md text-xs w-full" @click="handleRequest('rejected', friendshipRequest.id)">
-                                    Reject
-                                </button>
-
+                            <button class="py-1 px-1 bg-purple-600 text-white rounded-md text-xs w-full"
+                                @click="handleRequest('accepted', friendshipRequest)">
+                                Accept
+                            </button>
+                            <button class="py-1 px-1 bg-gray-600 text-white rounded-md text-xs w-full"
+                                @click="handleRequest('rejected', friendshipRequest)">
+                                Reject
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -45,10 +49,10 @@
             <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friends.length > 0">
                 <h2 class="text-xl mb-6">Friendships</h2>
                 <div class=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
-                        v-for="friend in friends">
+                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="friend in friends">
                         <router-link :to="{ name: 'profile', params: { 'id': friend.id } }">
-                            <img :src="friend.avatar_link" class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
+                            <img :src="friend.avatar_link"
+                                class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
                             <p><strong>{{friend.name}}</strong></p>
                             <div class="mt-3 flex space-x-4 justify-around">
                                 <p class="text-xs text-gray-500">{{friend.friends_count}} friends</p>
@@ -83,6 +87,7 @@ import {
     watch,
     onMounted
 } from 'vue';
+import { FriendshipRequest, User } from '@/interfaces';
 export default defineComponent({
     async beforeRouteUpdate(to, from) {
         // react to route changes...
@@ -99,26 +104,30 @@ export default defineComponent({
     },
     data() {
         return {
-            user: {},
-            friendshipRequests: [],
+            user: {} as User,
+            friendship_requests: [] as FriendshipRequest[],
             friends: []
         }
     },
     methods: {
         async getFriends() {
             await axios.get(`/api/friends/${this.$route.params.id}/`).then(response => {
-                console.log(response)
-                this.friendshipRequests = response.data.requests;
+                this.friendship_requests = response.data.requests;
                 this.friends = response.data.friends;
                 this.user = response.data.user
             }).catch(error => {
                 console.log(error);
             })
         },
-        async handleRequest(status: string, friendshipRequestId: string) {
-            axios.post(`/api/friends/${friendshipRequestId}/${status}/`).then(
-                async response => await this.getFriends()
-            ).catch(error => {
+        async handleRequest(status: string, friendship_request: FriendshipRequest) {
+            axios.post(`/api/friends/${friendship_request.created_by.id}/request/${friendship_request.id}/`, {
+                status: status
+            }).then(response => {
+                this.getFriends()
+                if (status === 'accepted') {
+                    this.user.friends_count += 1;
+                }
+            }).catch(error => {
                 console.log(error);
             })
         },

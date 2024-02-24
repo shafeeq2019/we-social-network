@@ -41,6 +41,9 @@ def signup(request):
 
     if form.is_valid():
         user = form.save()
+        # temporary
+        user.is_active = True
+        user.save()
 
         url = f'{settings.WEBSITE_URL}/activateemail/?email={user.email}&id={user.id}'
         send_mail(
@@ -71,59 +74,74 @@ def friends(request, id):
                         safe=False)
 
 
-@api_view(['POST'])
-def send_friendship_request(request, id):
-    user = User.objects.get(pk=id)
-
-    check1 = FriendshipRequest.objects.filter(
-        created_for=request.user, created_by=user, status=FriendshipRequest.SENT)
-    check2 = FriendshipRequest.objects.filter(
-        created_for=user, created_by=request.user, status=FriendshipRequest.SENT)
-
-    if not check1 and not check2:
-        friendship_request = FriendshipRequest(
-            created_for=user, created_by=request.user)
-        friendship_request.save()
-        Notification.objects.create_notification(
-            created_for=user, created_by=request.user, type_of_notification=Notification.NEWFRIENDREQUEST)
-
-        return JsonResponse({'message': "friendship request created"})
-    else:
-        return JsonResponse({'message': "friendship request already sent"})
-
-
-@api_view(['POST'])
-def handle_request(request, friendshipRequestId, status):
-
+@api_view(['POST', 'DELETE'])
+def send_or_delete_friendship_request(request, friend_id):
+    friend = User.objects.get(pk=friend_id)
     user = request.user
 
-    friendshipRequestest = FriendshipRequest.objects.get(
-        id=friendshipRequestId)
-    request_user = friendshipRequestest.created_by
-    friendshipRequestest.status = status
-    friendshipRequestest.save()
+    if request.method == "POST":
+        check1 = FriendshipRequest.objects.filter(
+            created_for=user, created_by=friend, status=FriendshipRequest.SENT)
+        check2 = FriendshipRequest.objects.filter(
+            created_for=friend, created_by=user, status=FriendshipRequest.SENT)
+
+        if not check1 and not check2:
+            friendship_request = FriendshipRequest(
+                created_for=friend, created_by=user)
+            friendship_request.save()
+            Notification.objects.create_notification(
+                created_for=friend, created_by=user, type_of_notification=Notification.NEWFRIENDREQUEST)
+
+            return JsonResponse(FriendshipRequestSerializer(friendship_request).data, safe=False)
+        else:
+            return JsonResponse({'message': "friendship request already sent"})
+    elif request.method == "DELETE":
+        user.friends.remove(friend)
+        user.friends_count -= 1
+        user.save()
+        friend.friends_count -= 1
+        friend.save()
+        return JsonResponse({'message': "friendship removed"})
+
+
+@api_view(['POST'])
+def handle_request(request, friend_id, request_id):
+    user = request.user
+    friend = User.objects.get(id=friend_id)
+    # status is: accepted | rejected | canceled
+    status = request.data.get('status')
+
+    if (status == 'canceled'):
+        friendshipRequest = FriendshipRequest.objects.get(
+            id=request_id, created_for=friend, created_by=user)
+    else:
+        friendshipRequest = FriendshipRequest.objects.get(
+            id=request_id, created_for=user, created_by=friend)
+
+    friendshipRequest.status = status
+    friendshipRequest.save()
 
     # add the user to friends list
     if (status == 'accepted'):
-        user.friends.add(request_user)
+        user.friends.add(friend)
         user.friends_count += 1
         user.save()
-        request_user.friends_count += 1
-        request_user.save()
+        friend.friends_count += 1
+        friend.save()
 
         # send a notification
         Notification.objects.create_notification(
-            created_for=request_user, created_by=user, type_of_notification=Notification.ACCEPTEDFRIENDREQUEST)
-        
+            created_for=friend, created_by=user, type_of_notification=Notification.ACCEPTEDFRIENDREQUEST)
+
         # delete from the suggestion list
-        user.people_you_may_know.remove(request_user)
-        request_user.people_you_may_know.remove(user)
-        
-    else:
+        user.people_you_may_know.remove(friend)
+        friend.people_you_may_know.remove(user)
+
+    elif (status == 'rejected'):
         Notification.objects.create_notification(
-            created_for=request_user, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
-         
-    return JsonResponse({'message': "friendship request updated"})
+            created_for=friend, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
+
+    return JsonResponse(FriendshipRequestSerializer(friendshipRequest).data, safe=False)
 
 
 @api_view(['POST'])
@@ -141,7 +159,8 @@ def edit_profile(request):
         logger.info(f"Profile edited successfully for user {user.id}")
     else:
         response['message'] = form.errors.as_json()
-        logger.error(f"Error editing profile for user {user.id}: {response['message']}")
+        logger.error(f"Error editing profile for user {
+                     user.id}: {response['message']}")
 
     return JsonResponse(response)
 
