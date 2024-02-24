@@ -41,7 +41,7 @@ def signup(request):
 
     if form.is_valid():
         user = form.save()
-        # temporary
+        # Temporary
         user.is_active = True
         user.save()
 
@@ -49,7 +49,7 @@ def signup(request):
         send_mail(
             "Please verify your email",
             f"The url for activating your accout is: {url}",
-            "noreply@we.com",
+            settings.EMAIL_HOST_USER,
             [user.email],
             fail_silently=False,
         )
