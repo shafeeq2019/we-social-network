@@ -13,6 +13,11 @@ This project serves as a practical application for learning Python Django, showc
 ## Live Demo
 https://we-social-network.web.app/
 
+## 📸 Screenshots
+<img src="screenshots/1.png">
+
+<img src="screenshots/2.png">
+
 ## Config
 You have to create a virtual environment for the backend and install all dependencies.
 
@@ -20,8 +25,6 @@ You have to create a virtual environment for the backend and install all depende
 Backend: You have to use a Python hosting service. I personally prefer www.pythonanywhere.com.
 Frontend: You only need to add your web app's Firebase configuration to `./frontend/src/firebase.ts` and provide your server URL in `./frontend/.env`.
 
-## 📸 Screenshots
-<img src="screenshots/1.png">
 
 ## Build Setup for Backend
 ```bash
