@@ -6,6 +6,7 @@ This project serves as a practical application for learning Python Django, showc
 ## ToDo List
 - [ ] Implement Real-time Chatting
 - [ ] Implement Infinite Scroll in Chats
+- [ ] Implement private posting functionality
 - [ ] Write Unit Tests
 - [ ] Turn the Vue Web App into a Progressive Web App (PWA)
 
