@@ -83,7 +83,7 @@ export default defineComponent({
                         await axios.get("/api/me/")
                             .then(response => {
                                 this.userStore.setUserInfo(response.data);
-                                this.$router.push(this.$route.query.redirect as string);
+                                this.$router.push(this.$route.query.redirect as string  || '/feed');
                             }).catch(error => {
                                 throw error;
                             })
