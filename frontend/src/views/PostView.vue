@@ -7,7 +7,7 @@
                 <CommentItem :comment="comment" @deleteComment="deleteComment" />
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg" >
+            <div class="bg-white border border-gray-200 rounded-lg w-11/12" >
                 <form method="post" @submit.prevent="submitForm">
                     <div class="p-4">
                         <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking?"

@@ -131,7 +131,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!userStore.user.isAuthenticated) {
-      next({ path: "/login" });
+      next({ name: 'login', query: { redirect: to.fullPath } });
     }
     else {
       next();
@@ -140,7 +140,6 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.matched.some((record) => record.meta.hideForAuth)) {
     if (userStore.user.isAuthenticated) {
-      console.log(userStore.user.isAuthenticated)
       next({ path: "/feed" });
     } else {
       next();
