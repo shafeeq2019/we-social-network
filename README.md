@@ -13,7 +13,7 @@ This project serves as a practical application for learning Python Django, showc
 - [ ] Turn the Vue Web App into a Progressive Web App (PWA)
 
 
-## Live Demo
+## Live
 https://we-social-network.web.app/
 
 ## 📸 Screenshots
