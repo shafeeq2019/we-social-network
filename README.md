@@ -7,6 +7,8 @@ This project serves as a practical application for learning Python Django, showc
 - [ ] Implement Real-time Chatting
 - [ ] Implement Infinite Scroll in Chats
 - [ ] Implement private posting functionality
+- [ ] Add "Forgot password" option
+- [ ] Implement dark mode
 - [ ] Write Unit Tests
 - [ ] Turn the Vue Web App into a Progressive Web App (PWA)
 
