@@ -1,5 +1,5 @@
 <template>
-    <div class="p-4 bg-white border border-gray-200 rounded-lg" v-if="users && users.length > 0">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md" v-if="users && users.length > 0">
         <h3 class="mb-6 text-xl">People you may know</h3>
 
         <div class="space-y-4">
