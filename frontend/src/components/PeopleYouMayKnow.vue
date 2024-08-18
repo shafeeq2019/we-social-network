@@ -16,31 +16,31 @@
         </div>
     </div>
 </template>
-    
+
 <script lang="ts">
-import axios from 'axios'
-import { User } from '../interfaces'
+import axios from 'axios';
+import { User } from '../interfaces';
 
 export default {
-    data() {
-        return {
-            users: [] as User[]
-        }
-    },
-    mounted() {
-        this.getFriendSuggestions()
-    },
-    methods: {
-        getFriendSuggestions() {
-            axios
-                .get('/api/friends/suggested/')
-                .then(response => {
-                    this.users = response.data
-                })
-                .catch(error => {
-                    console.log('error', error)
-                })
-        }
+  data() {
+    return {
+      users: [] as User[]
+    };
+  },
+  mounted() {
+    this.getFriendSuggestions();
+  },
+  methods: {
+    getFriendSuggestions() {
+      axios
+        .get('/api/friends/suggested/')
+        .then(response => {
+          this.users = response.data;
+        })
+        .catch(error => {
+          console.log('error', error);
+        });
     }
-}
+  }
+};
 </script>

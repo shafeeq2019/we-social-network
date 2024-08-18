@@ -50,83 +50,63 @@
 
 </template>
 <script lang="ts">
-import { Comment } from '../interfaces'
+import { Comment } from '../interfaces';
 import {
-    PropType,
-    defineComponent
-} from 'vue'
+  PropType,
+} from 'vue';
 import {
-    useToastStore
-} from '@/stores/toast'
+  useToastStore
+} from '@/stores/toast';
 import {
-    useUserStore
-} from '@/stores/user'
+  useUserStore
+} from '@/stores/user';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+import axios from 'axios';
+export default {
+  emits: ["deleteComment"],
+  props: {
+    comment: {
+      type: Object as PropType<Comment>,
+      required: true
+    },
+  },
+  components: {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
-import axios from 'axios'
-export default {
-    emits: ["deleteComment"],
-    props: {
-        comment: {
-            type: Object as PropType<Comment>,
-            required: true
-        },
-    },
-    components: {
-        Dialog,
-        DialogContent,
-        DialogDescription,
-        DialogFooter,
-        DialogHeader,
-        DialogTitle,
-        DialogTrigger,
-        DropdownMenu,
-        DropdownMenuContent,
-        DropdownMenuItem,
-        DropdownMenuLabel,
-        DropdownMenuSeparator,
-        DropdownMenuTrigger,
-    },
-    setup() {
-        const userStore = useUserStore();
-        const toastStore = useToastStore();
-        return {
-            userStore,
-            toastStore
+  },
+  setup() {
+    const userStore = useUserStore();
+    const toastStore = useToastStore();
+    return {
+      userStore,
+      toastStore
+    };
+  },
+  methods: {
+    deleteComment() {
+      axios.delete(`/api/post/${this.$route.params.id}/comment/${this.comment?.id}/`).then(
+        () => {
+          this.$emit('deleteComment', this.comment.id);
         }
+      ).catch(error => {
+        console.log(error);
+      });
     },
-    methods: {
-        deleteComment() {
-            axios.delete(`/api/post/${this.$route.params.id}/comment/${this.comment?.id}/`).then(
-                response => {
-                    this.$emit('deleteComment', this.comment.id);
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        },
-        openReportModal() {
+    openReportModal() {
 
-        }
-    },
-    created() {
     }
-}
+  },
+  created() {
+  }
+};
 </script>
 <style lang="">
 

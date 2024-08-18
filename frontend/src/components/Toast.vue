@@ -7,9 +7,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineComponent } from 'vue'
 // This is a composition API Component
-import { useToastStore } from '@/stores/toast'
+import { useToastStore } from '@/stores/toast';
 
-const store = useToastStore()
+const store = useToastStore();
 </script>

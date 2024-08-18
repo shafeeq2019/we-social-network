@@ -18,7 +18,7 @@
                     <!-- <select id="privacy" v-model="is_private"
                         class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3 cursor-pointer">
                         <option selected value=false>Public</option>
-                        <option value=true>Private</option> 
+                        <option value=true>Private</option>
                     </select>  -->
                     <button type="submit"
                         class="inline-block bg-purple-600 text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
@@ -28,62 +28,62 @@
     </form>
 </template>
 <script lang="ts">
-import { PropType, defineComponent } from 'vue'
+import { PropType, defineComponent } from 'vue';
 import axios from 'axios';
-import { useUserStore } from '@/stores/user'
-import { User, Post } from '../interfaces.ts'
+import { useUserStore } from '@/stores/user';
+import { User, Post } from '../interfaces.ts';
 
 export default defineComponent({
-    props: {
-        user: {
-            type: Object as PropType<User>,
-            required: false
-        },
-        posts: {
-            type: Array as PropType<Post[]>,
-            required: true
+  props: {
+    user: {
+      type: Object as PropType<User>,
+      required: false
+    },
+    posts: {
+      type: Array as PropType<Post[]>,
+      required: true
+    }
+  },
+  setup() {
+    const userStore = useUserStore();
+    return {
+      userStore
+    };
+  },
+  data() {
+    return {
+      body: '',
+      url: '',
+      is_private: false
+    };
+  },
+  methods: {
+    onFileChange() {
+      const imageInput = document.getElementById("upload-image")! as HTMLInputElement;
+      this.url = URL.createObjectURL(imageInput.files![0]);
+    },
+    async submitForm() {
+      const imageInput = document.getElementById("upload-image")! as HTMLInputElement;
+      axios.post("/api/post/create/", {
+        body: this.body,
+        image: imageInput.files![0],
+        is_private: this.is_private
+      }, {
+        headers: {
+          "Content-Type": "multipart/form-data"
         }
+      }).then(response => {
+        this.body = '';
+        this.is_private = false;
+        imageInput.value = "";
+        this.url = '';
+        this.posts.unshift(response.data);
+        this.user ? this.user.posts_count += 1 : '';
+      }).catch(error => {
+        console.log(error);
+      });
     },
-    setup() {
-        const userStore = useUserStore();
-        return {
-            userStore
-        }
-    },
-    data() {
-        return {
-            body: '',
-            url: '',
-            is_private: false
-        }
-    },
-    methods: {
-        onFileChange() {
-            const imageInput = document.getElementById("upload-image")! as HTMLInputElement
-            this.url = URL.createObjectURL(imageInput.files![0])
-        },
-        async submitForm() {
-            const imageInput = document.getElementById("upload-image")! as HTMLInputElement
-            axios.post("/api/post/create/", {
-                body: this.body,
-                image: imageInput.files![0],
-                is_private: this.is_private
-            }, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            }).then(response => {
-                this.body = '';
-                this.is_private = false;
-                imageInput.value = "";
-                this.url = '';
-                this.posts.unshift(response.data)
-                this.user ? this.user.posts_count += 1 : '';
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-    },
-})
+  },
+});
 </script>
 <style></style>

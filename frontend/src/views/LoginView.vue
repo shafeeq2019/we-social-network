@@ -33,70 +33,70 @@
                             </div>
                         </template>
 
-                        <div>
-                            <button class="py-4 px-6 bg-purple-600 text-white rounded-lg" >Log in</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div>
+  <button class="py-4 px-6 bg-purple-600 text-white rounded-lg">Log in</button>
+</div>
+</form>
+</div>
+</div>
+</div>
 </template>
 
 <script lang="ts">
-import axios from 'axios'
-import { useUserStore } from '@/stores/user'
-import { defineComponent } from 'vue'
+import axios from 'axios';
+import { useUserStore } from '@/stores/user';
+import { defineComponent } from 'vue';
 export default defineComponent({
-    setup() {
-        const userStore = useUserStore();
-        return {
-            userStore
-        }
-    },
-    data() {
-        return {
-            form: {
-                email: "" as string,
-                password: "" as string,
+  setup() {
+    const userStore = useUserStore();
+    return {
+      userStore
+    };
+  },
+  data() {
+    return {
+      form: {
+        email: "" as string,
+        password: "" as string,
 
-            },
-            errors: [] as string[]
-        }
-    },
-    methods: {
-        async submitForm() {
-            this.errors = [];
-            if (this.form.email === '') {
-                this.errors.push('Your e-mail is missing')
-            }
+      },
+      errors: [] as string[]
+    };
+  },
+  methods: {
+    async submitForm() {
+      this.errors = [];
+      if (this.form.email === '') {
+        this.errors.push('Your e-mail is missing');
+      }
 
-            if (this.form.password === '') {
-                this.errors.push('Your password is missing')
-            }
+      if (this.form.password === '') {
+        this.errors.push('Your password is missing');
+      }
 
-            if (this.errors.length === 0) {
-                await axios.post('/api/login/', this.form)
-                    .then(async response => {
-                        this.userStore.setToken(response.data)
-                        axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
+      if (this.errors.length === 0) {
+        await axios.post('/api/login/', this.form)
+          .then(async response => {
+            this.userStore.setToken(response.data);
+            axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
 
-                        await axios.get("/api/me/")
-                            .then(response => {
-                                this.userStore.setUserInfo(response.data);
-                                this.$router.push(this.$route.query.redirect as string  || '/feed');
-                            }).catch(error => {
-                                throw error;
-                            })
-                    })
-                    .catch(error => {
-                        console.log('error', error);
-                        this.errors.push('The email or password is incorrect! Or the user is not activated!');
-                    })
+            await axios.get("/api/me/")
+              .then(response => {
+                this.userStore.setUserInfo(response.data);
+                this.$router.push(this.$route.query.redirect as string || '/feed');
+              }).catch(error => {
+                throw error;
+              });
+          })
+          .catch(error => {
+            console.log('error', error);
+            this.errors.push('The email or password is incorrect! Or the user is not activated!');
+          });
 
-            }
-        }
+      }
     }
-})
+  }
+});
 </script>
 <style lang="">
 

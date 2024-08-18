@@ -131,8 +131,10 @@
         <!-- New post & feeds on the middle -->
         <div class="main-center space-y-4 col-span-4 md:col-span-2 order-3 md:order-2">
             <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts" />
-            <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"
-                v-if="posts.length > 0" />
+            <div  v-if="posts.length > 0" class="space-y-4">
+                <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
+            </div>
+
             <div v-else-if="!loading" class="bg-white shadow-md sm:rounded-lg p-6">
                 <div class="text-center">
 
@@ -157,152 +159,148 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 import axios from 'axios';
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-import Trends from '../components/Trends.vue'
-import { useUserStore } from '@/stores/user'
-import FeedItem from '../components/FeedItem.vue'
+import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
+import Trends from '../components/Trends.vue';
+import { useUserStore } from '@/stores/user';
+import FeedItem from '../components/FeedItem.vue';
 import { useToastStore } from "@/stores/toast";
 import { User, Post, FriendshipRequest } from '../interfaces';
 import FeedForm from '@/components/FeedForm.vue';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+export default defineComponent({
+  async beforeRouteUpdate(to) {
+    this.posts = [];
+    // react to route changes...
+    await this.getFeeds(to.params.id);
+  },
+  setup() {
+    const userStore = useUserStore();
+    const toastStore = useToastStore();
+    return {
+      userStore,
+      toastStore
+    };
+  },
+  components: {
+    PeopleYouMayKnow,
+    Trends,
+    FeedItem,
+    FeedForm,
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  },
+  data() {
+    return {
+      posts: [] as Post[],
+      user: {} as User,
+      friendship_request: {} as FriendshipRequest,
+      isFriends: false,
+      currentPage: 1,
+      hasNext: true,
+      loading: true
 
-export default defineComponent({
-    async beforeRouteUpdate(to, from) {
-        this.posts = [];
-        // react to route changes...
-        await this.getFeeds(to.params.id);
-    },
-    setup() {
-        const userStore = useUserStore();
-        const toastStore = useToastStore();
-        return {
-            userStore,
-            toastStore
-        }
-    },
-    components: {
-        PeopleYouMayKnow,
-        Trends,
-        FeedItem,
-        FeedForm,
-        DropdownMenu,
-        DropdownMenuContent,
-        DropdownMenuItem,
-        DropdownMenuLabel,
-        DropdownMenuSeparator,
-        DropdownMenuTrigger,
-    },
-    data() {
-        return {
-            posts: [] as Post[],
-            user: {} as User,
-            friendship_request: {} as FriendshipRequest,
-            isFriends: false,
-            currentPage: 1,
-            hasNext: true,
-            loading: true
+    };
+  },
+  computed: {
 
-        }
-    },
-    computed: {
-
-    },
-    methods: {
-        async sendDirectMessage() {
-            axios.post(`/api/chat/${this.$route.params.id}/`).then(
-                response => {
-                    this.$router.push({
-                        name: 'messages',
-                        params: {
-                            user_id: this.$route.params.id
-                        }
-                    });
-                }
-            ).catch(error => {
-                console.log(error);
-            })
-        },
-        async getFeeds(userId: string | string[]) {
-            await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
-                if (response.data.next) {
-                    this.hasNext = true
-                }
-                this.loading = false;
-                this.posts = [...this.posts, ...response.data.results.posts];
-                this.user = response.data.results.user
-                this.friendship_request = response.data.results.friendship_request
-                this.isFriends = response.data.results.friends
-            }).catch(error => {
-                this.loading = false;
-                console.log(error);
-            })
-        },
-        async sendFriendshipRequest() {
-            axios.post(`/api/friends/${this.$route.params.id}/request/`, {
-            }).then(response => {
-                if (response.data.id) {
-                    this.friendship_request = response.data;
-                    this.toastStore.showToast(5000, "The request was sent!", "bg-emerald-300");
-                }
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-        async deleteFriendshipRequest() {
-            axios.delete(`/api/friends/${this.$route.params.id}/request/`, {
-            }).then(response => {
-                if (response.data.message == "friendship removed") {
-                    this.isFriends = false;
-                    this.friendship_request = {} as FriendshipRequest;
-                    this.user.friends_count -= 1;
-                    this.toastStore.showToast(5000, "Friendship removed!", "bg-emerald-300");
-                }
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-        async handleFriendshipRequest(status: string) {
-            axios.post(`/api/friends/${this.$route.params.id}/request/${this.friendship_request.id}/`, {
-                status: status
-            }).then(response => {
-                this.friendship_request = response.data
-                if (status === 'accepted') {
-                    this.isFriends = true;
-                    this.user.friends_count += 1;
-                    this.toastStore.showToast(5000, `You are now friends with ${this.user.name}!`, "bg-emerald-300");
-                }
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-        deletePost(postId: string) {
-            this.posts = this.posts.filter(
-                post => post.id != postId
-            )
-            this.user.posts_count -= 1;
-        }
-    },
-    mounted() {
-        const onScroll = () => {
-            let bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight
-            if (bottomOfWindow && this.hasNext) {
-                this.currentPage += 1;
-                this.hasNext = false;
-                this.getFeeds(this.$route.params.id)
+  },
+  methods: {
+    async sendDirectMessage() {
+      axios.post(`/api/chat/${this.$route.params.id}/`).then(
+        () => {
+          this.$router.push({
+            name: 'messages',
+            params: {
+              user_id: this.$route.params.id
             }
+          });
         }
-        this.getFeeds(this.$route.params.id);
-        window.onscroll = onScroll;
-        window.ontouchmove = onScroll;
+      ).catch(error => {
+        console.log(error);
+      });
+    },
+    async getFeeds(userId: string | string[]) {
+      await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
+        if (response.data.next) {
+          this.hasNext = true;
+        }
+        this.loading = false;
+        this.posts = [...this.posts, ...response.data.results.posts];
+        this.user = response.data.results.user;
+        this.friendship_request = response.data.results.friendship_request;
+        this.isFriends = response.data.results.friends;
+      }).catch(error => {
+        this.loading = false;
+        console.log(error);
+      });
+    },
+    async sendFriendshipRequest() {
+      axios.post(`/api/friends/${this.$route.params.id}/request/`, {
+      }).then(response => {
+        if (response.data.id) {
+          this.friendship_request = response.data;
+          this.toastStore.showToast(5000, "The request was sent!", "bg-emerald-300");
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    },
+    async deleteFriendshipRequest() {
+      axios.delete(`/api/friends/${this.$route.params.id}/request/`, {
+      }).then(response => {
+        if (response.data.message == "friendship removed") {
+          this.isFriends = false;
+          this.friendship_request = {} as FriendshipRequest;
+          this.user.friends_count -= 1;
+          this.toastStore.showToast(5000, "Friendship removed!", "bg-emerald-300");
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    },
+    async handleFriendshipRequest(status: string) {
+      axios.post(`/api/friends/${this.$route.params.id}/request/${this.friendship_request.id}/`, {
+        status
+      }).then(response => {
+        this.friendship_request = response.data;
+        if (status === 'accepted') {
+          this.isFriends = true;
+          this.user.friends_count += 1;
+          this.toastStore.showToast(5000, `You are now friends with ${this.user.name}!`, "bg-emerald-300");
+        }
+      }).catch(error => {
+        console.log(error);
+      });
+    },
+    deletePost(postId: string) {
+      this.posts = this.posts.filter(
+        post => post.id != postId
+      );
+      this.user.posts_count -= 1;
     }
+  },
+  mounted() {
+    const onScroll = () => {
+      const bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight;
+      if (bottomOfWindow && this.hasNext) {
+        this.currentPage += 1;
+        this.hasNext = false;
+        this.getFeeds(this.$route.params.id);
+      }
+    };
+    this.getFeeds(this.$route.params.id);
+    window.onscroll = onScroll;
+    window.ontouchmove = onScroll;
+  }
 });
 </script>

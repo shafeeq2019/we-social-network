@@ -20,8 +20,7 @@
             <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friendship_requests.length > 0">
                 <h2 class="text-xl mb-6">Friendship Requests</h2>
                 <div class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200"
-                        v-for="friendshipRequest in friendship_requests">
+                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="(friendshipRequest, index) in friendship_requests" :key="index">
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
                             <img :src="friendshipRequest.created_by.avatar_link"
                                 class="mb-6 mx-auto w-24 h-24 rounded-full object-cover object-center">
@@ -49,7 +48,7 @@
             <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friends.length > 0">
                 <h2 class="text-xl mb-6">Friendships</h2>
                 <div class=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="friend in friends">
+                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="(friend, index) in friends"  :key="index">
                         <router-link :to="{ name: 'profile', params: { 'id': friend.id } }">
                             <img :src="friend.avatar_link"
                                 class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
@@ -74,68 +73,61 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 import axios from 'axios';
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-import Trends from '../components/Trends.vue'
+import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
+import Trends from '../components/Trends.vue';
 import {
-    useUserStore
-} from '@/stores/user'
-import FeedItem from '../components/FeedItem.vue'
+  useUserStore
+} from '@/stores/user';
 import {
-    ref,
-    watch,
-    onMounted
 } from 'vue';
 import { FriendshipRequest, User } from '@/interfaces';
 export default defineComponent({
-    async beforeRouteUpdate(to, from) {
-        // react to route changes...
+  setup() {
+    const userStore = useUserStore();
+    return {
+      userStore
+    };
+  },
+  components: {
+    PeopleYouMayKnow,
+    Trends
+  },
+  data() {
+    return {
+      user: {} as User,
+      friendship_requests: [] as FriendshipRequest[],
+      friends: []
+    };
+  },
+  methods: {
+    async getFriends() {
+      await axios.get(`/api/friends/${this.$route.params.id}/`).then(response => {
+        this.friendship_requests = response.data.requests;
+        this.friends = response.data.friends;
+        this.user = response.data.user;
+      }).catch(error => {
+        console.log(error);
+      });
     },
-    setup() {
-        const userStore = useUserStore();
-        return {
-            userStore
+    async handleRequest(status: string, friendship_request: FriendshipRequest) {
+      axios.post(`/api/friends/${friendship_request.created_by.id}/request/${friendship_request.id}/`, {
+        status
+      }).then(() => {
+        this.getFriends();
+        if (status === 'accepted') {
+          this.user.friends_count += 1;
         }
+      }).catch(error => {
+        console.log(error);
+      });
     },
-    components: {
-        PeopleYouMayKnow,
-        Trends
-    },
-    data() {
-        return {
-            user: {} as User,
-            friendship_requests: [] as FriendshipRequest[],
-            friends: []
-        }
-    },
-    methods: {
-        async getFriends() {
-            await axios.get(`/api/friends/${this.$route.params.id}/`).then(response => {
-                this.friendship_requests = response.data.requests;
-                this.friends = response.data.friends;
-                this.user = response.data.user
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-        async handleRequest(status: string, friendship_request: FriendshipRequest) {
-            axios.post(`/api/friends/${friendship_request.created_by.id}/request/${friendship_request.id}/`, {
-                status: status
-            }).then(response => {
-                this.getFriends()
-                if (status === 'accepted') {
-                    this.user.friends_count += 1;
-                }
-            }).catch(error => {
-                console.log(error);
-            })
-        },
 
-    },
-    created() {
-        this.getFriends()
-    }
+  },
+  created() {
+    this.getFriends();
+  }
 });
 </script>
 <style lang=""></style>

@@ -45,79 +45,79 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import axios from 'axios'
-import { useToastStore } from '@/stores/toast'
-import { useUserStore } from '@/stores/user'
-import { mapState } from 'pinia'
+import { defineComponent } from 'vue';
+import axios from 'axios';
+import { useToastStore } from '@/stores/toast';
+import { useUserStore } from '@/stores/user';
 
 export default defineComponent({
-    setup() {
-        const toastStore = useToastStore()
-        const userStore = useUserStore()
-        return {
-            toastStore,
-            userStore,
-        }
-    },
-    data() {
-        return {
-            form: {
-                name: "",
-                email: ""
-            },
-            errors: [] as string[],
-        }
-    },
-    methods: {
-        submitForm() {
-            this.errors = []
+  setup() {
+    const toastStore = useToastStore();
+    const userStore = useUserStore();
+    return {
+      toastStore,
+      userStore,
+    };
+  },
+  data() {
+    return {
+      form: {
+        name: "",
+        email: ""
+      },
+      errors: [] as string[],
+    };
+  },
+  methods: {
+    submitForm() {
+      this.errors = [];
 
-            if (this.form.email === '') {
-                this.errors.push('Your e-mail is missing')
+      if (this.form.email === '') {
+        this.errors.push('Your e-mail is missing');
+      }
+
+      if (this.form.name === '') {
+        this.errors.push('Your name is missing');
+      }
+      if (this.errors.length === 0) {
+        const formData = new FormData();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        formData.append("avatar", (this.$refs.file as any).files[0]);
+        formData.append("email", this.form.email);
+        formData.append("name", this.form.name);
+        axios
+          .post('/api/editprofile/', formData, {
+            headers: {
+              "Content-Type": "multipart/form-data"
             }
-
-            if (this.form.name === '') {
-                this.errors.push('Your name is missing')
+          })
+          .then(response => {
+            if (response.data.message === 'success') {
+              this.toastStore.showToast(5000, 'The information was saved.', 'bg-emerald-500');
+              this.userStore.setUserInfo(response.data.updated_user);
+              this.form.email = this.userStore.user.email;
+              this.form.name = this.userStore.user.name;
+              this.$router.back();
+            } else {
+              const data = JSON.parse(response.data.message);
+              for (const key in data) {
+                this.errors.push(data[key][0].message);
+              }
+              this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300');
             }
-            if (this.errors.length === 0) {
-                let formData = new FormData()
-                formData.append("avatar", (this.$refs.file as any).files[0])
-                formData.append("email", this.form.email)
-                formData.append("name", this.form.name)
-                axios
-                    .post('/api/editprofile/', formData, {
-                        headers: {
-                            "Content-Type": "multipart/form-data"
-                        }
-                    })
-                    .then(response => {
-                        if (response.data.message === 'success') {
-                            this.toastStore.showToast(5000, 'The information was saved.', 'bg-emerald-500')
-                            this.userStore.setUserInfo(response.data.updated_user);
-                            this.form.email = this.userStore.user.email
-                            this.form.name = this.userStore.user.name
-                            this.$router.back()
-                        } else {
-                            const data = JSON.parse(response.data.message)
-                            for (const key in data) {
-                                this.errors.push(data[key][0].message)
-                            }
-                            this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300')
-                        }
-                    })
-                    .catch(error => {
-                        console.log('error', error)
-                    })
-            }
-        }
-
-    },
-    created() {
-        this.form.name = this.userStore.user.name;
-        this.form.email = this.userStore.user.email;
-
+          })
+          .catch(error => {
+            console.log('error', error);
+          });
+      }
     }
-}) 
+
+  },
+  created() {
+    this.form.name = this.userStore.user.name;
+    this.form.email = this.userStore.user.email;
+
+  }
+});
 </script>
 <style></style>

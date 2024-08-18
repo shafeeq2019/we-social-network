@@ -93,10 +93,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu';
 import axios from "axios";
 import {
   defineComponent
@@ -115,18 +113,16 @@ export default defineComponent({
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
   },
   methods: {
     logout() {
       this.userStore.removeToken();
-      this.$router.push("/login")
+      this.$router.push("/login");
     }
   },
   created() {
-    this.userStore.initStore()
+    this.userStore.initStore();
     const token = this.userStore.user.access;
     if (token) {
       axios.defaults.headers.common["Authorization"] = "Bearer " + token;

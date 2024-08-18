@@ -1,17 +1,17 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 import { useUserStore } from "@/stores/user";
-import SignupView from '../views/SignupView.vue'
-import LoginView from '../views/LoginView.vue'
-import FeedView from '../views/FeedView.vue'
-import MessageView from '../views/MessageView.vue'
-import SearchView from '../views/SearchView.vue'
-import ProfileView from '../views/ProfileView.vue'
-import FriendsView from '../views/FriendsView.vue'
-import PostView from '../views/PostView.vue'
-import TrendsView from '../views/TrendsView.vue'
-import EditProfileView from '../views/EditProfileView.vue'
-import EditPasswordView from '../views/EditPasswordView.vue'
-import NotificationsView from '../views/NotificationsView.vue'
+import SignupView from '../views/SignupView.vue';
+import LoginView from '../views/LoginView.vue';
+import FeedView from '../views/FeedView.vue';
+import MessageView from '../views/MessageView.vue';
+import SearchView from '../views/SearchView.vue';
+import ProfileView from '../views/ProfileView.vue';
+import FriendsView from '../views/FriendsView.vue';
+import PostView from '../views/PostView.vue';
+import TrendsView from '../views/TrendsView.vue';
+import EditProfileView from '../views/EditProfileView.vue';
+import EditPasswordView from '../views/EditPasswordView.vue';
+import NotificationsView from '../views/NotificationsView.vue';
 
 
 const router = createRouter({
@@ -124,7 +124,7 @@ const router = createRouter({
       },
     }
   ]
-})
+});
 
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore();
@@ -132,8 +132,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!userStore.user.isAuthenticated) {
       next({ name: 'login', query: { redirect: to.fullPath } });
-    }
-    else {
+    } else {
       next();
     }
   }
@@ -148,4 +147,4 @@ router.beforeEach(async (to, from, next) => {
 
 });
 
-export default router
+export default router;

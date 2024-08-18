@@ -9,7 +9,7 @@ TODO:
             <div class="bg-white border border-gray-200 rounded-lg text-center shadow-md">
                 <div class="flex items-center justify-between cursor-pointer pl-4 py-2 group"
                     v-for="conversation in conversations" @click="openConversation(conversation)" :key="conversation.id"
-                    :class="{ 'bg-gray-300 rounded-lg': activeConversation.id == conversation.id, 
+                    :class="{ 'bg-gray-300 rounded-lg': activeConversation.id == conversation.id,
                         ' shadow-md' : conversation.id == conversations[conversations.length-1].id  ,
                         'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
                     <div class="flex items-center space-x-2">
@@ -118,111 +118,107 @@ TODO:
 
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 import axios from 'axios';
 import {
-    useUserStore
+  useUserStore
 } from '@/stores/user';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Conversation } from '../interfaces';
+
+export default defineComponent({
+  components: {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Conversation, User } from '../interfaces';
-
-export default defineComponent({
-    components: {
-        DropdownMenu,
-        DropdownMenuContent,
-        DropdownMenuItem,
-        DropdownMenuLabel,
-        DropdownMenuSeparator,
-        DropdownMenuTrigger,
-    },
-    props: ['user_id'],
-    setup() {
-        const userStore = useUserStore()
-        return {
-            userStore,
-            loading: true
+  },
+  props: ['user_id'],
+  setup() {
+    const userStore = useUserStore();
+    return {
+      userStore,
+      loading: true
+    };
+  },
+  data() {
+    return {
+      conversations: [] as Conversation[],
+      activeConversation: {} as Conversation,
+      messageText: ''
+    };
+  },
+  methods: {
+    async getConversationsList() {
+      axios.get('/api/chat/').then(async response => {
+        this.conversations = response.data.conversations;
+        if (this.conversations.length > 0 && this.user_id) {
+          await this.getMessages(this.user_id);
+          this.scrollToBottom();
+        } else if (this.conversations.length > 0 && !this.user_id) {
+          this.activeConversation = this.conversations[0];
+          await this.openConversation(this.conversations[0]);
         }
+        this.loading = false;
+      }).catch(error => {
+        this.loading = false;
+        console.log(error);
+      });
     },
-    data() {
-        return {
-            conversations: [] as Conversation[],
-            activeConversation: {} as Conversation,
-            messageText: ''
+    async getMessages(user_id: string) {
+      return axios.get(`/api/chat/${user_id}/`).then(response => {
+        this.activeConversation = response.data.conversation;
+      }).catch(error => {
+        console.log(error);
+      });
+    },
+    async submitForm() {
+      if (this.messageText.replace(/\s/g, '').length > 0) {
+        axios.post(`/api/chat/${this.user_id}/messages/`, {
+          message: this.messageText
+        }).then(async () => {
+          this.messageText = '';
+          //this.activeConversation.messages.push(response.data.message)
+          await this.getMessages(this.user_id);
+        }).catch(error => {
+          console.log(error);
+        });
+      }
+    },
+    async openConversation(conversation: Conversation) {
+      this.messageText = '';
+      await this.$router.push({
+        name: 'messages',
+        params: {
+          user_id: conversation.users[0].id
         }
+      });
+      await this.getMessages(this.user_id);
+      this.scrollToBottom();
     },
-    methods: {
-        async getConversationsList() {
-            axios.get('/api/chat/').then(async response => {
-                this.conversations = response.data.conversations;
-                if (this.conversations.length > 0 && this.user_id) {
-                    await this.getMessages(this.user_id);
-                    this.scrollToBottom()
-                } else if (this.conversations.length > 0 && !this.user_id) {
-                    this.activeConversation = this.conversations[0]
-                    await this.openConversation(this.conversations[0])
-                }
-                this.loading = false;
-            }).catch(error => {
-                this.loading = false;
-                console.log(error);
-            })
-        },
-        async getMessages(user_id: string) {
-            return axios.get(`/api/chat/${user_id}/`).then(response => {
-                this.activeConversation = response.data.conversation;
-            }).catch(error => {
-                console.log(error)
-            })
-        },
-        async submitForm() {
-            if (this.messageText.replace(/\s/g, '').length > 0) {
-                axios.post(`/api/chat/${this.user_id}/messages/`, {
-                    message: this.messageText
-                }).then(async response => {
-                    this.messageText = ''
-                    //this.activeConversation.messages.push(response.data.message)
-                    await this.getMessages(this.user_id)
-                }).catch(error => {
-                    console.log(error)
-                })
-            }
-        },
-        async openConversation(conversation: Conversation) {
-            this.messageText = '';
-            await this.$router.push({
-                name: 'messages',
-                params: {
-                    user_id: conversation.users[0].id
-                }
-            });
-            await this.getMessages(this.user_id);
-            this.scrollToBottom()
-        },
-        async deleteConversation() {
-            axios.delete(`/api/chat/${this.user_id}/`).then(async response => {
-                this.activeConversation = {} as Conversation;
-                await this.getConversationsList();
-                await this.$router.push({
-                    name: 'messages',
-                });
-            })
-        },
-        scrollToBottom() {
-            let container = document.getElementById("conversation");
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
-        }
+    async deleteConversation() {
+      axios.delete(`/api/chat/${this.user_id}/`).then(async () => {
+        this.activeConversation = {} as Conversation;
+        await this.getConversationsList();
+        await this.$router.push({
+          name: 'messages',
+        });
+      });
     },
-    created() {
-        this.getConversationsList()
+    scrollToBottom() {
+      const container = document.getElementById("conversation");
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
     }
-})
+  },
+  created() {
+    this.getConversationsList();
+  }
+});
 </script>

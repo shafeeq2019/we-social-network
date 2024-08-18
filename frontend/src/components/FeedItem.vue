@@ -125,129 +125,123 @@
 
 <script lang="ts">
 import {
-    defineComponent
-} from 'vue'
+  defineComponent
+} from 'vue';
 import axios from 'axios';
 import {
-    Post
-} from '../interfaces.ts'
+  Post
+} from '../interfaces.ts';
 import type {
-    PropType
-} from 'vue'
+  PropType
+} from 'vue';
 import {
-    useToastStore
-} from '@/stores/toast'
+  useToastStore
+} from '@/stores/toast';
 import {
-    useUserStore
-} from '@/stores/user'
+  useUserStore
+} from '@/stores/user';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+export default defineComponent({
+  components: {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog'
-export default defineComponent({
-    components: {
-        Dialog,
-        DialogContent,
-        DialogDescription,
-        DialogFooter,
-        DialogHeader,
-        DialogTitle,
-        DialogTrigger,
-        DropdownMenu,
-        DropdownMenuContent,
-        DropdownMenuItem,
-        DropdownMenuLabel,
-        DropdownMenuSeparator,
-        DropdownMenuTrigger,
-    },
-    setup() {
-        const userStore = useUserStore();
-        const toastStore = useToastStore();
-        return {
-            userStore,
-            toastStore
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+  },
+  setup() {
+    const userStore = useUserStore();
+    const toastStore = useToastStore();
+    return {
+      userStore,
+      toastStore
+    };
+  },
+  props: {
+    post: {
+      type: Object as PropType<Post>,
+      required: true
+    }
+  },
+  data() {
+    return {
+      openReportModal: false,
+      reportText: ''
+    };
+  },
+  methods: {
+    likePost() {
+      axios.post(`/api/post/${this.post.id}/like/`).then(response => {
+        if (response.data.message == 'post liked successfully') {
+          this.post.likes_count += 1;
+          this.post.post_liked = true;
+        } else {
+          this.post.likes_count -= 1;
+          this.post.post_liked = false;
         }
+      }).catch(e => {
+        console.log(e);
+      });
     },
-    props: {
-        post: {
-            type: Object as PropType<Post>,
-            required: true
+    formatHashtags(text: string): string {
+      const escapeHTML = (text: string) => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const escapedText = escapeHTML(text);
+      return escapedText.replace(/\B#(\w+)/g,
+        '<a class="text-blue-700" href="/trends/$1">#$1</a>');
+    },
+    async deletePost() {
+      axios.delete(`/api/post/${this.post.id}`).then(
+        () => {
+          this.$emit('deletePost', this.post.id);
+          this.toastStore.showToast(5000, 'The post was deleted', 'bg-emerald-500');
+          if (this.$route.name == 'postview') {
+            this.$router.go(-1);
+          }
         }
+      ).catch(e => {
+        console.log(e);
+      });
     },
-    data() {
-        return {
-            openReportModal: false,
-            reportText: ''
-        }
+    async reportPost() {
+      axios.post(`/api/post/${this.post.id}/report/`, {
+        reportText: this.reportText
+      }).then(response => {
+        this.openReportModal = false;
+        console.log(response);
+        this.toastStore.showToast(5000, 'The post was reported', 'bg-emerald-500');
+      }).catch(e => {
+        console.log(e);
+      });
     },
-    methods: {
-        likePost() {
-            axios.post(`/api/post/${this.post.id}/like/`).then(response => {
-                if (response.data.message == 'post liked successfully') {
-                    this.post.likes_count += 1;
-                    this.post.post_liked = true
-                } else {
-                    this.post.likes_count -= 1;
-                    this.post.post_liked = false
-                }
-            }).catch(e => {
-                console.log(e)
-            })
-        },
-        formatHashtags(text: string): string {
-            const escapeHTML = (text: string) => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            const escapedText = escapeHTML(text);
-            return escapedText.replace(/\B#(\w+)/g,
-                '<a class="text-blue-700" href="/trends/$1">#$1</a>');
-        },
-        async deletePost() {
-            axios.delete(`/api/post/${this.post.id}`).then(
-                response => {
-                    this.$emit('deletePost', this.post.id)
-                    this.toastStore.showToast(5000, 'The post was deleted', 'bg-emerald-500');
-                    if (this.$route.name == 'postview') {
-                        this.$router.go(-1);
-                    }
-                }
-            ).catch(e => {
-                console.log(e)
-            })
-        },
-        async reportPost() {
-            axios.post(`/api/post/${this.post.id}/report/`, {
-                reportText: this.reportText
-            }).then(response => {
-                this.openReportModal = false;
-                console.log(response)
-                this.toastStore.showToast(5000, 'The post was reported', 'bg-emerald-500')
-            }).catch(e => {
-                console.log(e)
-            })
-        },
-        share() {
-            const route = this.$router.resolve({ name: 'postview', params: { id: this.post.id } });
-            const absoluteURL = new URL(route.href, window.location.origin).href;
+    share() {
+      const route = this.$router.resolve({ name: 'postview', params: { id: this.post.id } });
+      const absoluteURL = new URL(route.href, window.location.origin).href;
 
-            navigator.share({
-                title: 'Post from We',
-                text: this.post.body,
-                url: absoluteURL,
-            })
-        }
-    },
-    created() { }
-})
+      navigator.share({
+        title: 'Post from We',
+        text: this.post.body,
+        url: absoluteURL,
+      });
+    }
+  },
+  created() { }
+});
 </script>

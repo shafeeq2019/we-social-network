@@ -31,63 +31,63 @@
     </div>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from 'vue';
 import axios from 'axios';
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-import Trends from '../components/Trends.vue'
-import FeedItem from '../components/FeedItem.vue'
-import CommentItem from '../components/CommentItem.vue'
-import { Comment } from '../interfaces'
+import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
+import Trends from '../components/Trends.vue';
+import FeedItem from '../components/FeedItem.vue';
+import CommentItem from '../components/CommentItem.vue';
+import { Comment } from '../interfaces';
 
 export default defineComponent({
-    async beforeRouteUpdate(to, from) {
-        // react to route changes...
-        await this.getPost();
+  async beforeRouteUpdate() {
+    // react to route changes...
+    await this.getPost();
+  },
+  components: {
+    PeopleYouMayKnow,
+    Trends,
+    FeedItem,
+    CommentItem
+  },
+  data() {
+    return {
+      post: {
+        comments: [] as Comment[]
+      },
+      commentText: ''
+    };
+  },
+  methods: {
+    async getPost() {
+      await axios.get(`/api/post/${this.$route.params.id}/detail/`).then(response => {
+        this.post = response.data.post;
+      }).catch(error => {
+        console.log(error);
+      });
     },
-    components: {
-        PeopleYouMayKnow,
-        Trends,
-        FeedItem,
-        CommentItem
+    async submitForm() {
+      if (this.commentText.trim().length !== 0) {
+        axios.post(`/api/post/${this.$route.params.id}/comment/`, {
+          "comment": this.commentText
+        }).then(async () => {
+          this.commentText = '';
+          //this.post.comments = [this.post.comments, ...this.commentText];
+          await this.getPost();
+        }).catch(error => {
+          console.log(error);
+        });
+      }
     },
-    data() {
-        return {
-            post: {
-                comments: [] as Comment[]
-            },
-            commentText: ''
-        }
-    },
-    methods: {
-        async getPost() {
-            await axios.get(`/api/post/${this.$route.params.id}/detail/`).then(response => {
-                this.post = response.data.post;
-            }).catch(error => {
-                console.log(error);
-            })
-        },
-        async submitForm() {
-            if (this.commentText.trim().length !== 0) {
-                axios.post(`/api/post/${this.$route.params.id}/comment/`, {
-                    "comment": this.commentText
-                }).then(async response => {
-                    this.commentText = '';
-                    //this.post.comments = [this.post.comments, ...this.commentText];
-                    await this.getPost()
-                }).catch(error => {
-                    console.log(error);
-                })
-            }
-        },
-        deleteComment(commentId: string) {
-            this.post.comments = this.post.comments.filter(
-                comment => comment.id != commentId
-            )
-        }
-    },
-    created() {
-        this.getPost()
+    deleteComment(commentId: string) {
+      this.post.comments = this.post.comments.filter(
+        comment => comment.id != commentId
+      );
     }
+  },
+  created() {
+    this.getPost();
+  }
 });
 </script>
 <style lang=""></style>

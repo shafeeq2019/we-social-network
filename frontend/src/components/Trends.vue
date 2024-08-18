@@ -1,13 +1,8 @@
-/**
- TODO:
-  - update the posts count when adding a new post to a trend
-*/ 
-
 <template>
     <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md" v-if="!loading">
         <h3 class="mb-6 text-xl">Trends</h3>
         <div class="space-y-4" v-if="trends && trends.length > 0">
-            <div class="flex items-center justify-between" v-for="trend in trends">
+            <div class="flex items-center justify-between" v-for="(trend, index) in trends" :key="index">
                 <p class="text-xs">
                     <strong>#{{ trend.hashtag }}</strong><br>
                     <span class="text-gray-500">{{ trend.occurences }} posts</span>
@@ -27,30 +22,34 @@
     </div>
 </template>
 <script  lang="ts">
-import { defineComponent } from 'vue'
-import { Trend } from '../interfaces'
+/**
+ TODO:
+  - update the posts count when adding a new post to a trend
+*/
+import { defineComponent } from 'vue';
+import { Trend } from '../interfaces';
 import axios from 'axios';
 
 export default defineComponent({
-    data() {
-        return {
-            trends: [] as Trend[],
-            loading:true
-        }
-    },
-    methods: {
-        getTrends() {
-            axios.get('/api/post/trends/')
-                .then(response => {
-                    this.trends = response.data;
-                    this.loading = false;
-                }).catch(error => {
-                    console.log(error)
-                })
-        }
-    },
-    created() {
-        this.getTrends()
+  data() {
+    return {
+      trends: [] as Trend[],
+      loading: true
+    };
+  },
+  methods: {
+    getTrends() {
+      axios.get('/api/post/trends/')
+        .then(response => {
+          this.trends = response.data;
+          this.loading = false;
+        }).catch(error => {
+          console.log(error);
+        });
     }
-}) 
+  },
+  created() {
+    this.getTrends();
+  }
+});
 </script>
