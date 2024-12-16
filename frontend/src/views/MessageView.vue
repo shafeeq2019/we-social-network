@@ -28,7 +28,7 @@ TODO:
                                     </path>
                                 </svg>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+                            <DropdownMenuContent class="bg-background">
                                 <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center" @click="$router.push({ name: 'profile', params: { id: conversation.users[0].id } })">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
