@@ -30,7 +30,7 @@
                             </svg>
                             <p>Friends</p>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent class="bg-background">
                             <!-- <DropdownMenuSeparator /> -->
                             <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
                                 @click="deleteFriendshipRequest">
@@ -56,7 +56,7 @@
                             </svg>
                             <p>Friendship request sent</p>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent class="bg-background">
                             <!-- <DropdownMenuSeparator /> -->
                             <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
                                 @click="handleFriendshipRequest('canceled')">
@@ -82,7 +82,7 @@
                             </svg>
                             <p>{{user.name}} want to be your friend</p>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent class="bg-background">
                             <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
                                 @click="handleFriendshipRequest('accepted')">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
