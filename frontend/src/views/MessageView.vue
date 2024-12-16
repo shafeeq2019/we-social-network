@@ -4,14 +4,14 @@ TODO:
 */
 
 <template lang="">
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4" v-if="conversations.length > 0">
+    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary" v-if="conversations.length > 0">
         <div class="main-left col-span-1">
-            <div class="bg-white border border-gray-200 rounded-lg text-center shadow-md">
+            <div class="bg-primary border border-border rounded-lg text-center shadow-md">
                 <div class="flex items-center justify-between cursor-pointer pl-4 py-2 group"
                     v-for="conversation in conversations" @click="openConversation(conversation)" :key="conversation.id"
-                    :class="{ 'bg-gray-300 rounded-lg': activeConversation.id == conversation.id,
+                    :class="{ 'bg-secondary rounded-lg': activeConversation.id == conversation.id,
                         ' shadow-md' : conversation.id == conversations[conversations.length-1].id  ,
-                        'hover:bg-gray-200 hover:rounded-lg':activeConversation.id != conversation.id}">
+                        'hover:bg-primary-hover hover:rounded-lg':activeConversation.id != conversation.id}">
                     <div class="flex items-center space-x-2">
                         <img :src="conversation.users[0].avatar_link"
                             class="mx-auto w-9 h-9  sm:w-12 sm:h-12 rounded-full object-cover object-center">
@@ -53,7 +53,7 @@ TODO:
             </div>
         </div>
         <div class="main-center col-span-3 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-lg">
+            <div class="bg-foreground border border-border rounded-lg">
                 <div class="flex flex-col flex-grow p-4 h-[calc(100vh-212px)] overflow-auto" id="conversation">
                     <template v-for="message in activeConversation.messages" :key="message.id">
                         <!--sent messages-->
@@ -63,9 +63,9 @@ TODO:
                                 <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
                                     <p class="text-sm text-right"> {{message.message}}</p>
                                 </div>
-                                <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
+                                <span class="text-xs text-secondary leading-none">{{message.created_ago}}</span>
                             </div>
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-secondary">
                                 <img :src="message.created_by.avatar_link"
                                     class="mx-auto w-11 h-11 rounded-full object-cover object-center">
                             </div>
@@ -73,27 +73,27 @@ TODO:
                         <!--received messages-->
                         <div class="flex w-full mt-2 space-x-3 max-w-md"
                             v-if="message.created_by.id != userStore.user.id">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-secondary">
                                 <img :src="message.created_by.avatar_link"
                                     class="mx-auto w-11 h-11 rounded-full object-cover object-center">
                             </div>
                             <div>
-                                <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
+                                <div class="bg-secondary p-3 rounded-r-lg rounded-bl-lg">
                                     <p class="text-sm"> {{message.message}}</p>
                                 </div>
-                                <span class="text-xs text-gray-500 leading-none">{{message.created_ago}}</span>
+                                <span class="text-xs text-secondary leading-none">{{message.created_ago}}</span>
                             </div>
                         </div>
                     </template>
                 </div>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg">
+            <div class="bg-foreground border border-border rounded-lg">
                 <form @submit.prevent="submitForm">
                     <div class="p-4 flex space-x-3">
-                    <input type="text" name="" id="" class="w-full bg-gray-100 rounded-lg p-4 " v-model="messageText"
+                    <input type="text" name="" id="" class="w-full bg-background rounded-lg p-4 " v-model="messageText"
                         @keydown.enter.prevent="submitForm" placeholder="What do you want to say?">
-                    <button class="inline-block py-3 px-3 bg-purple-600 text-white rounded-lg" type="submit">
+                    <button class="inline-block py-3 px-3 bg-button-primary text-white rounded-lg" type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -105,14 +105,14 @@ TODO:
             </div>
         </div>
     </div>
-    <div v-else-if="!loading" class="max-w-lg mx-auto bg-white shadow-md sm:rounded-lg p-6">
+    <div v-else-if="!loading" class="max-w-lg mx-auto bg-foreground shadow-md sm:rounded-lg p-6">
         <div class="text-center">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
                 stroke="currentColor" class="h-40 w-40 text-purple-600 mx-auto ">
                 <path strokeLinecap="round" strokeLinejoin="round"
                     d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
             </svg>
-            <p class="mt-2 text-xl font-semibold text-gray-700">You don't have any messages</p>
+            <p class="mt-2 text-xl font-semibold text-desc">You don't have any messages</p>
         </div>
     </div>
 

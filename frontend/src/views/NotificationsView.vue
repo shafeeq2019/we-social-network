@@ -1,8 +1,8 @@
 <template>
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
-        <div class="main-center col-span-4 md:col-span-3 space-y-4">
-            <div v-if="notifications.length">
-                <div class="p-3 bg-white border border-gray-200 rounded-lg flex justify-start items-center"
+    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary">
+        <div class="main-center col-span-4 md:col-span-3">
+            <div v-if="notifications.length" class="flex flex-col gap-2">
+                <div class="p-3 bg-foreground border border-border rounded-lg flex justify-start items-center"
                     v-for="notification in notifications" v-bind:key="notification.id">
                     <router-link :to="{ name: 'profile', params: { id: notification.created_by.id } }">
                         <div class="flex items-center space-x-3">
@@ -15,7 +15,7 @@
                     </button>
                 </div>
             </div>
-            <div v-else class="p-4 bg-white border border-gray-200 rounded-lg">
+            <div v-else class="p-4 bg-foreground border border-border rounded-lg">
                 You don't have any unread notifications!
             </div>
         </div>

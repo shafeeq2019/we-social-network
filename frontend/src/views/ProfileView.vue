@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <!-- User on the left -->
         <div class="main-left col-span-4 md:col-span-1 order-1">
-            <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
+            <div class="p-4 bg-foreground border border-border text-center rounded-lg text-primary">
                 <div class="flex items-center justify-center ">
                     <img :src="user.avatar_link"
                         class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
@@ -10,19 +10,19 @@
 
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <router-link :to="{name:'friends', params:{id: user.id}}" class="text-xs text-gray-500">
+                    <router-link :to="{name:'friends', params:{id: user.id}}" class="text-xs text-secondary">
                         {{user.friends_count}} friends</router-link>
-                    <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
+                    <p class="text-xs text-secondary">{{user.posts_count}} posts</p>
                 </div>
                 <div class="mt-6 space-y-2">
                     <router-link v-if="user.id == userStore.user.id" :to="{name:'editprofile'}"
-                        class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full">
+                        class="inline-block p-1 bg-button-primary text-white rounded-md text-xs w-full">
                         Edit profile
                     </router-link>
 
                     <DropdownMenu v-if="user.id != userStore.user.id && isFriends">
                         <DropdownMenuTrigger
-                            class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full flex justify-center items-center space-x-2">
+                            class="inline-block p-1 bg-button-primary text-white rounded-md text-xs w-full flex justify-center items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -48,7 +48,7 @@
                     <DropdownMenu
                         v-if="user.id != userStore.user.id && friendship_request.status === 'sent' && friendship_request.created_by.id == userStore.user.id">
                         <DropdownMenuTrigger
-                            class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full flex justify-center items-center space-x-2">
+                            class="inline-block p-1 bg-button-primary text-white rounded-md text-xs w-full flex justify-center items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -74,7 +74,7 @@
                     <DropdownMenu
                         v-if="user.id != userStore.user.id && friendship_request.status === 'sent' && friendship_request.created_by.id == user.id">
                         <DropdownMenuTrigger
-                            class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full flex justify-center items-center space-x-2">
+                            class="inline-block p-1 bg-button-primary text-white rounded-md text-xs w-full flex justify-center items-center space-x-2">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -105,7 +105,7 @@
                     </DropdownMenu>
 
                     <button v-if="user.id != userStore.user.id && !isFriends && friendship_request.status != 'sent'"
-                        class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full flex justify-center items-center space-x-2"
+                        class="inline-block p-1 bg-button-primary text-white rounded-md text-xs w-full flex justify-center items-center space-x-2"
                         @click="sendFriendshipRequest()">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-5 h-5">
@@ -116,7 +116,7 @@
                     </button>
 
                     <button v-if="user.id != userStore.user.id"
-                        class="inline-block p-1 bg-purple-600 text-white rounded-md text-xs w-full flex justify-center items-center space-x-2"
+                        class="inline-block p-1 bg-button-primary text-white rounded-md text-xs w-full flex justify-center items-center space-x-2"
                         @click="sendDirectMessage">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-5 h-5">
@@ -135,7 +135,7 @@
                 <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
             </div>
 
-            <div v-else-if="!loading" class="bg-white shadow-md sm:rounded-lg p-6">
+            <div v-else-if="!loading" class="bg-foreground shadow-md sm:rounded-lg p-6">
                 <div class="text-center">
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -144,7 +144,7 @@
                             d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
                     </svg>
 
-                    <p class="mt-2 text-xl font-semibold text-gray-700">{{user.name}} has not published any posts yet
+                    <p class="mt-2 text-xl font-semibold text-desc">{{user.name}} has not published any posts yet
                     </p>
                 </div>
             </div>

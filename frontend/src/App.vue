@@ -1,5 +1,5 @@
 <template>
-  <nav class="py-3 px-4 border-b border-gray-200 bg-white fixed w-full top-0">
+  <nav class="py-3 px-4 border-b border-border bg-foreground text-primary fixed w-full top-0">
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="menu-left">
@@ -47,7 +47,7 @@
               <DropdownMenuTrigger>
                 <img :src="userStore.user.avatar_link" class="rounded-full w-10 h-10" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="font-medium  bg-white rounded-md">
+              <DropdownMenuContent class="font-medium bg-background rounded-md">
                 <DropdownMenuItem class="cursor-pointer">
                   <RouterLink :to="{ name: 'profile', params: { id: userStore.user.id } }"
                     class="flex space-x-2 items-center">
@@ -55,9 +55,24 @@
                     <span class="px-2">{{ userStore.user.name }}</span>
                   </RouterLink>
                 </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer">
+                  <div class="flex space-x-2 items-center" @click="changeColorTheme()">
+                    <svg v-if="theme === 'dark'" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                      stroke="currentColor" class="h-8 w-8 text-secondary">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+                    </svg>
+                    <svg v-if="theme === 'light'"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                      stroke="currentColor" class="h-8 w-8 text-secondary">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+                    </svg>
+                    <span class="px-2">{{ theme == "dark" ? "Light" : "Dark" }} Mode </span>
+                  </div>
+                </DropdownMenuItem>
                 <DropdownMenuItem class="cursor-pointer" @click="logout">
                   <div class="flex space-x-2 items-center">
-                    <svg class="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
@@ -72,65 +87,84 @@
         <template v-else>
           <div class="menu-right">
             <RouterLink class="py-2 px-4 bg-gray-500 text-white rounded-md mr-4 text-sm" to="/login">Log in</RouterLink>
-            <RouterLink class="py-2 px-4 bg-purple-600 text-white rounded-md text-sm" to="/signup">Sign up</RouterLink>
+            <RouterLink class="py-2 px-4 bg-button-primary text-white rounded-md text-sm" to="/signup">Sign up
+            </RouterLink>
           </div>
         </template>
       </div>
     </div>
   </nav>
-  <main class="px-4 py-6 mt-14">
+  <main class="px-4 py-6 mt-14 bg-background">
     <RouterView />
   </main>
   <Toast />
 </template>
 
 <script lang="ts">
-import Toast from "@/components/Toast.vue";
-import {
-  useUserStore
-} from "@/stores/user";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import axios from "axios";
-import {
-  defineComponent
-} from "vue";
-
-export default defineComponent({
-  setup() {
-    const userStore = useUserStore();
-    return {
-      userStore,
-      userId: ''
-    };
-  },
-  components: {
-    Toast,
+  import Toast from "@/components/Toast.vue";
+  import {
+    useUserStore
+  } from "@/stores/user";
+  import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-  },
-  methods: {
-    logout() {
-      this.userStore.removeToken();
-      this.$router.push("/login");
+  } from '@/components/ui/dropdown-menu';
+  import axios from "axios";
+  import {
+    defineComponent
+  } from "vue";
+  import { getCurrentThem } from "./lib/utils";
+  export default defineComponent({
+    setup() {
+      const userStore = useUserStore();
+      return {
+        userStore,
+        userId: '',
+        theme: ''
+      };
+    },
+    components: {
+      Toast,
+      DropdownMenu,
+      DropdownMenuContent,
+      DropdownMenuItem,
+      DropdownMenuTrigger,
+    },
+    methods: {
+      logout() {
+        this.userStore.removeToken();
+        this.$router.push("/login");
+      },
+      changeColorTheme() {
+        let theme = getCurrentThem();
+        if (theme === "dark") {
+          theme = "light";
+        } else {
+          theme = "dark";
+        }
+        localStorage.setItem("we.theme", theme);
+        this.theme = getCurrentThem();
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      },
+    },
+    created() {
+      this.theme = getCurrentThem();
+      console.log(this.theme)
+      this.userStore.initStore();
+      const token = this.userStore.user.access;
+      if (token) {
+        axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+      } else {
+        axios.defaults.headers.common["Authorization"] = "";
+      }
     }
-  },
-  created() {
-    this.userStore.initStore();
-    const token = this.userStore.user.access;
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-    } else {
-      axios.defaults.headers.common["Authorization"] = "";
-    }
-  }
-});
+  });
 </script>
 
 <style scoped></style>

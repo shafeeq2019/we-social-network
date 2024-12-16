@@ -1,17 +1,18 @@
 <template>
     <form method="post" @submit.prevent="submitForm">
-        <div class="bg-white border border-gray-200 rounded-lg">
+        <div class="bg-foreground border border-border rounded-lg text-primary">
             <div class="p-4">
-                <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"
-                    v-model="body"></textarea>
+                <textarea class="p-4 w-full border-border rounded-lg bg-background text-primary dark:focus:outline-none" placeholder="What are you thinking about?"
+                    v-model="body">
+                </textarea>
                 <div id="preview" v-if="url">
                     <img :src="url" class="w-[100px] mt-3 rounded-xl" />
                 </div>
             </div>
 
-            <div class="p-4 border-t border-gray-100 flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
+            <div class="p-4 border-t border-border flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
                 <label for="upload-image"
-                    class="inline-block bg-gray-600 text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
+                    class="inline-block bg-button-secondary text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
                     Image</label>
                 <input id="upload-image" type="file" ref="postPhoto" accept="image/*" @input="onFileChange" hidden>
                 <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
@@ -21,7 +22,7 @@
                         <option value=true>Private</option>
                     </select>  -->
                     <button type="submit"
-                        class="inline-block bg-purple-600 text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
+                        class="inline-block bg-button-primary text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
                 </div>
             </div>
         </div>

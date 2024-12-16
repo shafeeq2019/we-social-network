@@ -1,5 +1,5 @@
 <template>
-    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md" v-if="users && users.length > 0">
+    <div class="p-4 bg-foreground text-primary border border-border rounded-lg shadow-md" v-if="users && users.length > 0">
         <h3 class="mb-6 text-xl">People you may know</h3>
 
         <div class="space-y-4">
@@ -11,7 +11,7 @@
                 </div>
 
                 <RouterLink :to="{ name: 'profile', params: { 'id': user.id } }"
-                    class="py-2 px-3 bg-purple-600 text-white text-xs rounded-lg">Show</RouterLink>
+                    class="py-2 px-3 bg-button-primary text-white text-xs rounded-lg">Show</RouterLink>
             </div>
         </div>
     </div>

@@ -1,9 +1,9 @@
 <template>
-  <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
+  <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4 text-primary">
     <div class="main-left col-span-2 md:col-span-1">
-      <div class="p-12 bg-white border border-gray-200 rounded-lg">
+      <div class="p-12 bg-foreground border border-border rounded-lg">
         <h1 class="mb-6 text-2xl">Sign up</h1>
-        <p class="mb-6 text-gray-500">
+        <p class="mb-6 text-secondary">
           <b>We</b> is a social network for sharing news and making new friendships. Log in or join now - it's free
         </p>
         <p class="font-bold">
@@ -14,30 +14,30 @@
     </div>
 
     <div class="main-right col-span-2 md:col-span-1">
-      <div class="p-12 bg-white border border-gray-200 rounded-lg">
+      <div class="p-12 bg-foreground border border-border rounded-lg">
         <form class="space-y-6" v-on:submit.prevent="submitForm">
           <div>
             <label>Name</label><br>
             <input type="text" v-model="form.name" placeholder="Your full name"
-              class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>E-mail</label><br>
             <input type="email" v-model="form.email" placeholder="Your e-mail address"
-              class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>Password</label><br>
             <input type="password" v-model="form.password1" placeholder="Your password"
-              class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>Repeat password</label><br>
             <input type="password" v-model="form.password2" placeholder="Repeat your password"
-              class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <template v-if="errors.length > 0">
@@ -47,7 +47,7 @@
           </template>
 
           <div>
-            <button class="py-4 px-6 bg-purple-600 text-white rounded-lg">Sign up</button>
+            <button class="py-4 px-6 bg-button-primary text-white rounded-lg">Sign up</button>
           </div>
         </form>
       </div>

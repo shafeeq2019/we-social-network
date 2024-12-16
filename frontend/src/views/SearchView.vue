@@ -1,12 +1,12 @@
 <template lang="">
     <div
-        class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+        class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-4 text-primary">
         <div class="main-center col-span-1 lg:col-span-3 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-lg">
+            <div class="bg-background border border-border rounded-lg">
                 <form class="p-4 flex space-x-4" @submit.prevent="submitForm">
-                    <input type="search" class="p-4 w-full bg-gray-100 rounded-lg" v-model="query"
+                    <input type="search" class="p-4 w-full bg-foreground rounded-lg" v-model="query"
                         placeholder="What are you looking for?">
-                    <button href="#" class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg" type="submit">
+                    <button href="#" class="inline-block py-4 px-6 bg-button-primary text-white rounded-lg" type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -17,14 +17,14 @@
             </div>
 
             <div v-if="users.length > 0"
-                class="bg-white border border-gray-200 rounded-lg p-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                class="bg-foreground border border-border rounded-lg p-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
                 <router-link :to="{ name: 'profile', params: { 'id': user.id } }" v-for="(user, index) in users"  :key="index">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200">
+                    <div class="p-4 text-center bg-primary rounded-lg hover:bg-primary-hover">
                         <img :src="user.avatar_link" class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
                         <p class="break-all"><strong>{{user.name}}</strong></p>
                         <div class="mt-6 flex space-x-4 justify-around">
-                            <p class="text-xs text-gray-500">{{user.friends_count}} friends</p>
-                            <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
+                            <p class="text-xs text-secondary">{{user.friends_count}} friends</p>
+                            <p class="text-xs text-secondary">{{user.posts_count}} posts</p>
                         </div>
                     </div>
                 </router-link>

@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         <!-- User on the left -->
         <div class="main-left col-span-1">
-            <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
+            <div class="p-4 bg-foreground text-primary border border-border text-center rounded-lg">
                 <div class="flex items-center justify-center">
                     <img :src="user.avatar_link"
                         class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
@@ -10,29 +10,29 @@
 
                 <p><strong>{{user.name}}</strong></p>
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <p class="text-xs text-gray-500">{{user.friends_count}} friends</p>
-                    <p class="text-xs text-gray-500">{{user.posts_count}} posts</p>
+                    <p class="text-xs text-secondary">{{user.friends_count}} friends</p>
+                    <p class="text-xs text-secondary">{{user.posts_count}} posts</p>
                 </div>
             </div>
         </div>
 
-        <div class="main-center lg:col-span-2 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friendship_requests.length > 0">
+        <div class="main-center lg:col-span-2 space-y-4 text-primary">
+            <div class="bg-foreground border border-border rounded-lg p-4" v-if="friendship_requests.length > 0">
                 <h2 class="text-xl mb-6">Friendship Requests</h2>
-                <div class=" grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="(friendshipRequest, index) in friendship_requests" :key="index">
+                <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div class="p-4 text-center bg-primary rounded-lg hover:bg-primary-hover" v-for="(friendshipRequest, index) in friendship_requests" :key="index">
                         <router-link :to="{ name: 'profile', params: { 'id': friendshipRequest.created_by.id } }">
                             <img :src="friendshipRequest.created_by.avatar_link"
                                 class="mb-6 mx-auto w-24 h-24 rounded-full object-cover object-center">
                             <p><strong>{{friendshipRequest.created_by.name}}</strong></p>
                             <div class="mt-3 flex space-x-4 justify-around">
-                                <p class="text-xs text-gray-500">{{friendshipRequest.created_by.friends_count}} friends
+                                <p class="text-xs text-secondary">{{friendshipRequest.created_by.friends_count}} friends
                                 </p>
-                                <p class="text-xs text-gray-500">{{friendshipRequest.created_by.posts_count}} posts</p>
+                                <p class="text-xs text-secondary">{{friendshipRequest.created_by.posts_count}} posts</p>
                             </div>
                         </router-link>
                         <div class="mt-3 flex space-x-3 justify-between">
-                            <button class="py-1 px-1 bg-purple-600 text-white rounded-md text-xs w-full"
+                            <button class="py-1 px-1 bg-button-primary text-white rounded-md text-xs w-full"
                                 @click="handleRequest('accepted', friendshipRequest)">
                                 Accept
                             </button>
@@ -45,17 +45,17 @@
                 </div>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg p-4" v-if="friends.length > 0">
+            <div class="bg-foreground border border-border rounded-lg p-4" v-if="friends.length > 0">
                 <h2 class="text-xl mb-6">Friendships</h2>
                 <div class=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div class="p-4 text-center bg-gray-100 rounded-lg hover:bg-gray-200" v-for="(friend, index) in friends"  :key="index">
+                    <div class="p-4 text-center bg-primary rounded-lg hover:bg-primary-hover" v-for="(friend, index) in friends"  :key="index">
                         <router-link :to="{ name: 'profile', params: { 'id': friend.id } }">
                             <img :src="friend.avatar_link"
                                 class="mb-6 mx-auto w-12 h-12 rounded-full object-cover object-center">
                             <p><strong>{{friend.name}}</strong></p>
                             <div class="mt-3 flex space-x-4 justify-around">
-                                <p class="text-xs text-gray-500">{{friend.friends_count}} friends</p>
-                                <p class="text-xs text-gray-500">{{friend.posts_count}} posts</p>
+                                <p class="text-xs text-secondary">{{friend.friends_count}} friends</p>
+                                <p class="text-xs text-secondary">{{friend.posts_count}} posts</p>
                             </div>
                         </router-link>
                     </div>

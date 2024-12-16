@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="p-4 bg-white border border-gray-200 rounded-lg">
+    <div class="p-4 bg-foreground border border-border rounded-lg text-primary">
 
         <div class="mb-6 flex items-center justify-between">
             <router-link :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
@@ -10,7 +10,7 @@
                 </div>
             </router-link>
 
-            <p class="text-gray-600">{{ /^0\s+minutes$/.test(post.created_ago) ? 'Just now' : post.created_ago}}</p>
+            <p class="text-gray-600 text-secondary">{{ /^0\s+minutes$/.test(post.created_ago) ? 'Just now' : post.created_ago}}</p>
         </div>
 
         <p v-html="formatHashtags(post.body)"> </p>
@@ -29,7 +29,7 @@
                         </path>
                     </svg>
 
-                    <span class="text-gray-500 text-xs">{{post.likes_count}}</span>
+                    <span class="text-desc text-xs">{{post.likes_count}}</span>
                 </div>
 
                 <RouterLink :to="{name: 'postview', params: {id: post.id}}"
@@ -41,18 +41,18 @@
                         </path>
                     </svg>
 
-                    <span class="text-gray-500 text-xs">
+                    <span class="text-desc text-xs">
                         {{ post.comments_count }} comments</span>
                 </RouterLink>
 
-                <div class="flex items-center space-x-2 text-gray-500" v-if="post.is_private">
+                <div class="flex items-center space-x-2 text-desc"  v-if="post.is_private">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
                     </svg>
 
-                    <span class="text-gray-500 text-xs">private</span>
+                    <span class="text-desc text-xs">private</span>
                 </div>
                 <div class="flex items-center space-x-2 cursor-pointer" @click="share()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -61,7 +61,7 @@
                             d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
                     </svg>
 
-                    <span class="text-gray-500 text-xs">Share</span>
+                    <span class="text-desc text-xs">Share</span>
                 </div>
 
             </div>
@@ -76,7 +76,7 @@
                             </path>
                         </svg>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent class="bg-background">
                         <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center" @click="deletePost"
                             v-if="userStore.user.id === post.created_by.id">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -88,7 +88,7 @@
                         </DropdownMenuItem>
                         <!-- <DropdownMenuSeparator /> -->
                         <DropdownMenuItem v-if="userStore.user.id != post.created_by.id"
-                            class="cursor-pointer flex space-x-2 items-center" @click="openReportModal = true">
+                            class="cursor-pointer flex gap-2 items-center" @click="openReportModal = true">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -102,15 +102,15 @@
         </div>
 
         <Dialog v-model:open="openReportModal" @update:open="reportText = ''">
-            <DialogContent class="sm:max-w-[425px]">
+            <DialogContent class="sm:max-w-[425px] text-primary">
                 <DialogHeader>
-                    <DialogTitle>Report a post</DialogTitle>
-                    <DialogDescription>
-                        Please tell us why you want to report this post
+                    <DialogTitle class="text-primary">Report a post</DialogTitle>
+                    <DialogDescription class="text-secondary">
+                      Please tell us why you want to report this post
                     </DialogDescription>
                 </DialogHeader>
-                <div class="p-2">
-                    <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="Why should we delete this post?"
+                <div class="p-2 text-primary">
+                    <textarea class="p-4 w-full bg-foreground rounded-lg" placeholder="Why should we delete this post?"
                         v-model="reportText"></textarea>
                 </div>
                 <DialogFooter>
@@ -205,7 +205,7 @@ export default defineComponent({
       const escapeHTML = (text: string) => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       const escapedText = escapeHTML(text);
       return escapedText.replace(/\B#(\w+)/g,
-        '<a class="text-blue-700" href="/trends/$1">#$1</a>');
+        '<a class="text-hashtag" href="/trends/$1">#$1</a>');
     },
     async deletePost() {
       axios.delete(`/api/post/${this.post.id}`).then(

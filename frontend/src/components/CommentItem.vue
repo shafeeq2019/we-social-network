@@ -3,12 +3,11 @@
         <router-link :to="{ name: 'profile', params: { 'id': comment.created_by.id } }">
             <div class="flex items-center space-x-3">
                 <img :src="comment.created_by.avatar_link" class="w-[40px] h-[39px] rounded-full">
-
                 <p><strong>{{comment.created_by.name}}</strong></p>
             </div>
         </router-link>
 
-        <p class="text-gray-600">{{ /^0\s+minutes$/.test(comment.created_ago) ? 'Just now' : comment.created_ago}}</p>
+        <p class="text-secondary">{{ /^0\s+minutes$/.test(comment.created_ago) ? 'Just now' : comment.created_ago}}</p>
     </div>
     <div class="flex justify-between text-sm">
         <p> {{ comment.comment}} </p>
@@ -22,7 +21,7 @@
                         </path>
                     </svg>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent class="bg-background">
                     <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center" @click="deleteComment"
                         v-if="userStore.user.id === comment.created_by.id">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"

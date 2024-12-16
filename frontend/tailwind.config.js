@@ -27,6 +27,7 @@ export const theme = {
       primary: {
         DEFAULT: "hsl(var(--primary))",
         foreground: "hsl(var(--primary-foreground))",
+        hover: "hsl(var(--primary-hover))",
       },
       secondary: {
         DEFAULT: "hsl(var(--secondary))",
@@ -52,6 +53,16 @@ export const theme = {
         DEFAULT: "hsl(var(--card))",
         foreground: "hsl(var(--card-foreground))",
       },
+      button: {
+        primary: "hsl(var(--button-primary))",
+        secondary: "hsl(var(--button-secondary))",
+      }
+    },
+    textColor:{
+      primary:"hsl(var(--text-primary))",
+      secondary:"hsl(var(--text-secondary))",
+      desc: "hsl(var(--text-desc))",
+      hashtag: "hsl(var(--text-hashtag))",
     },
     borderRadius: {
       lg: "var(--radius)",

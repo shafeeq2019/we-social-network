@@ -3,20 +3,20 @@
         <!-- New post & feeds on the middle -->
         <div class="main-center space-y-2 col-span-4 md:col-span-3">
             <FeedItem :post="post" v-if="post.created_by" />
-            <div class="p-4 w-11/12 bg-white border border-gray-200 rounded-lg " v-for="comment in post.comments" :key="comment.id">
+            <div class="p-4 w-11/12 bg-foreground border border-border rounded-lg text-primary" v-for="comment in post.comments" :key="comment.id">
                 <CommentItem :comment="comment" @deleteComment="deleteComment" />
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg w-11/12" >
+            <div class="bg-foreground border border-border rounded-lg w-11/12" >
                 <form method="post" @submit.prevent="submitForm">
                     <div class="p-4">
-                        <textarea class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking?"
+                        <textarea class="p-4 w-full rounded-lg bg-background text-primary dark:focus:outline-none" placeholder="What are you thinking?"
                             v-model="commentText"></textarea>
                     </div>
 
-                    <div class="p-4 border-t border-gray-100 flex justify-between">
+                    <div class="p-4 border-t border-border flex justify-between">
                         <button type="submit"
-                            class="inline-block py-2 px-3 bg-purple-600 text-white rounded-lg">Comment</button>
+                            class="inline-block py-2 px-3 bg-button-primary text-white rounded-lg">Comment</button>
                     </div>
                 </form>
             </div>

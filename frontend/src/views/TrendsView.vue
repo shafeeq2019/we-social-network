@@ -1,6 +1,6 @@
 <template lang="">
     <div class="mb-4 max-w-7xl mx-auto">
-        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md">
+        <div class="p-4 bg-foreground text-primary border border-border rounded-lg shadow-md ">
             <h2 class="text-xl font-semibold">Trend: #{{hashtag}}</h2>
         </div>
     </div>
