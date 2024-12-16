@@ -4,12 +4,12 @@ Welcome to We, a vibrant social network designed for sharing news and fostering 
 This project serves as a practical application for learning Python Django, showcasing a range of real-world features and functionalities. Our frontend is crafted using the latest technologies, including Vue.js 3 and Tailwind CSS, ensuring a seamless and dynamic user experience
 
 ## ToDo List
+- [x] Implement dark mode
 - [ ] Implement Real-time Chatting
 - [ ] Implement Infinite Scroll in Chats
 - [ ] Implement private posting functionality
 - [ ] Add "Forgot password" option
-- [ ] Implement dark mode
-- [ ] Write Unit Tests
+- [ ] Write playwright Tests
 - [ ] Turn the Vue Web App into a Progressive Web App (PWA)
 
 
