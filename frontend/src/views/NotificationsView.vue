@@ -1,30 +1,30 @@
 <template>
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary">
-        <div class="main-center col-span-4 md:col-span-3">
-            <div v-if="notifications.length" class="flex flex-col gap-2">
-                <div class="p-3 bg-foreground border border-border rounded-lg flex justify-start items-center"
-                    v-for="notification in notifications" v-bind:key="notification.id">
-                    <router-link :to="{ name: 'profile', params: { id: notification.created_by.id } }">
-                        <div class="flex items-center space-x-3">
-                            <img :src="notification.created_by.avatar_link" class="w-[40px] h-[39px] rounded-full" />
-                        </div>
-                    </router-link>
-                    <p class="ml-3">{{ notification.body }}</p>
-                    <button class="ml-2 underline" @click="readNotification(notification)">
-                        Read more
-                    </button>
-                </div>
+  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary">
+    <div class="main-center col-span-4 md:col-span-3">
+      <div v-if="notifications.length" class="flex flex-col gap-2">
+        <div class="p-3 bg-foreground border border-border rounded-lg flex justify-start items-center"
+             v-for="notification in notifications" v-bind:key="notification.id">
+          <router-link :to="{ name: 'profile', params: { id: notification.created_by.id } }">
+            <div class="flex items-center space-x-3">
+              <img :src="notification.created_by.avatar_link" class="w-[40px] h-[39px] rounded-full" />
             </div>
-            <div v-else class="p-4 bg-foreground border border-border rounded-lg">
-                You don't have any unread notifications!
-            </div>
+          </router-link>
+          <p class="ml-3">{{ notification.body }}</p>
+          <button class="ml-2 underline" @click="readNotification(notification)">
+            Read more
+          </button>
         </div>
-        <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4 hidden md:block">
-            <PeopleYouMayKnow />
-            <Trends />
-        </div>
+      </div>
+      <div v-else class="p-4 bg-foreground border border-border rounded-lg">
+        You don't have any unread notifications!
+      </div>
     </div>
+    <!-- People you may know -->
+    <div class="main-right col-span-1 space-y-4 hidden md:block">
+      <PeopleYouMayKnow />
+      <Trends />
+    </div>
+  </div>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";

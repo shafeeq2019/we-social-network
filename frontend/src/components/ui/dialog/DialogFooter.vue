@@ -16,7 +16,7 @@ const props = defineProps<DialogFooterProps>();
         props.class,
       )
     "
-  >
+    >
     <slot />
   </div>
 </template>

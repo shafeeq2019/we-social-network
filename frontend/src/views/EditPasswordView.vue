@@ -20,20 +20,20 @@ TODOS:
           <div>
             <label>Old password</label><br>
             <input type="password" v-model="form.old_password" placeholder="Your old password"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
 
           <div>
             <label>New password</label><br>
             <input type="password" v-model="form.new_password1" placeholder="Enter your new password"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>Repeat new password</label><br>
             <input type="password" v-model="form.new_password2" placeholder="Repeat your new password"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <template v-if="errors.length > 0">

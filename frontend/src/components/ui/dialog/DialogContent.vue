@@ -21,7 +21,7 @@ const emitsAsProps = useEmitAsProps(emits);
   <DialogPortal>
     <DialogOverlay
       class="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-    />
+      />
     <DialogContent
       :class="
         cn(
@@ -30,12 +30,12 @@ const emitsAsProps = useEmitAsProps(emits);
         )
       "
       v-bind="{ ...props, ...emitsAsProps }"
-    >
+      >
       <slot />
 
       <DialogClose
         class="absolute top-3 right-3 p-0.5 transition-colors rounded-md hover:bg-secondary"
-      >
+        >
         <X class="w-4 h-4" />
         <span class="sr-only">Close</span>
       </DialogClose>

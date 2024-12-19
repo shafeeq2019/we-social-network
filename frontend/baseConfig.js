@@ -1,4 +1,5 @@
 import stylistic from "@stylistic/eslint-plugin";
+import tseslint from "typescript-eslint";
 
 const baseConfig = {
   name: "baseConfig",
@@ -19,6 +20,7 @@ const baseConfig = {
     "@stylistic/member-delimiter-style": "error",
     "@stylistic/key-spacing": "error",
     "@stylistic/keyword-spacing": "error",
+    "@stylistic/no-multi-spaces": "error",
     "@stylistic/object-property-newline": ["error", {
       allowAllPropertiesOnSameLine: true
     }],
@@ -32,8 +34,24 @@ const baseConfig = {
 
 const vueConfig = {
   name: "vueConfig",
+  files: ["**/*.vue"],
+  languageOptions: {
+    parserOptions: {
+      parser: tseslint.parser
+    }
+  },
   rules: {
-    "vue/multi-word-component-names": "off"
+    "vue/multi-word-component-names": "off",
+    "vue/html-indent": ["error", 2, {
+      "attribute": 1,
+      "baseIndent": 1,
+      "closeBracket": 1,
+      "alignAttributesVertically": true,
+      "ignores": []
+    }],
+    "vue/no-multi-spaces": ["error", {
+      "ignoreProperties": false
+    }]
   }
 };
 

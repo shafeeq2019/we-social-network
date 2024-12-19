@@ -14,7 +14,7 @@ const props = defineProps<DialogTitleProps & { class?: string }>();
         props.class,
       )
     "
-  >
+    >
     <slot />
   </DialogTitle>
 </template>

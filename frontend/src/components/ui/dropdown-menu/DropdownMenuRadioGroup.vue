@@ -14,7 +14,7 @@ const emits = defineEmits<DropdownMenuRadioGroupEmits>();
   <DropdownMenuRadioGroup
     v-bind="props"
     @update:model-value="emits('update:modelValue', $event)"
-  >
+    >
     <slot />
   </DropdownMenuRadioGroup>
 </template>

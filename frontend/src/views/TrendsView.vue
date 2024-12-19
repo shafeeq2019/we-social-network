@@ -1,22 +1,22 @@
 <template lang="">
-    <div class="mb-4 max-w-7xl mx-auto">
-        <div class="p-4 bg-foreground text-primary border border-border rounded-lg shadow-md ">
-            <h2 class="text-xl font-semibold">Trend: #{{hashtag}}</h2>
-        </div>
+  <div class="mb-4 max-w-7xl mx-auto">
+    <div class="p-4 bg-foreground text-primary border border-border rounded-lg shadow-md ">
+      <h2 class="text-xl font-semibold">Trend: #{{hashtag}}</h2>
     </div>
-    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
-        <!-- New post & feeds on the middle -->
-        <div class="main-center col-span-4 md:col-span-3 space-y-4">
-            <FeedItem v-for="post in posts" :post="post" :key="post.id"  @deletePost="deletePost"/>
-        </div>
-
-        <!-- People you may know -->
-        <div class="main-right col-span-1 space-y-4 hidden md:block">
-            <PeopleYouMayKnow />
-            <Trends />
-        </div>
-
+  </div>
+  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+    <!-- New post & feeds on the middle -->
+    <div class="main-center col-span-4 md:col-span-3 space-y-4">
+      <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
     </div>
+
+    <!-- People you may know -->
+    <div class="main-right col-span-1 space-y-4 hidden md:block">
+      <PeopleYouMayKnow />
+      <Trends />
+    </div>
+
+  </div>
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';

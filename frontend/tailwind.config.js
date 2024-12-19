@@ -58,9 +58,9 @@ export const theme = {
         secondary: "hsl(var(--button-secondary))",
       }
     },
-    textColor:{
-      primary:"hsl(var(--text-primary))",
-      secondary:"hsl(var(--text-secondary))",
+    textColor: {
+      primary: "hsl(var(--text-primary))",
+      secondary: "hsl(var(--text-secondary))",
       desc: "hsl(var(--text-desc))",
       hashtag: "hsl(var(--text-hashtag))",
     },

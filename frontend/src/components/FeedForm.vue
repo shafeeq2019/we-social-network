@@ -1,32 +1,32 @@
 <template>
-    <form method="post" @submit.prevent="submitForm">
-        <div class="bg-foreground border border-border rounded-lg text-primary">
-            <div class="p-4">
-                <textarea class="p-4 w-full border-border rounded-lg bg-background text-primary dark:focus:outline-none" placeholder="What are you thinking about?"
-                    v-model="body">
+  <form method="post" @submit.prevent="submitForm">
+    <div class="bg-foreground border border-border rounded-lg text-primary">
+      <div class="p-4">
+        <textarea class="p-4 w-full border-border rounded-lg bg-background text-primary dark:focus:outline-none" placeholder="What are you thinking about?"
+                  v-model="body">
                 </textarea>
-                <div id="preview" v-if="url">
-                    <img :src="url" class="w-[100px] mt-3 rounded-xl" />
-                </div>
-            </div>
+        <div id="preview" v-if="url">
+          <img :src="url" class="w-[100px] mt-3 rounded-xl" />
+        </div>
+      </div>
 
-            <div class="p-4 border-t border-border flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
-                <label for="upload-image"
-                    class="inline-block bg-button-secondary text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
-                    Image</label>
-                <input id="upload-image" type="file" ref="postPhoto" accept="image/*" @input="onFileChange" hidden>
-                <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
-                    <!-- <select id="privacy" v-model="is_private"
+      <div class="p-4 border-t border-border flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
+        <label for="upload-image"
+               class="inline-block bg-button-secondary text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
+          Image</label>
+        <input id="upload-image" type="file" ref="postPhoto" accept="image/*" @input="onFileChange" hidden>
+        <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
+          <!-- <select id="privacy" v-model="is_private"
                         class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3 cursor-pointer">
                         <option selected value=false>Public</option>
                         <option value=true>Private</option>
                     </select>  -->
-                    <button type="submit"
-                        class="inline-block bg-button-primary text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
-                </div>
-            </div>
+          <button type="submit"
+                  class="inline-block bg-button-primary text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
         </div>
-    </form>
+      </div>
+    </div>
+  </form>
 </template>
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
@@ -78,6 +78,7 @@ export default defineComponent({
         this.is_private = false;
         imageInput.value = "";
         this.url = '';
+        /* eslint-disable */
         this.posts.unshift(response.data);
         this.user ? this.user.posts_count += 1 : '';
       }).catch(error => {

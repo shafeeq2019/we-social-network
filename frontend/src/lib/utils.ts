@@ -11,7 +11,7 @@ export function getCurrentThem(): string {
     document.documentElement.classList.add('dark');
     return 'dark';
   } else {
-    document.documentElement.classList.remove('dark')
+    document.documentElement.classList.remove('dark');
     return 'light';
   }
 }

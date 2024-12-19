@@ -15,7 +15,7 @@ const props = defineProps<DropdownMenuItemProps & { inset?: boolean; class?: str
         props.class,
       ),
     ]"
-  >
+    >
     <slot />
   </DropdownMenuItem>
 </template>

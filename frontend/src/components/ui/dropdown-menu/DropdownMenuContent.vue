@@ -29,7 +29,7 @@ const forwarded = useForwardPropsEmits(props, emits);
         ),
       ]"
       v-bind="forwarded"
-    >
+      >
       <slot />
     </DropdownMenuContent>
   </DropdownMenuPortal>

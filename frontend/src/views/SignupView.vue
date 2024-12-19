@@ -19,25 +19,25 @@
           <div>
             <label>Name</label><br>
             <input type="text" v-model="form.name" placeholder="Your full name"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>E-mail</label><br>
             <input type="email" v-model="form.email" placeholder="Your e-mail address"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>Password</label><br>
             <input type="password" v-model="form.password1" placeholder="Your password"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <div>
             <label>Repeat password</label><br>
             <input type="password" v-model="form.password2" placeholder="Repeat your password"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
 
           <template v-if="errors.length > 0">

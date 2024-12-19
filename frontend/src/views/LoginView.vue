@@ -21,13 +21,13 @@
           <div>
             <label>E-mail</label><br>
             <input type="email" placeholder="Your e-mail address"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.email">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.email">
           </div>
 
           <div>
             <label>Password</label><br>
             <input type="password" placeholder="Your password"
-              class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.password">
+                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.password">
           </div>
 
           <template v-if="errors.length > 0">

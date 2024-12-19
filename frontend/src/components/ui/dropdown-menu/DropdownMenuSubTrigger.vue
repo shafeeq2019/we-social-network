@@ -18,7 +18,7 @@ const props = defineProps<DropdownMenuSubTriggerProps & { class?: string }>();
         props.class,
       ),
     ]"
-  >
+    >
     <slot />
     <ChevronRight class="ml-auto h-4 w-4" />
   </DropdownMenuSubTrigger>
