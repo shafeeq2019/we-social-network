@@ -23,7 +23,6 @@
       <Trends />
     </div>
   </div>
-
   <div class="max-w-7xl mx-auto md:hidden space-y-4">
     <FeedForm :user="null" :posts="posts" />
     <PeopleYouMayKnow />

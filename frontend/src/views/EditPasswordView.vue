@@ -7,13 +7,11 @@ TODOS:
     <div class="main-left col-span-2 md:col-span-1">
       <div class="p-12 bg-foreground border border-border rounded-lg">
         <h1 class="mb-6 text-2xl">Edit password</h1>
-
         <p class="mb-6 text-secondary">
           Here you can change your password
         </p>
       </div>
     </div>
-
     <div class="main-right col-span-2 md:col-span-1">
       <div class="p-12 bg-foreground border border-border rounded-lg">
         <form class="space-y-6" v-on:submit.prevent="submitForm">
@@ -22,26 +20,21 @@ TODOS:
             <input type="password" v-model="form.old_password" placeholder="Your old password"
                    class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
-
-
           <div>
             <label>New password</label><br>
             <input type="password" v-model="form.new_password1" placeholder="Enter your new password"
                    class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
-
           <div>
             <label>Repeat new password</label><br>
             <input type="password" v-model="form.new_password2" placeholder="Repeat your new password"
                    class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
-
           <template v-if="errors.length > 0">
             <div class="bg-red-300 text-white rounded-lg p-6">
               <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
             </div>
           </template>
-
           <div>
             <button class="py-4 px-6 bg-button-primary text-white rounded-lg">Save changes</button>
           </div>

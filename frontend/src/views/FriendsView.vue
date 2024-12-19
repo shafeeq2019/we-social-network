@@ -7,7 +7,6 @@
           <img :src="user.avatar_link"
                class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
         </div>
-
         <p><strong>{{user.name}}</strong></p>
         <div class="mt-6 flex space-x-8 justify-around">
           <p class="text-xs text-secondary">{{user.friends_count}} friends</p>
@@ -15,7 +14,6 @@
         </div>
       </div>
     </div>
-
     <div class="main-center lg:col-span-2 space-y-4 text-primary">
       <div class="bg-foreground border border-border rounded-lg p-4" v-if="friendship_requests.length > 0">
         <h2 class="text-xl mb-6">Friendship Requests</h2>
@@ -44,7 +42,6 @@
           </div>
         </div>
       </div>
-
       <div class="bg-foreground border border-border rounded-lg p-4" v-if="friends.length > 0">
         <h2 class="text-xl mb-6">Friendships</h2>
         <div class=" grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -61,15 +58,12 @@
           </div>
         </div>
       </div>
-
     </div>
-
     <!-- People you may know -->
     <div class="main-right col-span-1 space-y-4">
       <PeopleYouMayKnow />
       <Trends />
     </div>
-
   </div>
 </template>
 <script lang="ts">

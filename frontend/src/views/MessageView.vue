@@ -1,8 +1,3 @@
-/**
-TODO:
-- real time messaging
-*/
-
 <template lang="">
   <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary" v-if="conversations.length > 0">
     <div class="main-left col-span-1">
@@ -87,7 +82,6 @@ TODO:
           </template>
         </div>
       </div>
-
       <div class="bg-foreground border border-border rounded-lg">
         <form @submit.prevent="submitForm">
           <div class="p-4 flex space-x-3">

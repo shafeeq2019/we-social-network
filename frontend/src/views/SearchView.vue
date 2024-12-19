@@ -15,7 +15,6 @@
           </button>
         </form>
       </div>
-
       <div v-if="users.length > 0"
            class="bg-foreground border border-border rounded-lg p-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4">
         <router-link :to="{ name: 'profile', params: { 'id': user.id } }" v-for="(user, index) in users" :key="index">
@@ -31,13 +30,11 @@
       </div>
       <FeedItem v-for="(post, index) in posts" :key="index" :post="post" />
     </div>
-
     <!-- People you may know -->
     <div class="main-right col-span-1 lg:col-span-1 space-y-4">
       <PeopleYouMayKnow />
       <Trends />
     </div>
-
   </div>
 </template>
 <script lang="ts">

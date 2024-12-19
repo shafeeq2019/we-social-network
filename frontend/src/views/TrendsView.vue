@@ -9,13 +9,11 @@
     <div class="main-center col-span-4 md:col-span-3 space-y-4">
       <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
     </div>
-
     <!-- People you may know -->
     <div class="main-right col-span-1 space-y-4 hidden md:block">
       <PeopleYouMayKnow />
       <Trends />
     </div>
-
   </div>
 </template>
 <script lang="ts">

@@ -6,14 +6,12 @@
       <div class="p-4 w-11/12 bg-foreground border border-border rounded-lg text-primary" v-for="comment in post.comments" :key="comment.id">
         <CommentItem :comment="comment" @deleteComment="deleteComment" />
       </div>
-
       <div class="bg-foreground border border-border rounded-lg w-11/12" >
         <form method="post" @submit.prevent="submitForm">
           <div class="p-4">
             <textarea class="p-4 w-full rounded-lg bg-background text-primary dark:focus:outline-none" placeholder="What are you thinking?"
                       v-model="commentText"></textarea>
           </div>
-
           <div class="p-4 border-t border-border flex justify-between">
             <button type="submit"
                     class="inline-block py-2 px-3 bg-button-primary text-white rounded-lg">Comment</button>
@@ -21,13 +19,11 @@
         </form>
       </div>
     </div>
-
     <!-- People you may know -->
     <div class="main-right col-span-1 space-y-4 hidden md:block">
       <PeopleYouMayKnow />
       <Trends />
     </div>
-
   </div>
 </template>
 <script lang="ts">

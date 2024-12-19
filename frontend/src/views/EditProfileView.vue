@@ -9,7 +9,6 @@
         <router-link to="/profile/edit/password" class="underline"> Edit password</router-link>
       </div>
     </div>
-
     <div class="main-right col-span-2 md:col-span-1">
       <div class="p-12 bg-foreground border border-border rounded-lg">
         <form class="space-y-6" v-on:submit.prevent="submitForm">
@@ -18,7 +17,6 @@
             <input type="text" v-model="form.name" placeholder="Your full name"
                    class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
           </div>
-
           <div>
             <label>E-mail</label><br>
             <input type="email" v-model="form.email" placeholder="Your e-mail address"

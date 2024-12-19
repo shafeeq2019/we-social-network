@@ -3,18 +3,15 @@
     <div class="main-left col-span-2 md:col-span-1">
       <div class="p-12 bg-foreground border border-border rounded-lg">
         <h1 class="mb-6 text-2xl">Log in</h1>
-
         <p class="mb-6 text-secondary">
           <b>We</b> is a social network for sharing news and making new friendships. Log in or join now - it's free
         </p>
-
         <p class="font-bold">
           Don't have an account? <RouterLink :to="{'name': 'signup'}" class="underline">Click here</RouterLink> to
           create one!
         </p>
       </div>
     </div>
-
     <div class="main-right col-span-2 md:col-span-1 text-primary">
       <div class="p-12 bg-foreground border border-border rounded-lg">
         <form class="space-y-6" @submit.prevent="submitForm">
@@ -23,13 +20,11 @@
             <input type="email" placeholder="Your e-mail address"
                    class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.email">
           </div>
-
           <div>
             <label>Password</label><br>
             <input type="password" placeholder="Your password"
                    class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.password">
           </div>
-
           <template v-if="errors.length > 0">
             <div class="bg-red-300 text-white rounded-lg p-6">
               <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
