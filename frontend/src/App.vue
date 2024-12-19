@@ -89,7 +89,7 @@
       </div>
     </div>
   </nav>
-  <main class="px-4 py-6 mt-14 bg-background">
+  <main class="px-4 py-6 mt-14 bg-background max-w-7xl mx-auto">
     <RouterView />
   </main>
   <Toast />

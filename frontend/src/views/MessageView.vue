@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary" v-if="conversations.length > 0">
+  <div class="grid grid-cols-4 gap-4 text-primary" v-if="conversations.length > 0">
     <div class="main-left col-span-1">
       <div class="bg-primary border border-border rounded-lg text-center shadow-md">
         <div class="flex items-center justify-between cursor-pointer pl-4 py-2 group"

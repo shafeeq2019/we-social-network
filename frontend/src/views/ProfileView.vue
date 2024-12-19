@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+  <div class="grid grid-cols-4 gap-4">
     <!-- User on the left -->
     <div class="main-left col-span-4 md:col-span-1 order-1">
       <div class="p-4 bg-foreground border border-border text-center rounded-lg text-primary">

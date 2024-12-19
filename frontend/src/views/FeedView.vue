@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="max-w-7xl mx-auto grid-cols-4 gap-4 hidden md:grid">
+  <div class="grid-cols-4 gap-4 hidden md:grid">
     <div class="main-center col-span-3 space-y-4">
       <FeedForm :user="null" :posts="posts" />
       <div v-if="posts.length > 0" class="space-y-4">
@@ -23,7 +23,7 @@
       <Trends />
     </div>
   </div>
-  <div class="max-w-7xl mx-auto md:hidden space-y-4">
+  <div class="md:hidden space-y-4">
     <FeedForm :user="null" :posts="posts" />
     <PeopleYouMayKnow />
     <Trends />

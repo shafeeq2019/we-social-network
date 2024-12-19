@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+  <div class="grid grid-cols-4 gap-4">
     <!-- New post & feeds on the middle -->
     <div class="main-center space-y-2 col-span-4 md:col-span-3">
       <FeedItem :post="post" v-if="post.created_by" />

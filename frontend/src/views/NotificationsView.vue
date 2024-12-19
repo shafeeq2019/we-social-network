@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4 text-primary">
+  <div class="grid grid-cols-4 gap-4 text-primary">
     <div class="main-center col-span-4 md:col-span-3">
       <div v-if="notifications.length" class="flex flex-col gap-2">
         <div class="p-3 bg-foreground border border-border rounded-lg flex justify-start items-center"

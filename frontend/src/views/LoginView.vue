@@ -1,5 +1,5 @@
 <template lang="">
-  <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4  text-primary">
+  <div class="mx-auto grid grid-cols-2 gap-4  text-primary">
     <div class="main-left col-span-2 md:col-span-1">
       <div class="p-12 bg-foreground border border-border rounded-lg">
         <h1 class="mb-6 text-2xl">Log in</h1>

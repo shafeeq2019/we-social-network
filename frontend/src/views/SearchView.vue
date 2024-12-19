@@ -1,6 +1,6 @@
 <template lang="">
   <div
-    class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-4 text-primary">
+    class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 gap-4 text-primary">
     <div class="main-center col-span-1 lg:col-span-3 space-y-4">
       <div class="bg-background border border-border rounded-lg">
         <form class="p-4 flex space-x-4" @submit.prevent="submitForm">
