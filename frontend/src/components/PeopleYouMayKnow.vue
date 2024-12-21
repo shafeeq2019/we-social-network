@@ -9,9 +9,11 @@
 
           <p class="text-xs"><strong>{{ user.name }}</strong></p>
         </div>
-
-        <RouterLink :to="{ name: 'profile', params: { 'id': user.id } }"
-                    class="py-2 px-3 bg-button-primary text-white text-xs rounded-lg">Show</RouterLink>
+        <router-link :to="{ name: 'profile', params: { 'id': user.id } }" v-slot="{ navigate }">
+          <btn @click="navigate" role="link" class="px-2 py-1">
+            Show
+          </btn>
+        </router-link>
       </div>
     </div>
   </div>
@@ -20,8 +22,10 @@
 <script lang="ts">
 import axios from 'axios';
 import { User } from '../interfaces';
+import btn from '@/components/ui/Button.vue';
 
 export default {
+  components: { btn },
   data() {
     return {
       users: [] as User[]
