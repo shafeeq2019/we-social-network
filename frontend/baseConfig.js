@@ -29,6 +29,7 @@ const baseConfig = {
       before: false,
       after: true
     }],
+    "@stylistic/object-curly-spacing": ["error", "always"],
   }
 };
 
