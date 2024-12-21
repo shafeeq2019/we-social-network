@@ -49,14 +49,14 @@
     </div>
     <div class="main-center col-span-3 space-y-4">
       <div class="bg-foreground border border-border rounded-lg">
-        <div class="flex flex-col flex-grow p-4 h-[calc(100vh-212px)] overflow-auto" id="conversation">
-          <template v-for="message in activeConversation.messages" :key="message.id">
+        <div class="flex flex-col gap-2 flex-grow p-4 h-[calc(100vh-212px)] overflow-auto" id="conversation">
+          <template v-for="(message) in activeConversation.messages" :key="message.id">
             <!--sent messages-->
-            <div class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end"
+            <div class="flex w-full gap-2 max-w-md ml-auto justify-end"
                  v-if="message.created_by.id == userStore.user.id">
-              <div>
-                <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg">
-                  <p class="text-sm text-right"> {{message.message}}</p>
+              <div class="flex flex-col gap-1 items-end">
+                <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg w-fit">
+                  <span class="text-sm"> {{message.message}}</span>
                 </div>
                 <span class="text-xs text-secondary leading-none">{{message.created_ago}}</span>
               </div>
@@ -66,15 +66,15 @@
               </div>
             </div>
             <!--received messages-->
-            <div class="flex w-full mt-2 space-x-3 max-w-md"
+            <div class="flex w-full gap-2 max-w-md"
                  v-if="message.created_by.id != userStore.user.id">
               <div class="flex-shrink-0 h-10 w-10 rounded-full bg-secondary">
                 <img :src="message.created_by.avatar_link"
                      class="mx-auto w-11 h-11 rounded-full object-cover object-center">
               </div>
-              <div>
+              <div class="flex flex-col gap-1 items-start">
                 <div class="bg-secondary p-3 rounded-r-lg rounded-bl-lg">
-                  <p class="text-sm"> {{message.message}}</p>
+                  <span class="text-sm"> {{message.message}}</span>
                 </div>
                 <span class="text-xs text-secondary leading-none">{{message.created_ago}}</span>
               </div>
@@ -87,13 +87,13 @@
           <div class="p-4 flex space-x-3">
             <input type="text" name="" id="" class="w-full bg-background rounded-lg p-4 " v-model="messageText"
                    @keydown.enter.prevent="submitForm" placeholder="What do you want to say?">
-            <button class="inline-block py-3 px-3 bg-button-primary text-white rounded-lg" type="submit">
+            <btn type="submit">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                    stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round"
                       d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
               </svg>
-            </button>
+            </btn>
           </div>
         </form>
       </div>
@@ -124,6 +124,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Conversation } from '../interfaces';
+import btn from '@/components/ui/Button.vue';
 
 export default defineComponent({
   components: {
@@ -131,6 +132,7 @@ export default defineComponent({
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    btn
   },
   props: ['user_id'],
   setup() {

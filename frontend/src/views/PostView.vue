@@ -12,9 +12,8 @@
             <textarea class="p-4 w-full rounded-lg bg-background text-primary dark:focus:outline-none" placeholder="What are you thinking?"
                       v-model="commentText"></textarea>
           </div>
-          <div class="p-4 border-t border-border flex justify-between">
-            <button type="submit"
-                    class="inline-block py-2 px-3 bg-button-primary text-white rounded-lg">Comment</button>
+          <div class="p-4 border-t border-border flex items-center justify-end">
+            <btn>Comment</btn>
           </div>
         </form>
       </div>
@@ -34,6 +33,7 @@ import Trends from '../components/Trends.vue';
 import FeedItem from '../components/FeedItem.vue';
 import CommentItem from '../components/CommentItem.vue';
 import { Comment } from '../interfaces';
+import btn from '../components/ui/Button.vue';
 
 export default defineComponent({
   async beforeRouteUpdate() {
@@ -44,7 +44,8 @@ export default defineComponent({
     PeopleYouMayKnow,
     Trends,
     FeedItem,
-    CommentItem
+    CommentItem,
+    btn
   },
   data() {
     return {

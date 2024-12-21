@@ -41,8 +41,8 @@
               <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
             </div>
           </template>
-          <div>
-            <button class="py-4 px-6 bg-button-primary text-white rounded-lg">Sign up</button>
+          <div class="flex justify-end">
+            <btn size="big" class="w-full sm:w-auto" type="submit">Sign up</btn>
           </div>
         </form>
       </div>
@@ -54,8 +54,10 @@
 import { defineComponent } from 'vue';
 import axios from 'axios';
 import { useToastStore } from '@/stores/toast';
+import btn from '@/components/ui/Button.vue';
 
 export default defineComponent({
+  components: { btn },
   setup() {
     const toastStore = useToastStore();
 

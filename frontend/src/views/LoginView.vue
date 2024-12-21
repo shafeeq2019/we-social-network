@@ -30,8 +30,8 @@
               <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
             </div>
           </template>
-          <div>
-            <button class="py-4 px-6 bg-button-primary text-white rounded-lg">Log in</button>
+          <div class="flex justify-end">
+            <btn size="big" class="w-full sm:w-auto">Log in</btn>
           </div>
         </form>
       </div>
@@ -43,7 +43,9 @@
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { defineComponent } from 'vue';
+import btn from '@/components/ui/Button.vue';
 export default defineComponent({
+  components: { btn },
   setup() {
     const userStore = useUserStore();
     return {

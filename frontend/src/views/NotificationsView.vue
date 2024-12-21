@@ -10,9 +10,9 @@
             </div>
           </router-link>
           <p class="ml-3">{{ notification.body }}</p>
-          <button class="ml-2 underline" @click="readNotification(notification)">
+          <span class="ml-2 underline cursor-pointer" @click="readNotification(notification)">
             Read more
-          </button>
+          </span>
         </div>
       </div>
       <div v-else class="p-4 bg-foreground border border-border rounded-lg">

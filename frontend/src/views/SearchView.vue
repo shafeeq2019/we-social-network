@@ -6,13 +6,13 @@
         <form class="p-4 flex space-x-4" @submit.prevent="submitForm">
           <input type="search" class="p-4 w-full bg-foreground rounded-lg" v-model="query"
                  placeholder="What are you looking for?">
-          <button href="#" class="inline-block py-4 px-6 bg-button-primary text-white rounded-lg" type="submit">
+          <btn class="px-4" type="submit">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"
                     d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
             </svg>
-          </button>
+          </btn>
         </form>
       </div>
       <div v-if="users.length > 0"
@@ -43,12 +43,14 @@ import axios from 'axios';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
 import Trends from '../components/Trends.vue';
 import FeedItem from '../components/FeedItem.vue';
+import btn from '../components/ui/Button.vue';
 
 export default defineComponent({
   components: {
     PeopleYouMayKnow,
     Trends,
-    FeedItem
+    FeedItem,
+    btn
   },
   data() {
     return {

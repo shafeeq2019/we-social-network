@@ -29,15 +29,17 @@
                 <p class="text-xs text-secondary">{{friendshipRequest.created_by.posts_count}} posts</p>
               </div>
             </router-link>
-            <div class="mt-3 flex space-x-3 justify-between">
-              <button class="py-1 px-1 bg-button-primary text-white rounded-md text-xs w-full"
-                      @click="handleRequest('accepted', friendshipRequest)">
+            <div class="mt-3 flex gap-3 justify-between">
+              <btn class="w-full"
+                   size="small"
+                   @click="handleRequest('accepted', friendshipRequest)">
                 Accept
-              </button>
-              <button class="py-1 px-1 bg-gray-600 text-white rounded-md text-xs w-full"
-                      @click="handleRequest('rejected', friendshipRequest)">
+              </btn>
+              <btn class="w-full"
+                   size="small"
+                   @click="handleRequest('rejected', friendshipRequest)">
                 Reject
-              </button>
+              </btn>
             </div>
           </div>
         </div>
@@ -77,6 +79,7 @@ import {
 import {
 } from 'vue';
 import { FriendshipRequest, User } from '@/interfaces';
+import btn from '@/components/ui/Button.vue';
 export default defineComponent({
   setup() {
     const userStore = useUserStore();
@@ -86,7 +89,8 @@ export default defineComponent({
   },
   components: {
     PeopleYouMayKnow,
-    Trends
+    Trends,
+    btn
   },
   data() {
     return {

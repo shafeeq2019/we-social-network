@@ -12,8 +12,9 @@
 
       <div class="p-4 border-t border-border flex justify-between flex-col sm:flex-row space-y-2 sm:space-y-0">
         <label for="upload-image"
-               class="inline-block bg-button-secondary text-white rounded-lg cursor-pointer p-1 sm:py-3 sm:px-6 text-center">Attach
-          Image</label>
+               class="inline-flex items-center justify-center bg-button-secondary text-white rounded-lg cursor-pointer p-2 sm:py-3 sm:px-6 text-center text-sm">
+          Attach Image
+        </label>
         <input id="upload-image" type="file" ref="postPhoto" accept="image/*" @input="onFileChange" hidden>
         <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
           <!-- <select id="privacy" v-model="is_private"
@@ -21,8 +22,7 @@
                         <option selected value=false>Public</option>
                         <option value=true>Private</option>
                     </select>  -->
-          <button type="submit"
-                  class="inline-block bg-button-primary text-white rounded-lg p-1 sm:py-3 sm:px-6 ml-0 sm:ml-2">Post</button>
+          <btn variant="primary" size="big" type="submit">Post</btn>
         </div>
       </div>
     </div>
@@ -30,11 +30,13 @@
 </template>
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
+import btn from './ui/Button.vue';
 import axios from 'axios';
 import { useUserStore } from '@/stores/user';
 import { User, Post } from '../interfaces.ts';
 
 export default defineComponent({
+  components: { btn },
   props: {
     user: {
       type: Object as PropType<User>,
@@ -59,6 +61,9 @@ export default defineComponent({
     };
   },
   methods: {
+    test() {
+      alert("ok");
+    },
     onFileChange() {
       const imageInput = document.getElementById("upload-image")! as HTMLInputElement;
       this.url = URL.createObjectURL(imageInput.files![0]);

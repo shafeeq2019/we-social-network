@@ -114,9 +114,7 @@
                     v-model="reportText"></textarea>
         </div>
         <DialogFooter>
-          <button @click="reportPost">
-            Send
-          </button>
+          <btn @click="reportPost">Send</btn>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -154,6 +152,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import btn from './ui/Button.vue';
 export default defineComponent({
   components: {
     // eslint-disable-next-line vue/no-reserved-component-names
@@ -167,6 +166,7 @@ export default defineComponent({
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    btn
   },
   setup() {
     const userStore = useUserStore();
