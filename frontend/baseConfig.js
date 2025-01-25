@@ -12,6 +12,7 @@ const baseConfig = {
     "prefer-const": "error",
     "no-trailing-spaces": "error",
     "keyword-spacing": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1, }],
     "@stylistic/indent": [
       "error",
       2
@@ -52,7 +53,8 @@ const vueConfig = {
     }],
     "vue/no-multi-spaces": ["error", {
       "ignoreProperties": false
-    }]
+    }],
+    "vue/padding-line-between-blocks": "error"
   }
 };
 
