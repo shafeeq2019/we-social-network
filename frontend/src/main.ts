@@ -16,7 +16,6 @@ axios.interceptors.request.use(config => {
   return Promise.reject(error);
 });
 
-
 const app = createApp(App);
 
 // Add Axios to the Vue prototype

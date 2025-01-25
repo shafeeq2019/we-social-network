@@ -28,6 +28,7 @@
     </div>
   </form>
 </template>
+
 <script lang="ts">
 import { PropType, defineComponent } from 'vue';
 import btn from './ui/Button.vue';

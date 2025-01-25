@@ -13,7 +13,6 @@ import EditProfileView from '../views/EditProfileView.vue';
 import EditPasswordView from '../views/EditPasswordView.vue';
 import NotificationsView from '../views/NotificationsView.vue';
 
-
 const router = createRouter({
   history: createWebHistory(),
   routes: [

@@ -26,6 +26,7 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent } from "vue";
 import PeopleYouMayKnow from "@/components/PeopleYouMayKnow.vue";

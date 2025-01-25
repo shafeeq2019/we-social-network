@@ -48,6 +48,7 @@
   </div>
 
 </template>
+
 <script lang="ts">
 import { Comment } from '../interfaces';
 import {
@@ -107,6 +108,5 @@ export default {
   }
 };
 </script>
-<style lang="">
 
-</style>
+<style></style>
