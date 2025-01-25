@@ -32,7 +32,6 @@ const buttonVariants = cva(
   }
 );
 
-
 type ButtonProps = VariantProps<typeof buttonVariants>;
 
 withDefaults(
