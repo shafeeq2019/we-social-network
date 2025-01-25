@@ -6,6 +6,11 @@ const baseConfig = {
   plugins: {
     "@stylistic": stylistic
   },
+  languageOptions: {
+    parserOptions: {
+      parser: tseslint.parser,
+    }
+  },
   rules: {
     "object-shorthand": "error",
     "semi": ["error", "always"],
@@ -37,11 +42,6 @@ const baseConfig = {
 const vueConfig = {
   name: "vueConfig",
   files: ["**/*.vue"],
-  languageOptions: {
-    parserOptions: {
-      parser: tseslint.parser
-    }
-  },
   rules: {
     "vue/multi-word-component-names": "off",
     "vue/html-indent": ["error", 2, {
@@ -60,5 +60,5 @@ const vueConfig = {
 
 export {
   baseConfig,
-  vueConfig
+  vueConfig,
 };
