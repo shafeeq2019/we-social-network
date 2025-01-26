@@ -9,6 +9,5 @@
 <script setup lang="ts">
 // This is a composition API Component
 import { useToastStore } from '@/stores/toast';
-
 const store = useToastStore();
 </script>

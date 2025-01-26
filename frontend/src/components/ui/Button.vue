@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -36,13 +36,13 @@ type ButtonProps = VariantProps<typeof buttonVariants>;
 
 withDefaults(
   defineProps<{
-    variant?: ButtonProps["variant"];
-    size?: ButtonProps["size"];
+    variant?: ButtonProps['variant'];
+    size?: ButtonProps['size'];
     disabled?: boolean;
   }>(),
   {
-    variant: "primary",
-    size: "default",
+    variant: 'primary',
+    size: 'default',
     disabled: false,
   },
 );

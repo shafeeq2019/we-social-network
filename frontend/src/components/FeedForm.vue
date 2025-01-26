@@ -62,27 +62,24 @@ export default defineComponent({
     };
   },
   methods: {
-    test() {
-      alert("ok");
-    },
     onFileChange() {
-      const imageInput = document.getElementById("upload-image")! as HTMLInputElement;
+      const imageInput = document.getElementById('upload-image')! as HTMLInputElement;
       this.url = URL.createObjectURL(imageInput.files![0]);
     },
     async submitForm() {
-      const imageInput = document.getElementById("upload-image")! as HTMLInputElement;
-      axios.post("/api/post/create/", {
+      const imageInput = document.getElementById('upload-image')! as HTMLInputElement;
+      axios.post('/api/post/create/', {
         body: this.body,
         image: imageInput.files![0],
         is_private: this.is_private
       }, {
         headers: {
-          "Content-Type": "multipart/form-data"
+          'Content-Type': 'multipart/form-data'
         }
       }).then(response => {
         this.body = '';
         this.is_private = false;
-        imageInput.value = "";
+        imageInput.value = '';
         this.url = '';
         /* eslint-disable */
         this.posts.unshift(response.data);

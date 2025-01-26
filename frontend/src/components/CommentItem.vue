@@ -69,7 +69,7 @@ import {
 
 import axios from 'axios';
 export default {
-  emits: ["deleteComment"],
+  emits: ['deleteComment'],
   props: {
     comment: {
       type: Object as PropType<Comment>,

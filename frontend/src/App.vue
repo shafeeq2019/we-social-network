@@ -96,21 +96,21 @@
 </template>
 
 <script lang="ts">
-import Toast from "@/components/Toast.vue";
+import Toast from '@/components/Toast.vue';
 import {
   useUserStore
-} from "@/stores/user";
+} from '@/stores/user';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import axios from "axios";
+import axios from 'axios';
 import {
   defineComponent
-} from "vue";
-import { getCurrentThem } from "./lib/utils";
+} from 'vue';
+import { getCurrentThem } from './lib/utils';
 export default defineComponent({
   setup() {
     const userStore = useUserStore();
@@ -130,16 +130,16 @@ export default defineComponent({
   methods: {
     logout() {
       this.userStore.removeToken();
-      this.$router.push("/login");
+      this.$router.push('/login');
     },
     changeColorTheme() {
       let theme = getCurrentThem();
-      if (theme === "dark") {
-        theme = "light";
+      if (theme === 'dark') {
+        theme = 'light';
       } else {
-        theme = "dark";
+        theme = 'dark';
       }
-      localStorage.setItem("we.theme", theme);
+      localStorage.setItem('we.theme', theme);
       this.theme = getCurrentThem();
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -154,9 +154,9 @@ export default defineComponent({
     this.userStore.initStore();
     const token = this.userStore.user.access;
     if (token) {
-      axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     } else {
-      axios.defaults.headers.common["Authorization"] = "";
+      axios.defaults.headers.common['Authorization'] = '';
     }
   }
 });

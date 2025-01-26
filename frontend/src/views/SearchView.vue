@@ -68,7 +68,7 @@ export default defineComponent({
         this.users = response.data.users;
         this.posts = response.data.posts;
       }).catch(e => {
-        console.log("error", e);
+        console.log('error', e);
       });
     }
   }

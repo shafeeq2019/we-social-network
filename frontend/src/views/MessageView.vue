@@ -208,7 +208,7 @@ export default defineComponent({
       });
     },
     scrollToBottom() {
-      const container = document.getElementById("conversation");
+      const container = document.getElementById('conversation');
       if (container) {
         container.scrollTop = container.scrollHeight;
       }

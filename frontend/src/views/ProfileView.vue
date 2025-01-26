@@ -173,7 +173,7 @@ import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
 import Trends from '../components/Trends.vue';
 import { useUserStore } from '@/stores/user';
 import FeedItem from '../components/FeedItem.vue';
-import { useToastStore } from "@/stores/toast";
+import { useToastStore } from '@/stores/toast';
 import { User, Post, FriendshipRequest } from '../interfaces';
 import FeedForm from '@/components/FeedForm.vue';
 import {
@@ -259,7 +259,7 @@ export default defineComponent({
       }).then(response => {
         if (response.data.id) {
           this.friendship_request = response.data;
-          this.toastStore.showToast(5000, "The request was sent!", "bg-emerald-300");
+          this.toastStore.showToast(5000, 'The request was sent!', 'bg-emerald-300');
         }
       }).catch(error => {
         console.log(error);
@@ -268,11 +268,11 @@ export default defineComponent({
     async deleteFriendshipRequest() {
       axios.delete(`/api/friends/${this.$route.params.id}/request/`, {
       }).then(response => {
-        if (response.data.message == "friendship removed") {
+        if (response.data.message == 'friendship removed') {
           this.isFriends = false;
           this.friendship_request = {} as FriendshipRequest;
           this.user.friends_count -= 1;
-          this.toastStore.showToast(5000, "Friendship removed!", "bg-emerald-300");
+          this.toastStore.showToast(5000, 'Friendship removed!', 'bg-emerald-300');
         }
       }).catch(error => {
         console.log(error);
@@ -286,7 +286,7 @@ export default defineComponent({
         if (status === 'accepted') {
           this.isFriends = true;
           this.user.friends_count += 1;
-          this.toastStore.showToast(5000, `You are now friends with ${this.user.name}!`, "bg-emerald-300");
+          this.toastStore.showToast(5000, `You are now friends with ${this.user.name}!`, 'bg-emerald-300');
         }
       }).catch(error => {
         console.log(error);

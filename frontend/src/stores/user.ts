@@ -6,12 +6,12 @@ export const useUserStore = defineStore('user', {
   state: (): State => ({
     user: {
       isAuthenticated: false,
-      id: "",
-      name: "",
-      email: "",
-      access: "",
-      refresh: "",
-      avatar_link: ""
+      id: '',
+      name: '',
+      email: '',
+      access: '',
+      refresh: '',
+      avatar_link: ''
     }
   }),
 
@@ -51,13 +51,13 @@ export const useUserStore = defineStore('user', {
     removeToken() {
       console.log('removeToken');
 
-      this.user.refresh = "";
-      this.user.access = "";
+      this.user.refresh = '';
+      this.user.access = '';
       this.user.isAuthenticated = false;
-      this.user.id = "";
-      this.user.name = "";
-      this.user.email = "";
-      this.user.avatar_link = "";
+      this.user.id = '';
+      this.user.name = '';
+      this.user.email = '';
+      this.user.avatar_link = '';
 
       localStorage.setItem('user.access', '');
       localStorage.setItem('user.refresh', '');
@@ -92,7 +92,7 @@ export const useUserStore = defineStore('user', {
 
           localStorage.setItem('user.access', response.data.access);
 
-          axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
+          axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access;
         })
         .catch((error) => {
           console.log(error);

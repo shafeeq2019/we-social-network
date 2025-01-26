@@ -55,8 +55,8 @@ export default defineComponent({
   data() {
     return {
       form: {
-        email: "" as string,
-        password: "" as string,
+        email: '' as string,
+        password: '' as string,
 
       },
       errors: [] as string[]
@@ -77,9 +77,9 @@ export default defineComponent({
         await axios.post('/api/login/', this.form)
           .then(async response => {
             this.userStore.setToken(response.data);
-            axios.defaults.headers.common["Authorization"] = "Bearer " + response.data.access;
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access;
 
-            await axios.get("/api/me/")
+            await axios.get('/api/me/')
               .then(response => {
                 this.userStore.setUserInfo(response.data);
                 this.$router.push(this.$route.query.redirect as string || '/feed');

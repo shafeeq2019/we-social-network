@@ -28,11 +28,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import PeopleYouMayKnow from "@/components/PeopleYouMayKnow.vue";
-import Trends from "@/components/Trends.vue";
-import { Notification } from "../interfaces.ts";
-import axios from "axios";
+import { defineComponent } from 'vue';
+import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
+import Trends from '@/components/Trends.vue';
+import { Notification } from '../interfaces.ts';
+import axios from 'axios';
 
 export default defineComponent({
   components: {
@@ -47,7 +47,7 @@ export default defineComponent({
   methods: {
     async getNotifications() {
       axios
-        .get("/api/notification/")
+        .get('/api/notification/')
         .then((response) => {
           this.notifications = response.data.results;
           console.log(response);
@@ -59,21 +59,21 @@ export default defineComponent({
         .get(`/api/notification/read/${notification.id}/`)
         .then(() => {
           if (
-            notification.type_of_notification == "post_like" ||
-                        notification.type_of_notification == "post_comment"
+            notification.type_of_notification == 'post_like' ||
+                        notification.type_of_notification == 'post_comment'
           ) {
-            this.$router.push({ name: "postview", params: { id: notification.post_id } });
+            this.$router.push({ name: 'postview', params: { id: notification.post_id } });
           } else if (
-            notification.type_of_notification == "accepted_friendrequest" ||
-                        notification.type_of_notification == "rejected_friendrequest"
+            notification.type_of_notification == 'accepted_friendrequest' ||
+                        notification.type_of_notification == 'rejected_friendrequest'
           ) {
             this.$router.push({
-              name: "profile",
+              name: 'profile',
               params: { id: notification.created_by.id },
             });
           } else {
             this.$router.push({
-              name: "friends",
+              name: 'friends',
               params: { id: notification.created_for_id },
             });
           }

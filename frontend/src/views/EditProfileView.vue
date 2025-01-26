@@ -62,8 +62,8 @@ export default defineComponent({
   data() {
     return {
       form: {
-        name: "",
-        email: ""
+        name: '',
+        email: ''
       },
       errors: [] as string[],
     };
@@ -82,13 +82,13 @@ export default defineComponent({
       if (this.errors.length === 0) {
         const formData = new FormData();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        formData.append("avatar", (this.$refs.file as any).files[0]);
-        formData.append("email", this.form.email);
-        formData.append("name", this.form.name);
+        formData.append('avatar', (this.$refs.file as any).files[0]);
+        formData.append('email', this.form.email);
+        formData.append('name', this.form.name);
         axios
           .post('/api/editprofile/', formData, {
             headers: {
-              "Content-Type": "multipart/form-data"
+              'Content-Type': 'multipart/form-data'
             }
           })
           .then(response => {

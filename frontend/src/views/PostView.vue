@@ -67,7 +67,7 @@ export default defineComponent({
     async submitForm() {
       if (this.commentText.trim().length !== 0) {
         axios.post(`/api/post/${this.$route.params.id}/comment/`, {
-          "comment": this.commentText
+          'comment': this.commentText
         }).then(async () => {
           this.commentText = '';
           //this.post.comments = [this.post.comments, ...this.commentText];

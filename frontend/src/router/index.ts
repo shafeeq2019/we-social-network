@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import { useUserStore } from "@/stores/user";
+import { useUserStore } from '@/stores/user';
 import SignupView from '../views/SignupView.vue';
 import LoginView from '../views/LoginView.vue';
 import FeedView from '../views/FeedView.vue';
@@ -17,8 +17,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: "/",
-      name: "home",
+      path: '/',
+      name: 'home',
       component: FeedView,
       meta: {
         requiresAuth: true,
@@ -138,7 +138,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.matched.some((record) => record.meta.hideForAuth)) {
     if (userStore.user.isAuthenticated) {
-      next({ path: "/feed" });
+      next({ path: '/feed' });
     } else {
       next();
     }
