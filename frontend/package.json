@@ -8,6 +8,7 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "deploy": "vue-tsc --noEmit && vite build && firebase deploy",
+    "test":"playwright test",
     "lint": "eslint .",
     "prepare": "cd .. && husky frontend/.husky"
   },
