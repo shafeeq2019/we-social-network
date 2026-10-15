@@ -9,7 +9,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from .models import FriendshipRequest, User
 from notification.models import Notification
-from .serializers import UserSerializer, FriendshipRequestSerializer
+from .serializers import UserSerializer, PrivateUserSerializer, FriendshipRequestSerializer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -155,7 +155,7 @@ def edit_profile(request):
     if form.is_valid():
         user = form.save()
         updated_user = User.objects.get(id=user.id)
-        response['updated_user'] = UserSerializer(updated_user).data
+        response['updated_user'] = PrivateUserSerializer(updated_user).data
         logger.info(f"Profile edited successfully for user {user.id}")
     else:
         response['message'] = form.errors.as_json()
