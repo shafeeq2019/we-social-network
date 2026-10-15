@@ -94,3 +94,19 @@ class PrivatePostVisibilityTests(TestCase):
 
         detail = self.client_for(self.author).get(f'/api/post/{self.private_post.id}/detail/')
         self.assertEqual(detail.status_code, 200)
+
+
+class ReportPostTests(TestCase):
+    def test_report_public_post(self):
+        author = User.objects.create_user(
+            name='Author', email='author@example.com', password='secret', is_active=True)
+        reporter = User.objects.create_user(
+            name='Reporter', email='reporter@example.com', password='secret', is_active=True)
+        post = Post.objects.create(body='hello', created_by=author)
+        client = APIClient()
+        client.force_authenticate(reporter)
+
+        response = client.post(f'/api/post/{post.id}/report/', {'reportText': 'spam'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(post.reports.get().report, 'spam')

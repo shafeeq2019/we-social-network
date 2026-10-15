@@ -3,6 +3,5 @@
 /frontend/.firebase/
 
 /backend/media
-/backend/**/migrations/
 /backend/**/__pycache__/
 backend/db.sqlite3
