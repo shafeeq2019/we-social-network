@@ -5,6 +5,7 @@ from post.models import Post, Trend
 from account.models import FriendshipRequest, User
 from account.serializers import FriendshipRequestSerializer, UserSerializer
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 from .serializers import PostSerializer, PostDetailSerializer, TrendSerializer
 from .forms import PostForm
@@ -17,7 +18,7 @@ def post_list(request):
     posts = []
     trend = request.GET.get('trend', '')
     if (trend):
-        posts = Post.objects.filter(body__iregex=f'\B#{trend}')
+        posts = Post.objects.visible_to(request.user).filter(body__iregex=f'\B#{trend}')
     else:
         user_friends = request.user.friends.all()
         query = Q()
@@ -28,7 +29,7 @@ def post_list(request):
         # Add request user in the query
         query |= Q(created_by=request.user)
 
-        posts = Post.objects.filter(query)
+        posts = Post.objects.visible_to(request.user).filter(query)
 
     for post in posts:
         post.post_liked = post.likes.filter(created_by=request.user).exists()
@@ -49,7 +50,8 @@ def post_create(request):
 
     form = PostForm({
         'body': data.get('body'),
-        'created_by': request.user.id
+        'created_by': request.user.id,
+        'is_private': data.get('is_private'),
     })
 
     if form.is_valid():
@@ -67,8 +69,8 @@ def post_create(request):
 
 @api_view(['GET'])
 def post_list_profile(request, id):
-    posts = Post.objects.filter(created_by_id=id)
-    user = User.objects.get(pk=id)
+    user = get_object_or_404(User, pk=id)
+    posts = Post.objects.visible_to(request.user).filter(created_by=user)
 
     for post in posts:
         post.post_liked = post.likes.filter(created_by=request.user).exists()
@@ -106,21 +108,21 @@ def post_list_profile(request, id):
 
 @api_view(['POST'])
 def post_like(request, post_id):
-    post = Post.objects.get(id=post_id)
+    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
     result = post.add_like(request.user)
     return JsonResponse({'message': result})
 
 
 @api_view(['GET'])
 def post_detail(request, post_id):
-    post = Post.objects.get(id=post_id)
+    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
     post.post_liked = post.likes.filter(created_by=request.user).exists()
     return JsonResponse({'post': PostDetailSerializer(post).data}, safe=False)
 
 
 @api_view(['POST'])
 def post_create_comment(request, post_id):
-    post = Post.objects.get(id=post_id)
+    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
     comment = request.data.get('comment')
     result = post.add_comment(request.user, comment)
 
@@ -151,7 +153,7 @@ def post_delete(request, post_id):
 
 @api_view(['POST'])
 def report_post(request, post_id):
-    post = Post.objects.get(id=post_id)
+    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
     report = request.data.get('reportText')
     post.reports.create(created_by=request.user, report=report)
     return JsonResponse({'message': 'Post reported'})

@@ -7,6 +7,12 @@ from django.utils.timesince import timesince
 # Create your models here.
 
 
+class PostQuerySet(models.QuerySet):
+    def visible_to(self, user):
+        # Private posts are only visible to their author
+        return self.filter(models.Q(is_private=False) | models.Q(created_by=user))
+
+
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     body = models.TextField(blank=True, null=True)
@@ -16,6 +22,8 @@ class Post(models.Model):
     created_by = models.ForeignKey(
         User, related_name='posts', on_delete=models.CASCADE)
     is_private = models.BooleanField(default=False)
+
+    objects = PostQuerySet.as_manager()
 
     class Meta:
         ordering = ('-created_at',)

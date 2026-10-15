@@ -16,12 +16,12 @@
           Attach Image
         </label>
         <input id="upload-image" type="file" ref="postPhoto" accept="image/*" @input="onFileChange" hidden>
-        <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0">
-          <!-- <select id="privacy" v-model="is_private"
-                        class="bg-gray-600 text-white border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 inline-block py-3 px-3 cursor-pointer">
-                        <option selected value=false>Public</option>
-                        <option value=true>Private</option>
-                    </select>  -->
+        <div class="flex justify-between flex-col sm:flex-row md:flex-row lg:flex-row space-y-2 sm:space-y-0 gap-3">
+          <select id="privacy" v-model="is_private"
+                  class="bg-background text-primary border border-border rounded-lg focus:ring-purple-500 focus:border-purple-500 inline-block py-3 px-3 cursor-pointer">
+            <option :value="false">Public</option>
+            <option :value="true">Private</option>
+          </select>
           <btn variant="primary" size="big" type="submit">Post</btn>
         </div>
       </div>

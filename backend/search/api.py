@@ -16,7 +16,7 @@ def search(request):
 
     if query:
         users = User.objects.filter(name__icontains=query)
-        posts = Post.objects.filter(body__icontains=query)
+        posts = Post.objects.visible_to(request.user).filter(body__icontains=query)
 
         for post in posts:
             post.post_liked = post.likes.filter(
