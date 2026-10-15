@@ -1,57 +1,79 @@
-<template lang="">
-  <div class="mb-4">
-    <div class="p-4 bg-foreground text-primary border border-border rounded-lg shadow-md ">
-      <h2 class="text-xl font-semibold">Trend: #{{hashtag}}</h2>
+<template>
+  <PageLayout>
+    <header class="surface relative overflow-hidden p-6 sm:p-8">
+      <div class="pointer-events-none absolute -right-6 -top-10 select-none font-display text-[180px] font-extrabold leading-none text-primary/10" aria-hidden="true">#</div>
+      <p class="eyebrow">Trending topic</p>
+      <h1 class="mt-1 break-all text-3xl font-extrabold sm:text-4xl">#{{ hashtag }}</h1>
+      <p class="mt-2 text-sm text-muted-foreground">
+        <template v-if="!loading">{{ posts.length }}{{ hasNext ? '+' : '' }} {{ posts.length === 1 ? 'post' : 'posts' }} from the community</template>
+        <template v-else>Loading posts…</template>
+      </p>
+    </header>
+
+    <div v-if="loading && posts.length === 0" class="space-y-4">
+      <PostSkeleton v-for="n in 2" :key="n" />
     </div>
-  </div>
-  <div class="grid grid-cols-4 gap-4">
-    <!-- New post & feeds on the middle -->
-    <div class="main-center col-span-4 md:col-span-3 space-y-4">
-      <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
+    <div v-else-if="posts.length > 0" class="space-y-4">
+      <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost" />
     </div>
-    <!-- People you may know -->
-    <div class="main-right col-span-1 space-y-4 hidden md:block">
-      <PeopleYouMayKnow />
-      <Trends />
+    <EmptyState v-else :icon="Hash" title="Nothing here yet"
+                :description="`Be the first to post about #${hashtag}.`" />
+
+    <div v-if="loadingMore" class="flex justify-center py-6" role="status">
+      <Loader2 class="h-5 w-5 animate-spin text-muted-foreground" aria-hidden="true" />
+      <span class="sr-only">Loading more posts</span>
     </div>
-  </div>
+  </PageLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios from 'axios';
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
-import Trends from '../components/Trends.vue';
+import { Hash, Loader2 } from 'lucide-vue-next';
 import FeedItem from '../components/FeedItem.vue';
+import PostSkeleton from '@/components/PostSkeleton.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
+import { useInfiniteScroll } from '@/lib/infiniteScroll';
 import { Post } from '../interfaces';
 
 export default defineComponent({
   props: ['hashtag'],
   async beforeRouteUpdate(to) {
     this.posts = [];
+    this.currentPage = 1;
+    this.loading = true;
     await this.getFeeds(to.params.hashtag);
   },
   components: {
-    PeopleYouMayKnow,
-    Trends,
-    FeedItem
+    FeedItem,
+    PostSkeleton,
+    PageLayout,
+    EmptyState,
+    Loader2,
+  },
+  setup() {
+    return { Hash };
   },
   data() {
     return {
       posts: [] as Post[],
       currentPage: 1,
-      hasNext: true
+      hasNext: true,
+      loading: true,
+      loadingMore: false
     };
   },
   methods: {
     async getFeeds(hashtag: string | string[]) {
       await axios.get(`/api/post?trend=${hashtag}&page=${this.currentPage}`).then(response => {
-        if (response.data.next) {
-          this.hasNext = true;
-        }
+        this.hasNext = !!response.data.next;
         this.posts = [...this.posts, ...response.data.results];
       }).catch(error => {
         console.log(error);
+      }).finally(() => {
+        this.loading = false;
+        this.loadingMore = false;
       });
     },
     deletePost(postId: string) {
@@ -61,20 +83,14 @@ export default defineComponent({
     }
   },
   mounted() {
-    const onScroll = () => {
-      const bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight;
-      if (bottomOfWindow && this.hasNext) {
+    this.getFeeds(this.hashtag);
+    useInfiniteScroll(() => {
+      if (this.hasNext && !this.loading && !this.loadingMore) {
         this.currentPage += 1;
-        this.hasNext = false;
+        this.loadingMore = true;
         this.getFeeds(this.hashtag);
       }
-    };
-
-    this.getFeeds(this.hashtag);
-    window.onscroll = onScroll;
-    window.ontouchmove = onScroll;
+    });
   }
 });
 </script>
-
-<style lang=""></style>

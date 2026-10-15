@@ -7,10 +7,20 @@ export interface User {
   avatar_link: string;
 }
 
+export interface Message {
+  id: string;
+  message: string;
+  created_at: string;
+  created_ago: string;
+  created_by: User;
+  sent_to: User;
+}
+
 export interface Conversation {
   id: string;
-  modifed_ago: string;
+  modified_ago: string;
   users: User[];
+  messages?: Message[];
 }
 
 export interface LoginUser {
@@ -40,8 +50,17 @@ export interface Post {
   created_by: User;
   likes_count: number;
   post_liked: boolean;
-
+  comments_count: number;
+  is_private?: boolean;
+  post_attachments: PostAttachment[];
+  comments?: Comment[];
 }
+
+export interface PostAttachment {
+  id: string;
+  image_link: string;
+}
+
 export interface Notification {
   id: string;
   body: string;

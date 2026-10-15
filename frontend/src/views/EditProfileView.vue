@@ -1,56 +1,58 @@
 <template>
-  <div class="grid grid-cols-2 gap-4 text-primary">
-    <div class="main-left col-span-2 md:col-span-1">
-      <div class="p-12 bg-foreground border border-border rounded-lg">
-        <h1 class="mb-6 text-2xl">Edit profile</h1>
-        <p class="mb-6 text-secondary">
-          Here you can change your name, your email, and your avatar
-        </p>
-        <router-link to="/profile/edit/password" class="underline"> Edit password</router-link>
+  <PageLayout no-aside>
+    <PageHeader eyebrow="Settings" title="Edit profile" description="Change how you appear to others on We." />
+    <SettingsNav />
+
+    <form class="surface space-y-6 p-5 sm:p-7" novalidate v-on:submit.prevent="submitForm">
+      <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+        <Avatar :src="avatarPreview || userStore.user.avatar_link" :name="form.name" size="xl" />
+        <div>
+          <p class="field-label mb-1">Profile picture</p>
+          <p class="mb-3 text-sm text-muted-foreground">A square image of at least 400 × 400 px works best.</p>
+          <label for="file-input"
+                 class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold transition hover:bg-muted focus-within:ring-2 focus-within:ring-ring">
+            <Camera class="h-4 w-4" aria-hidden="true" /> {{ avatarPreview ? 'Choose another' : 'Upload new picture' }}
+            <input class="sr-only" type="file" accept="image/*" ref="file" id="file-input" @change="onAvatarChange">
+          </label>
+        </div>
       </div>
-    </div>
-    <div class="main-right col-span-2 md:col-span-1">
-      <div class="p-12 bg-foreground border border-border rounded-lg">
-        <form class="space-y-6" v-on:submit.prevent="submitForm">
-          <div>
-            <label>Name</label><br>
-            <input type="text" v-model="form.name" placeholder="Your full name"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
-          </div>
-          <div>
-            <label>E-mail</label><br>
-            <input type="email" v-model="form.email" placeholder="Your e-mail address"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
-          </div>
-          <div>
-            <label class="" for="file-input">Avatar</label>
-            <input
-              class="block w-full text-gray-900 border border-border rounded-lg cursor-pointer mt-2 py-4 px-6 bg-background text-primary"
-              type="file" ref="file" id="file-input">
-          </div>
-          <template v-if="errors.length > 0">
-            <div class="bg-red-300 text-white rounded-lg p-6">
-              <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
-            </div>
-          </template>
-          <div class="flex justify-end">
-            <btn size="big" variant="primary" class="w-full sm:w-auto">Save changes</btn>
-          </div>
-        </form>
+
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="profile-name" class="field-label">Name</label>
+          <input id="profile-name" type="text" v-model="form.name" autocomplete="name" placeholder="Your full name" class="field h-12">
+        </div>
+        <div>
+          <label for="profile-email" class="field-label">E-mail</label>
+          <input id="profile-email" type="email" v-model="form.email" autocomplete="email" placeholder="you@example.com" class="field h-12">
+        </div>
       </div>
-    </div>
-  </div>
+
+      <FormErrors :errors="errors" />
+
+      <div class="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:justify-end">
+        <btn variant="ghost" type="button" @click="$router.back()">Cancel</btn>
+        <btn type="submit" :loading="submitting">Save changes</btn>
+      </div>
+    </form>
+  </PageLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios from 'axios';
+import { Camera } from 'lucide-vue-next';
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
 import btn from '@/components/ui/Button.vue';
+import Avatar from '@/components/ui/Avatar.vue';
+import FormErrors from '@/components/ui/FormErrors.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
+import SettingsNav from '@/components/layout/SettingsNav.vue';
 
 export default defineComponent({
-  components: { btn },
+  components: { btn, Avatar, FormErrors, PageLayout, PageHeader, SettingsNav, Camera },
   setup() {
     const toastStore = useToastStore();
     const userStore = useUserStore();
@@ -66,9 +68,18 @@ export default defineComponent({
         email: ''
       },
       errors: [] as string[],
+      avatarPreview: '',
+      submitting: false
     };
   },
   methods: {
+    onAvatarChange() {
+      const file = (this.$refs.file as HTMLInputElement).files?.[0];
+      if (this.avatarPreview) {
+        URL.revokeObjectURL(this.avatarPreview);
+      }
+      this.avatarPreview = file ? URL.createObjectURL(file) : '';
+    },
     submitForm() {
       this.errors = [];
 
@@ -81,10 +92,13 @@ export default defineComponent({
       }
       if (this.errors.length === 0) {
         const formData = new FormData();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        formData.append('avatar', (this.$refs.file as any).files[0]);
+        const avatar = (this.$refs.file as HTMLInputElement).files?.[0];
+        if (avatar) {
+          formData.append('avatar', avatar);
+        }
         formData.append('email', this.form.email);
         formData.append('name', this.form.name);
+        this.submitting = true;
         axios
           .post('/api/editprofile/', formData, {
             headers: {
@@ -108,6 +122,10 @@ export default defineComponent({
           })
           .catch(error => {
             console.log('error', error);
+            this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300');
+          })
+          .finally(() => {
+            this.submitting = false;
           });
       }
     }
@@ -120,5 +138,3 @@ export default defineComponent({
   }
 });
 </script>
-
-<style></style>

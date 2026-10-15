@@ -1,131 +1,139 @@
-<template lang="">
-  <div class="grid grid-cols-4 gap-4 text-primary" v-if="conversations.length > 0">
-    <div class="main-left col-span-1">
-      <div class="bg-primary border border-border rounded-lg text-center shadow-md">
-        <div class="flex items-center justify-between cursor-pointer pl-4 py-2 group"
-             v-for="conversation in conversations" @click="openConversation(conversation)" :key="conversation.id"
-             :class="{ 'bg-secondary rounded-lg': activeConversation.id == conversation.id,
-                       ' shadow-md' : conversation.id == conversations[conversations.length-1].id ,
-                       'hover:bg-primary-hover hover:rounded-lg':activeConversation.id != conversation.id}">
-          <div class="flex items-center space-x-2">
-            <img :src="conversation.users[0].avatar_link"
-                 class="mx-auto w-9 h-9  sm:w-12 sm:h-12 rounded-full object-cover object-center">
-            <p class="text-xs font-bold hidden sm:block"> {{conversation.users[0].name}} </p>
-          </div>
-          <div>
+<template>
+  <div class="mx-auto w-full max-w-[1040px]">
+    <div v-if="loading" class="surface flex h-[calc(100dvh-12rem)] items-center justify-center md:h-[calc(100dvh-5rem)]" role="status">
+      <Loader2 class="h-6 w-6 animate-spin text-muted-foreground" aria-hidden="true" />
+      <span class="sr-only">Loading conversations</span>
+    </div>
+
+    <div v-else-if="conversations.length > 0"
+         class="surface flex h-[calc(100dvh-12rem)] overflow-hidden md:h-[calc(100dvh-5rem)]">
+      <!-- Conversation list -->
+      <aside :class="['w-full shrink-0 flex-col border-r border-border/60 md:flex md:w-[300px]', user_id ? 'hidden' : 'flex']"
+             aria-label="Conversations">
+        <div class="px-5 pb-3 pt-5">
+          <h1 class="text-2xl font-extrabold">Messages</h1>
+          <p class="text-sm text-muted-foreground">{{ conversations.length }} {{ conversations.length === 1 ? 'conversation' : 'conversations' }}</p>
+        </div>
+        <ul class="flex-1 space-y-0.5 overflow-y-auto px-2 pb-3">
+          <li v-for="conversation in conversations" :key="conversation.id">
+            <button type="button" @click="openConversation(conversation)"
+                    :aria-current="isActive(conversation) ? 'true' : undefined"
+                    :class="['flex w-full items-center gap-3 rounded-2xl p-2.5 text-left transition-colors',
+                             isActive(conversation) ? 'bg-primary-soft' : 'hover:bg-muted']">
+              <Avatar :src="conversation.users[0].avatar_link" :name="conversation.users[0].name" />
+              <span class="min-w-0 flex-1">
+                <span :class="['block truncate text-sm font-semibold', isActive(conversation) && 'text-primary-soft-foreground']">
+                  {{ conversation.users[0].name }}
+                </span>
+                <span class="block truncate text-xs text-muted-foreground">Active {{ formatAgo(conversation.modified_ago) }}</span>
+              </span>
+            </button>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Chat pane -->
+      <section :class="['min-w-0 flex-1 flex-col md:flex', user_id ? 'flex' : 'hidden']" aria-label="Conversation">
+        <template v-if="partner">
+          <header class="flex items-center gap-3 border-b border-border/60 px-3 py-3 sm:px-5">
+            <button type="button" class="icon-btn md:hidden" aria-label="Back to conversations" @click="$router.push({ name: 'messages' })">
+              <ArrowLeft class="h-5 w-5" aria-hidden="true" />
+            </button>
+            <RouterLink :to="{ name: 'profile', params: { id: partner.id } }" class="flex min-w-0 flex-1 items-center gap-3 rounded-2xl">
+              <Avatar :src="partner.avatar_link" :name="partner.name" size="sm" />
+              <span class="min-w-0">
+                <span class="block truncate font-semibold leading-tight">{{ partner.name }}</span>
+                <span class="block text-xs text-muted-foreground">View profile</span>
+              </span>
+            </RouterLink>
             <DropdownMenu>
-              <DropdownMenuTrigger
-                class="sm:invisible group-hover:visible hover:bg-gray-400 hover:rounded-lg mx-1">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-5 h-5 sm:w-8 sm:h-8 block">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z">
-                  </path>
-                </svg>
+              <DropdownMenuTrigger class="icon-btn" aria-label="Conversation options">
+                <MoreHorizontal class="h-5 w-5" aria-hidden="true" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent class="bg-background">
-                <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center" @click="$router.push({ name: 'profile', params: { id: conversation.users[0].id } })">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                       stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  </svg>
-                  <p>Show profile</p>
+              <DropdownMenuContent align="end" class="w-52 rounded-2xl p-1.5 shadow-lift">
+                <DropdownMenuItem class="cursor-pointer gap-3 rounded-xl px-2.5 py-2"
+                                  @select="$router.push({ name: 'profile', params: { id: partner.id } })">
+                  <UserRound class="h-4 w-4 text-muted-foreground" aria-hidden="true" /> Show profile
                 </DropdownMenuItem>
-                <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center"
-                                  @click="deleteConversation">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                       stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                  </svg>
-                  <p>Delete Conversation</p>
+                <DropdownMenuItem class="menu-item-danger cursor-pointer gap-3 rounded-xl px-2.5 py-2" @select="deleteConversation">
+                  <Trash2 class="h-4 w-4" aria-hidden="true" /> Delete conversation
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="main-center col-span-3 space-y-4">
-      <div class="bg-foreground border border-border rounded-lg">
-        <div class="flex flex-col gap-2 flex-grow p-4 h-[calc(100vh-212px)] overflow-auto" id="conversation">
-          <template v-for="(message) in activeConversation.messages" :key="message.id">
-            <!--sent messages-->
-            <div class="flex w-full gap-2 max-w-md ml-auto justify-end"
-                 v-if="message.created_by.id == userStore.user.id">
-              <div class="flex flex-col gap-1 items-end">
-                <div class="bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg w-fit">
-                  <span class="text-sm"> {{message.message}}</span>
-                </div>
-                <span class="text-xs text-secondary leading-none">{{message.created_ago}}</span>
-              </div>
-              <div class="flex-shrink-0 h-10 w-10 rounded-full bg-secondary">
-                <img :src="message.created_by.avatar_link"
-                     class="mx-auto w-11 h-11 rounded-full object-cover object-center">
-              </div>
-            </div>
-            <!--received messages-->
-            <div class="flex w-full gap-2 max-w-md"
-                 v-if="message.created_by.id != userStore.user.id">
-              <div class="flex-shrink-0 h-10 w-10 rounded-full bg-secondary">
-                <img :src="message.created_by.avatar_link"
-                     class="mx-auto w-11 h-11 rounded-full object-cover object-center">
-              </div>
-              <div class="flex flex-col gap-1 items-start">
-                <div class="bg-secondary p-3 rounded-r-lg rounded-bl-lg">
-                  <span class="text-sm"> {{message.message}}</span>
-                </div>
-                <span class="text-xs text-secondary leading-none">{{message.created_ago}}</span>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-      <div class="bg-foreground border border-border rounded-lg">
-        <form @submit.prevent="submitForm">
-          <div class="p-4 flex space-x-3">
-            <input type="text" name="" id="" class="w-full bg-background rounded-lg p-4 " v-model="messageText"
-                   @keydown.enter.prevent="submitForm" placeholder="What do you want to say?">
-            <btn type="submit">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                   stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-              </svg>
-            </btn>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div v-else-if="!loading" class="max-w-lg mx-auto bg-foreground shadow-md sm:rounded-lg p-6">
-    <div class="text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-           stroke="currentColor" class="h-40 w-40 text-purple-600 mx-auto ">
-        <path strokeLinecap="round" strokeLinejoin="round"
-              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-      </svg>
-      <p class="mt-2 text-xl font-semibold text-desc">You don't have any messages</p>
-    </div>
-  </div>
+          </header>
 
+          <div id="conversation" class="flex flex-1 flex-col gap-1.5 overflow-y-auto px-4 py-5 sm:px-6" aria-live="polite">
+            <p v-if="!activeConversation.messages || activeConversation.messages.length === 0"
+               class="m-auto max-w-xs text-center text-sm text-muted-foreground">
+              Say hi to {{ partner.name }} — this is the beginning of your conversation.
+            </p>
+            <template v-for="(message, index) in activeConversation.messages" :key="message.id">
+              <div :class="['flex w-full items-end gap-2', isMine(message) ? 'justify-end' : 'justify-start',
+                            startsGroup(index) ? 'mt-3' : '']">
+                <Avatar v-if="!isMine(message)" :src="message.created_by.avatar_link" :name="message.created_by.name" size="xs"
+                        :class="endsGroup(index) ? '' : 'invisible'" />
+                <div :class="['flex max-w-[78%] flex-col sm:max-w-[65%]', isMine(message) ? 'items-end' : 'items-start']">
+                  <div :class="['whitespace-pre-line break-words px-4 py-2.5 text-[15px] leading-snug',
+                                isMine(message)
+                                  ? 'rounded-[22px] rounded-br-md bg-primary text-primary-foreground'
+                                  : 'rounded-[22px] rounded-bl-md bg-muted text-foreground']">
+                    {{ message.message }}
+                  </div>
+                  <span v-if="endsGroup(index)" class="mt-1 px-1 text-[11px] text-muted-foreground">{{ formatAgo(message.created_ago) }}</span>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <form class="flex items-center gap-2 border-t border-border/60 p-3 sm:p-4" @submit.prevent="submitForm">
+            <label for="message-input" class="sr-only">Message {{ partner.name }}</label>
+            <input id="message-input" type="text" class="field h-12 flex-1 rounded-full bg-muted/60" v-model="messageText"
+                   autocomplete="off" :placeholder="`Message ${partner.name.split(' ')[0]}…`">
+            <btn type="submit" size="icon" class="h-12 w-12 shrink-0" :loading="sending" :disabled="!messageText.trim()"
+                 aria-label="Send message">
+              <SendHorizontal v-if="!sending" class="h-5 w-5" aria-hidden="true" />
+            </btn>
+          </form>
+        </template>
+
+        <div v-else class="m-auto max-w-xs p-6 text-center">
+          <MessagesSquare class="mx-auto h-8 w-8 text-muted-foreground" aria-hidden="true" />
+          <p class="mt-3 text-sm text-muted-foreground">Select a conversation to start chatting.</p>
+        </div>
+      </section>
+    </div>
+
+    <EmptyState v-else :icon="MessagesSquare" title="No messages yet"
+                description="Open someone's profile and tap “Message” to start a conversation.">
+      <RouterLink :to="{ name: 'search' }"
+                  class="inline-flex h-10 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/85">
+        Find people
+      </RouterLink>
+    </EmptyState>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios from 'axios';
 import {
+  ArrowLeft, Loader2, MessagesSquare, MoreHorizontal, SendHorizontal, Trash2, UserRound
+} from 'lucide-vue-next';
+import {
   useUserStore
 } from '@/stores/user';
+import { useToastStore } from '@/stores/toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Conversation } from '../interfaces';
+import { Conversation, Message, User } from '../interfaces';
 import btn from '@/components/ui/Button.vue';
+import Avatar from '@/components/ui/Avatar.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
+import { formatAgo } from '@/lib/utils';
 
 export default defineComponent({
   components: {
@@ -133,31 +141,70 @@ export default defineComponent({
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-    btn
+    btn,
+    Avatar,
+    EmptyState,
+    ArrowLeft,
+    Loader2,
+    MoreHorizontal,
+    SendHorizontal,
+    Trash2,
+    UserRound,
+    MessagesSquare,
   },
   props: ['user_id'],
   setup() {
     const userStore = useUserStore();
+    const toastStore = useToastStore();
     return {
       userStore,
-      loading: true
+      toastStore,
+      formatAgo,
+      MessagesSquare
     };
   },
   data() {
     return {
       conversations: [] as Conversation[],
       activeConversation: {} as Conversation,
-      messageText: ''
+      messageText: '',
+      loading: true,
+      sending: false
     };
   },
+  computed: {
+    partner(): User | undefined {
+      if (!this.user_id) {
+        return undefined;
+      }
+      return this.activeConversation.users?.find(user => user.id === this.user_id)
+        ?? this.conversations.find(c => c.users[0]?.id === this.user_id)?.users[0];
+    }
+  },
   methods: {
+    isActive(conversation: Conversation): boolean {
+      return !!this.user_id && conversation.users[0]?.id === this.user_id;
+    },
+    isMine(message: Message): boolean {
+      return message.created_by.id == this.userStore.user.id;
+    },
+    startsGroup(index: number): boolean {
+      const messages = this.activeConversation.messages ?? [];
+      return index > 0 && messages[index - 1].created_by.id !== messages[index].created_by.id;
+    },
+    endsGroup(index: number): boolean {
+      const messages = this.activeConversation.messages ?? [];
+      return index === messages.length - 1 || messages[index + 1].created_by.id !== messages[index].created_by.id;
+    },
     async getConversationsList() {
       axios.get('/api/chat/').then(async response => {
         this.conversations = response.data.conversations;
+        const isWide = window.matchMedia('(min-width: 768px)').matches;
         if (this.conversations.length > 0 && this.user_id) {
           await this.getMessages(this.user_id);
           this.scrollToBottom();
-        } else if (this.conversations.length > 0 && !this.user_id) {
+        } else if (this.conversations.length > 0 && !this.user_id && isWide) {
+          // on wide screens open the latest conversation; on phones show the list first
           this.activeConversation = this.conversations[0];
           await this.openConversation(this.conversations[0]);
         }
@@ -175,15 +222,19 @@ export default defineComponent({
       });
     },
     async submitForm() {
-      if (this.messageText.replace(/\s/g, '').length > 0) {
+      if (this.messageText.replace(/\s/g, '').length > 0 && !this.sending) {
+        this.sending = true;
         axios.post(`/api/chat/${this.user_id}/messages/`, {
           message: this.messageText
         }).then(async () => {
           this.messageText = '';
-          //this.activeConversation.messages.push(response.data.message)
           await this.getMessages(this.user_id);
+          this.scrollToBottom();
         }).catch(error => {
           console.log(error);
+          this.toastStore.showToast(4000, 'Your message could not be sent.', 'bg-red-300');
+        }).finally(() => {
+          this.sending = false;
         });
       }
     },
@@ -201,17 +252,23 @@ export default defineComponent({
     async deleteConversation() {
       axios.delete(`/api/chat/${this.user_id}/`).then(async () => {
         this.activeConversation = {} as Conversation;
-        await this.getConversationsList();
         await this.$router.push({
           name: 'messages',
         });
+        await this.getConversationsList();
+        this.toastStore.showToast(3000, 'Conversation deleted', 'bg-emerald-500');
+      }).catch(error => {
+        console.log(error);
+        this.toastStore.showToast(4000, 'The conversation could not be deleted.', 'bg-red-300');
       });
     },
     scrollToBottom() {
-      const container = document.getElementById('conversation');
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+      this.$nextTick(() => {
+        const container = document.getElementById('conversation');
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
     }
   },
   created() {
