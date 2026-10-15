@@ -1,3 +1,5 @@
+import re
+
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from django.http import JsonResponse
@@ -18,7 +20,7 @@ def post_list(request):
     posts = []
     trend = request.GET.get('trend', '')
     if (trend):
-        posts = Post.objects.visible_to(request.user).filter(body__iregex=f'\B#{trend}')
+        posts = Post.objects.visible_to(request.user).filter(body__iregex=rf'\B#{re.escape(trend)}\b')
     else:
         user_friends = request.user.friends.all()
         query = Q()
