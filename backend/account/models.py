@@ -55,6 +55,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    def update_friends_count(self):
+        self.friends_count = self.friends.count()
+        self.save(update_fields=['friends_count'])
+
     def avatar_link(self):
         if self.avatar:
             return f'{settings.WEBSITE_URL}' + self.avatar.url

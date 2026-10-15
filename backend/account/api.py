@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 # To override the settings in setting.py
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.conf import settings
@@ -63,7 +64,7 @@ def signup(request):
 @api_view(['get'])
 def friends(request, id):
     requests = []
-    user = User.objects.get(pk=id)
+    user = get_object_or_404(User, pk=id)
     if user == request.user:
         requests = FriendshipRequest.objects.filter(
             created_for=user, status=FriendshipRequest.SENT)
@@ -76,10 +77,16 @@ def friends(request, id):
 
 @api_view(['POST', 'DELETE'])
 def send_or_delete_friendship_request(request, friend_id):
-    friend = User.objects.get(pk=friend_id)
+    friend = get_object_or_404(User, pk=friend_id)
     user = request.user
+    is_friend = user.friends.filter(id=friend.id).exists()
 
     if request.method == "POST":
+        if friend == user:
+            return JsonResponse({'message': "you can't send a friendship request to yourself"}, status=400)
+        if is_friend:
+            return JsonResponse({'message': "you are already friends"}, status=400)
+
         check1 = FriendshipRequest.objects.filter(
             created_for=user, created_by=friend, status=FriendshipRequest.SENT)
         check2 = FriendshipRequest.objects.filter(
@@ -96,38 +103,41 @@ def send_or_delete_friendship_request(request, friend_id):
         else:
             return JsonResponse({'message': "friendship request already sent"})
     elif request.method == "DELETE":
+        if not is_friend:
+            return JsonResponse({'message': "you are not friends"}, status=400)
+
         user.friends.remove(friend)
-        user.friends_count -= 1
-        user.save()
-        friend.friends_count -= 1
-        friend.save()
+        user.update_friends_count()
+        friend.update_friends_count()
         return JsonResponse({'message': "friendship removed"})
 
 
 @api_view(['POST'])
 def handle_request(request, friend_id, request_id):
     user = request.user
-    friend = User.objects.get(id=friend_id)
-    # status is: accepted | rejected | canceled
+    friend = get_object_or_404(User, id=friend_id)
     status = request.data.get('status')
 
-    if (status == 'canceled'):
-        friendshipRequest = FriendshipRequest.objects.get(
-            id=request_id, created_for=friend, created_by=user)
+    # The sender can cancel a request, the receiver can accept or reject it
+    if status == FriendshipRequest.CANCELED:
+        created_for, created_by = friend, user
+    elif status in (FriendshipRequest.ACCEPTED, FriendshipRequest.REJECTED):
+        created_for, created_by = user, friend
     else:
-        friendshipRequest = FriendshipRequest.objects.get(
-            id=request_id, created_for=user, created_by=friend)
+        return JsonResponse({'message': 'invalid status'}, status=400)
+
+    friendshipRequest = get_object_or_404(
+        FriendshipRequest, id=request_id, created_for=created_for,
+        created_by=created_by, status=FriendshipRequest.SENT)
 
     friendshipRequest.status = status
     friendshipRequest.save()
 
     # add the user to friends list
-    if (status == 'accepted'):
+    if status == FriendshipRequest.ACCEPTED:
         user.friends.add(friend)
-        user.friends_count += 1
-        user.save()
-        friend.friends_count += 1
-        friend.save()
+        user.update_friends_count()
+        friend.update_friends_count()
 
         # send a notification
         Notification.objects.create_notification(
@@ -137,7 +147,7 @@ def handle_request(request, friend_id, request_id):
         user.people_you_may_know.remove(friend)
         friend.people_you_may_know.remove(user)
 
-    elif (status == 'rejected'):
+    elif status == FriendshipRequest.REJECTED:
         Notification.objects.create_notification(
             created_for=friend, created_by=user, type_of_notification=Notification.REJECTEDFRIENDREQUEST)
 
