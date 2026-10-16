@@ -57,15 +57,19 @@ class Post(models.Model):
         return 'post commented successfully'
     
     def delete_comment(self, user, comment_id):
-        comment = Comment.objects.filter(id=comment_id, created_by=user)
-        if comment.exists():
-            comment[0].delete()
-            self.comments_count -= 1
-            self.save()
-            return 'commented deleted successfully'
-        else:
-            return 'no comment found!'
-            
+        # The post author can delete every comment, others only their own
+        comments = self.comments.all()
+        if user != self.created_by:
+            comments = comments.filter(created_by=user)
+
+        comment = comments.filter(id=comment_id).first()
+        if comment is None:
+            return False
+
+        comment.delete()
+        self.comments_count = self.comments.count()
+        self.save(update_fields=['comments_count'])
+        return True
 
     def delete_post(self, user):
         self.delete()

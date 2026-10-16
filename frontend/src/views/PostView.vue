@@ -4,7 +4,7 @@
     <div class="main-center space-y-2 col-span-4 md:col-span-3">
       <FeedItem :post="post" v-if="post.created_by" />
       <div class="p-4 w-11/12 bg-foreground border border-border rounded-lg text-primary" v-for="comment in post.comments" :key="comment.id">
-        <CommentItem :comment="comment" @deleteComment="deleteComment" />
+        <CommentItem :comment="comment" :post-author-id="post.created_by?.id" @deleteComment="deleteComment" />
       </div>
       <div class="bg-foreground border border-border rounded-lg w-11/12" >
         <form method="post" @submit.prevent="submitForm">

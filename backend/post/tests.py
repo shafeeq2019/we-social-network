@@ -133,3 +133,60 @@ class TrendFilterTests(TestCase):
     def test_trend_with_regex_characters(self):
         for trend in ['(', 'pyth.*', '(a+)+$']:
             self.assertEqual(self.trend_bodies(trend), [], trend)
+
+
+class DeleteCommentTests(TestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(
+            name='Author', email='author@example.com', password='secret', is_active=True)
+        self.commenter = User.objects.create_user(
+            name='Commenter', email='commenter@example.com', password='secret', is_active=True)
+        self.other = User.objects.create_user(
+            name='Other', email='other@example.com', password='secret', is_active=True)
+        self.post = Post.objects.create(body='post', created_by=self.author)
+        self.other_post = Post.objects.create(body='other post', created_by=self.other)
+        self.post.add_comment(self.commenter, 'comment')
+        self.other_post.add_comment(self.commenter, 'other comment')
+        self.comment = self.post.comments.get()
+        self.other_comment = self.other_post.comments.get()
+
+    def delete_comment(self, user, post, comment):
+        client = APIClient()
+        client.force_authenticate(user)
+        return client.delete(f'/api/post/{post.id}/comment/{comment.id}/')
+
+    def assert_comments_count(self, post, count):
+        post.refresh_from_db()
+        self.assertEqual(post.comments.count(), count)
+        self.assertEqual(post.comments_count, count)
+
+    def test_comment_author_can_delete_comment(self):
+        response = self.delete_comment(self.commenter, self.post, self.comment)
+
+        self.assertEqual(response.status_code, 200)
+        self.assert_comments_count(self.post, 0)
+
+    def test_post_author_can_delete_comment(self):
+        response = self.delete_comment(self.author, self.post, self.comment)
+
+        self.assertEqual(response.status_code, 200)
+        self.assert_comments_count(self.post, 0)
+
+    def test_other_user_cannot_delete_comment(self):
+        response = self.delete_comment(self.other, self.post, self.comment)
+
+        self.assertEqual(response.status_code, 404)
+        self.assert_comments_count(self.post, 1)
+
+    def test_cannot_delete_comment_through_other_post(self):
+        response = self.delete_comment(self.commenter, self.post, self.other_comment)
+
+        self.assertEqual(response.status_code, 404)
+        self.assert_comments_count(self.post, 1)
+        self.assert_comments_count(self.other_post, 1)
+
+    def test_post_author_cannot_delete_comment_on_other_post(self):
+        response = self.delete_comment(self.author, self.post, self.other_comment)
+
+        self.assertEqual(response.status_code, 404)
+        self.assert_comments_count(self.other_post, 1)

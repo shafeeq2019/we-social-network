@@ -23,7 +23,7 @@
         </DropdownMenuTrigger>
         <DropdownMenuContent class="bg-background">
           <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center" @click="deleteComment"
-                            v-if="userStore.user.id === comment.created_by.id">
+                            v-if="canDelete">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -75,6 +75,10 @@ export default {
       type: Object as PropType<Comment>,
       required: true
     },
+    postAuthorId: {
+      type: String,
+      required: false
+    },
   },
   components: {
     DropdownMenu,
@@ -89,6 +93,13 @@ export default {
       userStore,
       toastStore
     };
+  },
+  computed: {
+    canDelete(): boolean {
+      // The comment author and the post author can delete a comment
+      const userId = this.userStore.user.id;
+      return userId === this.comment.created_by.id || userId === this.postAuthorId;
+    }
   },
   methods: {
     deleteComment() {

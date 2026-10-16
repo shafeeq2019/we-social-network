@@ -133,11 +133,12 @@ def post_create_comment(request, post_id):
 
 @api_view(['DELETE'])
 def post_delete_comment(request, post_id, comment_id):
-    user = request.user
-    post = Post.objects.get(id=post_id)
-    result = post.delete_comment(user, comment_id)
+    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
 
-    return JsonResponse({'message': result})
+    if not post.delete_comment(request.user, comment_id):
+        return JsonResponse({'message': 'no comment found!'}, status=404)
+
+    return JsonResponse({'message': 'comment deleted successfully'})
 
 
 @api_view(['GET'])
