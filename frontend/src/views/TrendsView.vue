@@ -66,7 +66,9 @@ export default defineComponent({
   },
   methods: {
     async getFeeds(hashtag: string | string[]) {
-      await axios.get(`/api/post?trend=${hashtag}&page=${this.currentPage}`).then(response => {
+      await axios.get('/api/post/', {
+        params: { trend: hashtag, page: this.currentPage }
+      }).then(response => {
         this.hasNext = !!response.data.next;
         this.posts = [...this.posts, ...response.data.results];
       }).catch(error => {

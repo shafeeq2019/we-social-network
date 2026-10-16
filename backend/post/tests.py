@@ -110,3 +110,26 @@ class ReportPostTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(post.reports.get().report, 'spam')
+
+
+class TrendFilterTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            name='Test', email='test@example.com', password='secret', is_active=True)
+        Post.objects.create(body='I like #python', created_by=self.user)
+        Post.objects.create(body='I like #pythonista', created_by=self.user)
+        Post.objects.create(body='I like #Python too', created_by=self.user)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+
+    def trend_bodies(self, trend):
+        response = self.client.get('/api/post/', {'trend': trend})
+        self.assertEqual(response.status_code, 200)
+        return sorted(post['body'] for post in response.json()['results'])
+
+    def test_trend_matches_whole_hashtag_only(self):
+        self.assertEqual(self.trend_bodies('python'), ['I like #Python too', 'I like #python'])
+
+    def test_trend_with_regex_characters(self):
+        for trend in ['(', 'pyth.*', '(a+)+$']:
+            self.assertEqual(self.trend_bodies(trend), [], trend)
