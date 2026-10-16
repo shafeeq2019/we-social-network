@@ -150,3 +150,33 @@ class FriendshipTests(TestCase):
 
         self.assertEqual(client.post(f'/api/friends/{unknown_id}/request/').status_code, 404)
         self.assertEqual(client.get(f'/api/friends/{unknown_id}/').status_code, 404)
+
+
+class ActivateEmailTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            name='Alice', email='alice@example.com', password='secret')
+
+    def activate(self, params):
+        return self.client.get('/activateemail/', params)
+
+    def test_activate_user(self):
+        response = self.activate({'email': self.user.email, 'id': self.user.id})
+
+        self.assertEqual(response.status_code, 200)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.is_active)
+
+    def test_invalid_parameters(self):
+        invalid_params = [
+            {},
+            {'email': self.user.email},
+            {'id': self.user.id},
+            {'email': 'wrong@example.com', 'id': self.user.id},
+            {'email': self.user.email, 'id': 'not-a-uuid'},
+        ]
+        for params in invalid_params:
+            self.assertEqual(self.activate(params).status_code, 400, params)
+
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)

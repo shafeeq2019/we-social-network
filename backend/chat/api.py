@@ -51,8 +51,12 @@ def message_controller(request, user_id):
         sender_conversation = get_object_or_404(
             sender_user.conversations, users__in=[receiver_user])
 
-        sender_message = sender_conversation.messages.create(message=request.data.get(
-            'message'), created_by=sender_user, sent_to=receiver_user)
+        message = str(request.data.get('message') or '').strip()
+        if not message:
+            return JsonResponse({'message': 'message is empty'}, status=400)
+
+        sender_message = sender_conversation.messages.create(
+            message=message, created_by=sender_user, sent_to=receiver_user)
 
         receiver_conversation = receiver_user.conversations.filter(
             users__in=[sender_user])
@@ -61,7 +65,7 @@ def message_controller(request, user_id):
         if not receiver_conversation.exists():
             receiver_user.conversations.create().users.add(sender_user)
 
-        receiver_message = receiver_conversation[0].messages.create(message=request.data.get(
-            'message'), created_by=sender_user, sent_to=receiver_user)
+        receiver_message = receiver_conversation[0].messages.create(
+            message=message, created_by=sender_user, sent_to=receiver_user)
 
     return JsonResponse({"message": ConversationMessageSerializer(sender_message).data}, safe=False)

@@ -125,7 +125,10 @@ def post_detail(request, post_id):
 @api_view(['POST'])
 def post_create_comment(request, post_id):
     post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
-    comment = request.data.get('comment')
+    comment = str(request.data.get('comment') or '').strip()
+    if not comment:
+        return JsonResponse({'message': 'comment is empty'}, status=400)
+
     result = post.add_comment(request.user, comment)
 
     return JsonResponse({'message': result}, safe=False)
@@ -149,7 +152,7 @@ def get_trends(request):
 
 @api_view(['DELETE'])
 def post_delete(request, post_id):
-    post = Post.objects.get(created_by=request.user, id=post_id)
+    post = get_object_or_404(Post, created_by=request.user, id=post_id)
     post.delete_post(user=request.user)
     return JsonResponse({'message': 'Post deleted'})
 
@@ -157,6 +160,9 @@ def post_delete(request, post_id):
 @api_view(['POST'])
 def report_post(request, post_id):
     post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
-    report = request.data.get('reportText')
+    report = str(request.data.get('reportText') or '').strip()
+    if not report:
+        return JsonResponse({'message': 'report is empty'}, status=400)
+
     post.reports.create(created_by=request.user, report=report)
     return JsonResponse({'message': 'Post reported'})

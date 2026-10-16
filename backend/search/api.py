@@ -9,8 +9,7 @@ from post.serializers import PostSerializer
 @api_view(['POST'])
 def search(request):
     data = request.data
-    query = data.get('query')
-    query = query.strip()
+    query = str(data.get('query') or '').strip()
     users = []
     posts = []
 

@@ -3,6 +3,7 @@ from .serializers import NotificationSerializer
 from rest_framework.decorators import api_view
 from rest_framework.pagination import PageNumberPagination
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 
 @api_view(['GET'])
@@ -21,7 +22,7 @@ def notifications(request):
 @api_view(['GET'])
 def read_notification(request, id):
     user = request.user
-    notification = Notification.objects.filter(created_for=user).get(id=id)
+    notification = get_object_or_404(Notification, created_for=user, id=id)
     notification.is_read = True
     notification.save()
     return JsonResponse({"message": "test"})

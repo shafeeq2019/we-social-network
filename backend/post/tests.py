@@ -190,3 +190,36 @@ class DeleteCommentTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assert_comments_count(self.other_post, 1)
+
+
+class InvalidPostRequestTests(TestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(
+            name='Author', email='author@example.com', password='secret', is_active=True)
+        self.other = User.objects.create_user(
+            name='Other', email='other@example.com', password='secret', is_active=True)
+        self.post = Post.objects.create(body='hello', created_by=self.author)
+        self.client = APIClient()
+        self.client.force_authenticate(self.other)
+
+    def test_empty_comment(self):
+        for data in [{}, {'comment': ''}, {'comment': '   '}]:
+            response = self.client.post(f'/api/post/{self.post.id}/comment/', data)
+            self.assertEqual(response.status_code, 400, data)
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.comments_count, 0)
+        self.assertFalse(self.post.notifications.exists())
+
+    def test_empty_report(self):
+        for data in [{}, {'reportText': '   '}]:
+            response = self.client.post(f'/api/post/{self.post.id}/report/', data)
+            self.assertEqual(response.status_code, 400, data)
+
+        self.assertFalse(self.post.reports.exists())
+
+    def test_delete_other_users_post(self):
+        response = self.client.delete(f'/api/post/{self.post.id}/')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Post.objects.filter(id=self.post.id).exists())

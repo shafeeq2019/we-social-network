@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -10,11 +11,15 @@ def activate_email(request):
     email = request.GET.get('email', '')
     id = request.GET.get('id', '')
 
-    if email and id:
-        user = User.objects.get(id=id, email=email)
-        if user:
-            user.is_active = True
-            user.save()
-            return HttpResponse("<h1 style='text-align:center;'>The user is now activated. You can go ahead and log in!</h1>")
+    try:
+        user = User.objects.filter(id=id, email=email).first() if email and id else None
+    except ValidationError:
+        # id is not a valid UUID
+        user = None
+
+    if user:
+        user.is_active = True
+        user.save()
+        return HttpResponse("<h1 style='text-align:center;'>The user is now activated. You can go ahead and log in!</h1>")
     else:
-        return HttpResponse("<h1 style='text-align:center;color:red'>The parameters are not valid!</h1>")
+        return HttpResponse("<h1 style='text-align:center;color:red'>The parameters are not valid!</h1>", status=400)
