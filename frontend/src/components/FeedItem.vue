@@ -1,123 +1,115 @@
-<template lang="">
-  <div class="p-4 bg-foreground border border-border rounded-lg text-primary">
-
-    <div class="mb-6 flex items-center justify-between">
-      <router-link :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
-        <div class="flex items-center space-x-3">
-          <img :src="post.created_by.avatar_link" class="w-9 h-9 rounded-full object-cover object-center">
-
-          <p><strong>{{post.created_by.name }}</strong></p>
-        </div>
-      </router-link>
-
-      <p class="text-gray-600 text-secondary">{{ /^0\s+minutes$/.test(post.created_ago) ? 'Just now' : post.created_ago}}</p>
-    </div>
-
-    <p v-html="formatHashtags(post.body)"> </p>
-
-    <img :src="post.post_attachments[0].image_link" :key="post.post_attachments[0].id"
-         class="w-full rounded-lg mt-4 h-auto max-w-xl mx-auto" v-if="post.post_attachments.length > 0">
-
-    <div class="mt-6 mb-1 flex justify-between">
-      <div class="flex space-x-6">
-        <div class="flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" :fill="post.post_liked ? 'red' : 'none'" viewBox="0 0 24 24"
-               stroke-width="1.5" @click="likePost" :stroke="post.post_liked ? 'red' : 'currentColor'"
-               class="w-6 h-6 cursor-pointer">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z">
-            </path>
-          </svg>
-
-          <span class="text-desc text-xs">{{post.likes_count}}</span>
-        </div>
-
-        <RouterLink :to="{name: 'postview', params: {id: post.id}}"
-                    class="flex items-center space-x-2 cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-               stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z">
-            </path>
-          </svg>
-
-          <span class="text-desc text-xs">
-            {{ post.comments_count }} comments</span>
+<template>
+  <article class="surface animate-fade-up overflow-hidden" :aria-labelledby="`post-${post.id}-author`">
+    <header class="flex items-start gap-3 px-5 pt-5">
+      <RouterLink :to="{ name: 'profile', params: { id: post.created_by.id } }" class="shrink-0 rounded-full" tabindex="-1" aria-hidden="true">
+        <Avatar :src="post.created_by.avatar_link" :name="post.created_by.name" />
+      </RouterLink>
+      <div class="min-w-0 flex-1 pt-0.5">
+        <RouterLink :id="`post-${post.id}-author`" :to="{ name: 'profile', params: { id: post.created_by.id } }"
+                    class="block truncate font-semibold leading-tight hover:underline underline-offset-2">
+          {{ post.created_by.name }}
         </RouterLink>
-
-        <div class="flex items-center space-x-2 text-desc" v-if="post.is_private">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-               stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-          </svg>
-          <span class="text-desc text-xs">Private</span>
-        </div>
-        <div class="flex items-center space-x-2 cursor-pointer" @click="share()">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-               stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-          </svg>
-
-          <span class="text-desc text-xs">Share</span>
-        </div>
-
+        <p class="mt-0.5 flex items-center gap-1.5 text-[13px] text-muted-foreground">
+          <RouterLink :to="{ name: 'postview', params: { id: post.id } }" class="hover:underline underline-offset-2">
+            <time :datetime="post.created_at">{{ formatAgo(post.created_ago) }}</time>
+          </RouterLink>
+          <span v-if="post.is_private !== undefined" aria-hidden="true">·</span>
+          <span v-if="post.is_private !== undefined" class="inline-flex items-center gap-1">
+            <Lock v-if="post.is_private" class="h-3.5 w-3.5" aria-hidden="true" />
+            <Globe2 v-else class="h-3.5 w-3.5" aria-hidden="true" />
+            {{ post.is_private ? 'Only you' : 'Public' }}
+          </span>
+        </p>
       </div>
 
-      <div>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                 stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z">
-              </path>
-            </svg>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent class="bg-background">
-            <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center" @click="deletePost"
-                              v-if="userStore.user.id === post.created_by.id">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                   stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-              </svg>
-              <p>Delete post</p>
-            </DropdownMenuItem>
-            <!-- <DropdownMenuSeparator /> -->
-            <DropdownMenuItem v-if="userStore.user.id != post.created_by.id"
-                              class="cursor-pointer flex gap-2 items-center" @click="openReportModal = true">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                   stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-              </svg>
-              <p>Report</p>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger class="icon-btn -mr-2 -mt-1" aria-label="Post options">
+          <MoreHorizontal class="h-5 w-5" aria-hidden="true" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" class="w-48 rounded-2xl p-1.5 shadow-lift">
+          <DropdownMenuItem class="cursor-pointer gap-3 rounded-xl px-2.5 py-2" @select="copyLink">
+            <Link2 class="h-4 w-4 text-muted-foreground" aria-hidden="true" /> Copy link
+          </DropdownMenuItem>
+          <DropdownMenuItem v-if="isOwner" class="menu-item-danger cursor-pointer gap-3 rounded-xl px-2.5 py-2"
+                            @select="openDeleteModal = true">
+            <Trash2 class="h-4 w-4" aria-hidden="true" /> Delete post
+          </DropdownMenuItem>
+          <DropdownMenuItem v-else class="cursor-pointer gap-3 rounded-xl px-2.5 py-2" @select="openReportModal = true">
+            <Flag class="h-4 w-4 text-muted-foreground" aria-hidden="true" /> Report
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </header>
+
+    <div v-if="post.body" class="post-text whitespace-pre-line break-words px-5 pt-3 text-[15.5px] leading-relaxed"
+         v-html="renderRichText(post.body)" @click="onBodyClick" />
+
+    <RouterLink v-if="post.post_attachments && post.post_attachments.length > 0"
+                :to="{ name: 'postview', params: { id: post.id } }"
+                class="mx-5 mt-4 block overflow-hidden rounded-2xl border border-border/60 bg-muted">
+      <img :src="post.post_attachments[0].image_link" :key="post.post_attachments[0].id"
+           :alt="`Image shared by ${post.created_by.name}`" loading="lazy"
+           class="max-h-[560px] w-full object-cover transition-transform duration-500 hover:scale-[1.015]">
+    </RouterLink>
+
+    <footer class="flex items-center gap-1 px-3 pb-3 pt-3">
+      <button type="button" @click="likePost" :aria-pressed="post.post_liked"
+              :aria-label="post.post_liked ? 'Unlike post' : 'Like post'"
+              :class="['group inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors',
+                       post.post_liked ? 'text-like hover:bg-like/10' : 'text-muted-foreground hover:bg-like/10 hover:text-like']">
+        <Heart :key="likeAnimKey" :class="['h-5 w-5', likeAnimKey > 0 && post.post_liked ? 'animate-pop' : '']"
+               :fill="post.post_liked ? 'currentColor' : 'none'" aria-hidden="true" />
+        <span class="tabular-nums">{{ post.likes_count }}</span>
+      </button>
+
+      <RouterLink :to="{ name: 'postview', params: { id: post.id } }"
+                  class="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary-soft-foreground dark:hover:text-primary"
+                  :aria-label="`${post.comments_count ?? 0} comments, open post`">
+        <MessageCircle class="h-5 w-5" aria-hidden="true" />
+        <span class="tabular-nums">{{ post.comments_count ?? 0 }}</span>
+      </RouterLink>
+
+      <button type="button" @click="share"
+              class="ml-auto inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+        <Share2 class="h-[18px] w-[18px]" aria-hidden="true" />
+        <span class="hidden sm:inline">Share</span>
+        <span class="sr-only sm:hidden">Share post</span>
+      </button>
+    </footer>
 
     <Dialog v-model:open="openReportModal" @update:open="reportText = ''">
-      <DialogContent class="sm:max-w-[425px] text-primary">
+      <DialogContent class="rounded-3xl sm:max-w-[440px]">
         <DialogHeader>
-          <DialogTitle class="text-primary">Report a post</DialogTitle>
-          <DialogDescription class="text-secondary">
-            Please tell us why you want to report this post
+          <DialogTitle class="font-display text-xl font-bold">Report this post</DialogTitle>
+          <DialogDescription class="text-muted-foreground">
+            Tell us what's wrong. Reports are anonymous and reviewed by our team.
           </DialogDescription>
         </DialogHeader>
-        <div class="p-2 text-primary">
-          <textarea class="p-4 w-full bg-foreground rounded-lg" placeholder="Why should we delete this post?"
-                    v-model="reportText"></textarea>
-        </div>
-        <DialogFooter>
-          <btn @click="reportPost">Send</btn>
+        <label for="report-text" class="sr-only">Reason</label>
+        <textarea id="report-text" class="field min-h-[120px] resize-none" placeholder="Why should this post be removed?"
+                  v-model="reportText"></textarea>
+        <DialogFooter class="gap-2">
+          <btn variant="ghost" type="button" @click="openReportModal = false">Cancel</btn>
+          <btn type="button" :loading="reporting" :disabled="!reportText.trim()" @click="reportPost">Send report</btn>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  </div>
+
+    <Dialog v-model:open="openDeleteModal">
+      <DialogContent class="rounded-3xl sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle class="font-display text-xl font-bold">Delete post?</DialogTitle>
+          <DialogDescription class="text-muted-foreground">
+            This can't be undone. The post, its likes and comments will be removed.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter class="gap-2">
+          <btn variant="ghost" type="button" @click="openDeleteModal = false">Cancel</btn>
+          <btn variant="destructive" type="button" :loading="deleting" @click="deletePost">Delete</btn>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  </article>
 </template>
 
 <script lang="ts">
@@ -131,6 +123,9 @@ import {
 import type {
   PropType
 } from 'vue';
+import {
+  Flag, Globe2, Heart, Link2, Lock, MessageCircle, MoreHorizontal, Share2, Trash2
+} from 'lucide-vue-next';
 import {
   useToastStore
 } from '@/stores/toast';
@@ -152,6 +147,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import btn from './ui/Button.vue';
+import Avatar from './ui/Avatar.vue';
+import { formatAgo, renderRichText } from '@/lib/utils';
+
 export default defineComponent({
   components: {
     // eslint-disable-next-line vue/no-reserved-component-names
@@ -165,14 +163,27 @@ export default defineComponent({
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-    btn
+    btn,
+    Avatar,
+    Flag,
+    Globe2,
+    Heart,
+    Link2,
+    Lock,
+    MessageCircle,
+    MoreHorizontal,
+    Share2,
+    Trash2,
   },
+  emits: ['deletePost'],
   setup() {
     const userStore = useUserStore();
     const toastStore = useToastStore();
     return {
       userStore,
-      toastStore
+      toastStore,
+      formatAgo,
+      renderRichText
     };
   },
   props: {
@@ -184,33 +195,59 @@ export default defineComponent({
   data() {
     return {
       openReportModal: false,
-      reportText: ''
+      openDeleteModal: false,
+      reportText: '',
+      reporting: false,
+      deleting: false,
+      liking: false,
+      likeAnimKey: 0
     };
+  },
+  computed: {
+    isOwner(): boolean {
+      return this.userStore.user.id === this.post.created_by.id;
+    },
+    absoluteURL(): string {
+      const route = this.$router.resolve({ name: 'postview', params: { id: this.post.id } });
+      return new URL(route.href, window.location.origin).href;
+    }
   },
   methods: {
     likePost() {
+      if (this.liking) {
+        return;
+      }
+      this.liking = true;
+      this.likeAnimKey += 1;
       axios.post(`/api/post/${this.post.id}/like/`).then(response => {
+        /* eslint-disable */
         if (response.data.message == 'post liked successfully') {
-          /* eslint-disable */
           this.post.likes_count += 1;
           this.post.post_liked = true;
         } else {
           this.post.likes_count -= 1;
           this.post.post_liked = false;
         }
+        /* eslint-enable */
       }).catch(e => {
         console.log(e);
+        this.toastStore.showToast(4000, 'Could not update your like. Please try again.', 'bg-red-300');
+      }).finally(() => {
+        this.liking = false;
       });
     },
-    formatHashtags(text: string): string {
-      const escapeHTML = (text: string) => text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const escapedText = escapeHTML(text);
-      return escapedText.replace(/\B#(\w+)/g,
-        '<a class="text-hashtag" href="/trends/$1">#$1</a>');
+    onBodyClick(event: MouseEvent) {
+      const target = (event.target as HTMLElement).closest('a[data-hashtag]') as HTMLAnchorElement | null;
+      if (target) {
+        event.preventDefault();
+        this.$router.push({ name: 'trendsview', params: { hashtag: target.dataset.hashtag } });
+      }
     },
     async deletePost() {
+      this.deleting = true;
       axios.delete(`/api/post/${this.post.id}`).then(
         () => {
+          this.openDeleteModal = false;
           this.$emit('deletePost', this.post.id);
           this.toastStore.showToast(5000, 'The post was deleted', 'bg-emerald-500');
           if (this.$route.name == 'postview') {
@@ -219,30 +256,49 @@ export default defineComponent({
         }
       ).catch(e => {
         console.log(e);
+        this.toastStore.showToast(5000, 'The post could not be deleted.', 'bg-red-300');
+      }).finally(() => {
+        this.deleting = false;
       });
     },
     async reportPost() {
+      this.reporting = true;
       axios.post(`/api/post/${this.post.id}/report/`, {
         reportText: this.reportText
-      }).then(response => {
+      }).then(() => {
         this.openReportModal = false;
-        console.log(response);
-        this.toastStore.showToast(5000, 'The post was reported', 'bg-emerald-500');
+        this.toastStore.showToast(5000, 'Thanks — the post was reported', 'bg-emerald-500');
       }).catch(e => {
         console.log(e);
+        this.toastStore.showToast(5000, 'The report could not be sent.', 'bg-red-300');
+      }).finally(() => {
+        this.reporting = false;
       });
     },
-    share() {
-      const route = this.$router.resolve({ name: 'postview', params: { id: this.post.id } });
-      const absoluteURL = new URL(route.href, window.location.origin).href;
-
-      navigator.share({
-        title: 'Post from We',
-        text: this.post.body,
-        url: absoluteURL,
-      });
+    async copyLink() {
+      try {
+        await navigator.clipboard.writeText(this.absoluteURL);
+        this.toastStore.showToast(3000, 'Link copied to clipboard', 'bg-emerald-500');
+      } catch (e) {
+        console.log(e);
+        this.toastStore.showToast(4000, 'Could not copy the link', 'bg-red-300');
+      }
+    },
+    async share() {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'Post from We',
+            text: this.post.body,
+            url: this.absoluteURL,
+          });
+        } catch {
+          // the user dismissed the share sheet
+        }
+      } else {
+        this.copyLink();
+      }
     }
-  },
-  created() { }
+  }
 });
 </script>

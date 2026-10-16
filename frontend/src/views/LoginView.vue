@@ -1,51 +1,47 @@
-<template lang="">
-  <div class="mx-auto grid grid-cols-2 gap-4  text-primary">
-    <div class="main-left col-span-2 md:col-span-1">
-      <div class="p-12 bg-foreground border border-border rounded-lg">
-        <h1 class="mb-6 text-2xl">Log in</h1>
-        <p class="mb-6 text-secondary">
-          <b>We</b> is a social network for sharing news and making new friendships. Log in or join now - it's free
-        </p>
-        <p class="font-bold">
-          Don't have an account? <RouterLink :to="{'name': 'signup'}" class="underline">Click here</RouterLink> to
-          create one!
-        </p>
+<template>
+  <AuthLayout title="Welcome back" subtitle="Log in to catch up with your friends.">
+    <form class="space-y-5" novalidate @submit.prevent="submitForm">
+      <div>
+        <label for="login-email" class="field-label">E-mail</label>
+        <input id="login-email" type="email" autocomplete="email" placeholder="you@example.com"
+               class="field h-12" v-model="form.email">
       </div>
-    </div>
-    <div class="main-right col-span-2 md:col-span-1 text-primary">
-      <div class="p-12 bg-foreground border border-border rounded-lg">
-        <form class="space-y-6" @submit.prevent="submitForm">
-          <div>
-            <label>E-mail</label><br>
-            <input type="email" placeholder="Your e-mail address"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.email">
-          </div>
-          <div>
-            <label>Password</label><br>
-            <input type="password" placeholder="Your password"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background" v-model="form.password">
-          </div>
-          <template v-if="errors.length > 0">
-            <div class="bg-red-300 text-white rounded-lg p-6">
-              <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
-            </div>
-          </template>
-          <div class="flex justify-end">
-            <btn size="big" class="w-full sm:w-auto">Log in</btn>
-          </div>
-        </form>
+      <div>
+        <label for="login-password" class="field-label">Password</label>
+        <div class="relative">
+          <input id="login-password" :type="showPassword ? 'text' : 'password'" autocomplete="current-password"
+                 placeholder="Your password" class="field h-12 pr-12" v-model="form.password">
+          <button type="button" class="icon-btn absolute right-1 top-1/2 -translate-y-1/2"
+                  :aria-label="showPassword ? 'Hide password' : 'Show password'" :aria-pressed="showPassword"
+                  @click="showPassword = !showPassword">
+            <EyeOff v-if="showPassword" class="h-4 w-4" aria-hidden="true" />
+            <Eye v-else class="h-4 w-4" aria-hidden="true" />
+          </button>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <FormErrors :errors="errors" />
+
+      <btn size="lg" class="w-full" type="submit" :loading="submitting">Log in</btn>
+    </form>
+
+    <template #footer>
+      New to We?
+      <RouterLink :to="{ name: 'signup' }" class="font-semibold text-foreground underline-offset-2 hover:underline">Create an account</RouterLink>
+    </template>
+  </AuthLayout>
 </template>
 
 <script lang="ts">
 import axios from 'axios';
+import { Eye, EyeOff } from 'lucide-vue-next';
 import { useUserStore } from '@/stores/user';
 import { defineComponent } from 'vue';
 import btn from '@/components/ui/Button.vue';
+import FormErrors from '@/components/ui/FormErrors.vue';
+import AuthLayout from '@/components/layout/AuthLayout.vue';
 export default defineComponent({
-  components: { btn },
+  components: { btn, FormErrors, AuthLayout, Eye, EyeOff },
   setup() {
     const userStore = useUserStore();
     return {
@@ -59,7 +55,9 @@ export default defineComponent({
         password: '' as string,
 
       },
-      errors: [] as string[]
+      errors: [] as string[],
+      submitting: false,
+      showPassword: false
     };
   },
   methods: {
@@ -74,6 +72,7 @@ export default defineComponent({
       }
 
       if (this.errors.length === 0) {
+        this.submitting = true;
         await axios.post('/api/login/', this.form)
           .then(async response => {
             this.userStore.setToken(response.data);
@@ -90,6 +89,9 @@ export default defineComponent({
           .catch(error => {
             console.log('error', error);
             this.errors.push('The email or password is incorrect! Or the user is not activated!');
+          })
+          .finally(() => {
+            this.submitting = false;
           });
 
       }
@@ -97,7 +99,3 @@ export default defineComponent({
   }
 });
 </script>
-
-<style lang="">
-
-</style>
