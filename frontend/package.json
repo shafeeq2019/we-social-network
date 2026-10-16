@@ -39,6 +39,7 @@
     "autoprefixer": "^10.4.17",
     "eslint": "^9.19.0",
     "eslint-plugin-vue": "^9.32.0",
+    "firebase-tools": "^15.34.0",
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "postcss": "^8.4.32",
