@@ -1,51 +1,74 @@
 <template>
-  <div class="p-4 bg-foreground text-primary border border-border rounded-lg shadow-md" v-if="!loading">
-    <h3 class="mb-6 text-xl">Trends</h3>
-    <div class="space-y-4" v-if="trends && trends.length > 0">
-      <div class="flex items-center justify-between" v-for="(trend, index) in trends" :key="index">
-        <p class="text-xs">
-          <strong>#{{ trend.hashtag }}</strong><br>
-          <span class="text-secondary">{{ trend.occurences }} posts</span>
-        </p>
-        <router-link :to="{ name: 'trendsview', params: { 'hashtag': trend.hashtag } }"
-                     class="py-2 px-3 bg-button-primary text-white text-xs rounded-lg">Explore</router-link>
-      </div>
+  <section class="surface p-5" aria-labelledby="trends-title">
+    <div class="mb-3 flex items-center justify-between">
+      <h2 id="trends-title" class="text-base font-bold">Trending now</h2>
+      <TrendingUp class="h-4 w-4 text-muted-foreground" aria-hidden="true" />
     </div>
-    <div v-else class="flex items-center justify-center">
-      <p class="pr-2 md:text-sm text-secondary font-medium">There are no new trends in the last 24 hours</p>
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-           class="w-9 h-9 text-secondary">
-        <path stroke-linecap="round" stroke-linejoin="round"
-              d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5-3.9 19.5m-2.1-19.5-3.9 19.5" />
-      </svg>
+
+    <ul v-if="loading" class="space-y-4 py-1" aria-hidden="true">
+      <li v-for="n in 4" :key="n" class="space-y-2">
+        <div class="skeleton h-3.5 w-28" />
+        <div class="skeleton h-3 w-14" />
+      </li>
+    </ul>
+
+    <ol v-else-if="trends.length > 0" class="-mx-2">
+      <li v-for="(trend, index) in trends" :key="trend.id ?? index">
+        <RouterLink :to="{ name: 'trendsview', params: { hashtag: trend.hashtag } }"
+                    class="group flex items-center gap-3 rounded-2xl px-2 py-2.5 transition-colors hover:bg-muted">
+          <span class="w-5 text-center font-display text-sm font-bold text-muted-foreground/70">{{ index + 1 }}</span>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-semibold group-hover:text-primary-soft-foreground dark:group-hover:text-primary">#{{ trend.hashtag }}</span>
+            <span class="block text-xs text-muted-foreground">{{ trend.occurences }} {{ trend.occurences === 1 ? 'post' : 'posts' }}</span>
+          </span>
+          <ArrowUpRight class="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+        </RouterLink>
+      </li>
+    </ol>
+
+    <p v-else-if="error" class="py-2 text-sm text-muted-foreground">
+      Trends couldn't be loaded.
+      <button type="button" class="font-semibold text-foreground underline-offset-2 hover:underline" @click="getTrends">Try again</button>
+    </p>
+
+    <div v-else class="flex items-center gap-3 rounded-2xl bg-muted/60 p-3 text-sm text-muted-foreground">
+      <Hash class="h-5 w-5 shrink-0" aria-hidden="true" />
+      No trending hashtags in the last 24 hours. Start one!
     </div>
-  </div>
+  </section>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 /**
  TODO:
   - update the posts count when adding a new post to a trend
 */
 import { defineComponent } from 'vue';
+import { ArrowUpRight, Hash, TrendingUp } from 'lucide-vue-next';
 import { Trend } from '../interfaces';
 import axios from 'axios';
 
 export default defineComponent({
+  components: { ArrowUpRight, Hash, TrendingUp },
   data() {
     return {
       trends: [] as Trend[],
-      loading: true
+      loading: true,
+      error: false
     };
   },
   methods: {
     getTrends() {
+      this.loading = true;
+      this.error = false;
       axios.get('/api/post/trends/')
         .then(response => {
           this.trends = response.data;
-          this.loading = false;
         }).catch(error => {
+          this.error = true;
           console.log(error);
+        }).finally(() => {
+          this.loading = false;
         });
     }
   },

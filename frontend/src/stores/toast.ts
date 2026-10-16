@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 
+let hideTimer: ReturnType<typeof setTimeout> | undefined;
+
 export const useToastStore = defineStore({
   id: 'toast',
 
@@ -10,6 +12,12 @@ export const useToastStore = defineStore({
     isVisible: false
   }),
 
+  getters: {
+    // Callers pass a Tailwind colour class (e.g. "bg-red-300") as a hint;
+    // the toast itself is styled by variant.
+    variant: (state): 'success' | 'error' => (/red|destructive|error/.test(state.classes) ? 'error' : 'success')
+  },
+
   actions: {
     showToast(ms: number, message: string, classes: string) {
       this.ms = ms;
@@ -17,17 +25,15 @@ export const useToastStore = defineStore({
       this.classes = classes;
       this.isVisible = true;
 
-      setTimeout(() => {
-        this.classes += ' -translate-y-28';
-      }, 10);
-
-      setTimeout(() => {
-        this.classes = this.classes.replace('-translate-y-28', '');
-      }, this.ms - 500);
-
-      setTimeout(() => {
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
         this.isVisible = false;
       }, this.ms);
+    },
+
+    hide() {
+      clearTimeout(hideTimer);
+      this.isVisible = false;
     }
   }
 });

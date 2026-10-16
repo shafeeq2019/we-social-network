@@ -1,58 +1,54 @@
+<template>
+  <PageLayout no-aside>
+    <PageHeader eyebrow="Settings" title="Change password" description="Use at least 8 characters that you don't use elsewhere." />
+    <SettingsNav />
+
+    <form class="surface space-y-5 p-5 sm:p-7" novalidate v-on:submit.prevent="submitForm">
+      <div>
+        <label for="old-password" class="field-label">Current password</label>
+        <input id="old-password" type="password" v-model="form.old_password" autocomplete="current-password"
+               placeholder="Your current password" class="field h-12">
+      </div>
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="new-password1" class="field-label">New password</label>
+          <input id="new-password1" type="password" v-model="form.new_password1" autocomplete="new-password"
+                 placeholder="New password" class="field h-12">
+        </div>
+        <div>
+          <label for="new-password2" class="field-label">Repeat new password</label>
+          <input id="new-password2" type="password" v-model="form.new_password2" autocomplete="new-password"
+                 placeholder="Repeat it" class="field h-12">
+        </div>
+      </div>
+
+      <FormErrors :errors="errors" />
+
+      <div class="flex flex-col-reverse gap-2 border-t border-border/60 pt-5 sm:flex-row sm:justify-end">
+        <btn variant="ghost" type="button" @click="$router.back()">Cancel</btn>
+        <btn type="submit" :loading="submitting">Update password</btn>
+      </div>
+    </form>
+  </PageLayout>
+</template>
+
+<script lang="ts">
 /**
 TODOS:
 - Error handling for Sing up and change password
 */
-<template>
-  <div class="grid grid-cols-2 gap-4 text-primary">
-    <div class="main-left col-span-2 md:col-span-1">
-      <div class="p-12 bg-foreground border border-border rounded-lg">
-        <h1 class="mb-6 text-2xl">Edit password</h1>
-        <p class="mb-6 text-secondary">
-          Here you can change your password
-        </p>
-      </div>
-    </div>
-    <div class="main-right col-span-2 md:col-span-1">
-      <div class="p-12 bg-foreground border border-border rounded-lg">
-        <form class="space-y-6" v-on:submit.prevent="submitForm">
-          <div>
-            <label>Old password</label><br>
-            <input type="password" v-model="form.old_password" placeholder="Your old password"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
-          </div>
-          <div>
-            <label>New password</label><br>
-            <input type="password" v-model="form.new_password1" placeholder="Enter your new password"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
-          </div>
-          <div>
-            <label>Repeat new password</label><br>
-            <input type="password" v-model="form.new_password2" placeholder="Repeat your new password"
-                   class="w-full mt-2 py-4 px-6 border border-border rounded-lg bg-background">
-          </div>
-          <template v-if="errors.length > 0">
-            <div class="bg-red-300 text-white rounded-lg p-6">
-              <p v-for="error in errors" v-bind:key="error">{{ error }}</p>
-            </div>
-          </template>
-          <div class="flex justify-end">
-            <btn size="big" variant="primary">Save changes</btn>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script lang="ts">
 import { defineComponent } from 'vue';
 import axios from 'axios';
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
 import btn from '@/components/ui/Button.vue';
+import FormErrors from '@/components/ui/FormErrors.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
+import SettingsNav from '@/components/layout/SettingsNav.vue';
 
 export default defineComponent({
-  components: { btn },
+  components: { btn, FormErrors, PageLayout, PageHeader, SettingsNav },
   setup() {
     const toastStore = useToastStore();
     const userStore = useUserStore();
@@ -69,16 +65,19 @@ export default defineComponent({
         new_password1: '' as string,
         new_password2: '' as string
       },
-      errors: [] as string[]
+      errors: [] as string[],
+      submitting: false
     };
   },
   methods: {
     submitForm() {
+      this.errors = [];
       if (this.form.new_password1 !== this.form.new_password2) {
         this.errors.push('The password does not match');
       }
 
       if (this.errors.length === 0) {
+        this.submitting = true;
         axios
           .post('/api/editpassword/', this.form)
           .then(response => {
@@ -95,6 +94,10 @@ export default defineComponent({
           })
           .catch(error => {
             console.log('error', error);
+            this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300');
+          })
+          .finally(() => {
+            this.submitting = false;
           });
       }
     }

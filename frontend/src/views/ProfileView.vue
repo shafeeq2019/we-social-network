@@ -1,181 +1,148 @@
-<template lang="">
-  <div class="grid grid-cols-4 gap-4">
-    <!-- User on the left -->
-    <div class="main-left col-span-4 md:col-span-1 order-1">
-      <div class="p-4 bg-foreground border border-border text-center rounded-lg text-primary">
-        <div class="flex items-center justify-center ">
-          <img :src="user.avatar_link"
-               class="mb-6 w-[220px] max-h-60 md:max-h-36 lg:max-h-60 rounded-full object-cover object-center" />
-        </div>
-
-        <p><strong>{{user.name}}</strong></p>
-        <div class="mt-6 flex space-x-8 justify-around">
-          <router-link :to="{name:'friends', params:{id: user.id}}" class="text-xs text-secondary">
-            {{user.friends_count}} friends</router-link>
-          <p class="text-xs text-secondary">{{user.posts_count}} posts</p>
-        </div>
-        <div class="mt-6 space-y-2">
-
-          <router-link :to="{name:'editprofile'}" v-slot="{ navigate }">
-            <btn class="w-full" size="small" v-if="user.id == userStore.user.id" @click="navigate" role="link">
-              Edit profile
-            </btn>
-          </router-link>
-
-          <DropdownMenu v-if="user.id != userStore.user.id && isFriends">
-            <DropdownMenuTrigger class="w-full">
-              <btn size='small' class="flex justify-center gap-2 w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox ="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-5 h-5">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                </svg>
-                <p>Friends</p>
-              </btn>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="bg-background">
-              <!-- <DropdownMenuSeparator /> -->
-              <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
-                                @click="deleteFriendshipRequest">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                </svg>
-
-                <p>Remove friendship with {{user.name}}</p>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu
-            v-if="user.id != userStore.user.id && friendship_request.status === 'sent' && friendship_request.created_by.id == userStore.user.id">
-            <DropdownMenuTrigger class="w-full">
-              <btn size='small' class="flex justify-center gap-2 w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-5 h-5">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                </svg>
-                <p>Friendship request sent</p>
-              </btn>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="bg-background">
-              <!-- <DropdownMenuSeparator /> -->
-              <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
-                                @click="handleFriendshipRequest('canceled')">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                </svg>
-
-                <p>Cancel friend request</p>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu
-            v-if="user.id != userStore.user.id && friendship_request.status === 'sent' && friendship_request.created_by.id == user.id">
-            <DropdownMenuTrigger class="w-full">
-              <btn size="small" class="flex justify-center gap-2 w-full">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                     stroke="currentColor" class="w-5 h-5">
-                  <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                </svg>
-                <p>{{user.name}} want to be your friend</p>
-              </btn>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent class="bg-background">
-              <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
-                                @click="handleFriendshipRequest('accepted')">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-
-                <p>Accept friend request</p>
-              </DropdownMenuItem>
-              <!-- <DropdownMenuSeparator /> -->
-              <DropdownMenuItem class="cursor-pointer flex space-x-2 items-center p-1"
-                                @click="handleFriendshipRequest('rejected')">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-                <p>Reject friend request</p>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <btn v-if="user.id != userStore.user.id && !isFriends && friendship_request.status != 'sent'"
-               size="small"
-               class="flex justify-center gap-2 items-center w-full"
-               @click="sendFriendshipRequest()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                 stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-            </svg>
-            <p>Send friendship request </p>
-          </btn>
-
-          <btn v-if="user.id != userStore.user.id"
-               size="small"
-               class="w-full flex justify-center items-center gap-2"
-               @click="sendDirectMessage">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                 stroke="currentColor" class="w-5 h-5">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-            </svg>
-            <p>Send direct message</p>
-          </btn>
-        </div>
+<template>
+  <PageLayout>
+    <!-- Profile header -->
+    <section v-if="loading && !user.id" class="surface overflow-hidden" aria-hidden="true">
+      <div class="skeleton h-36 rounded-none sm:h-48" />
+      <div class="px-5 pb-6 sm:px-7">
+        <div class="skeleton -mt-12 h-28 w-28 rounded-full ring-4 ring-card" />
+        <div class="skeleton mt-4 h-6 w-48" />
+        <div class="skeleton mt-3 h-4 w-32" />
       </div>
-    </div>
-    <!-- New post & feeds on the middle -->
-    <div class="main-center space-y-4 col-span-4 md:col-span-2 order-3 md:order-2">
-      <FeedForm :user="user" v-if="userStore.user.id == user.id" :posts="posts" />
-      <div v-if="posts.length > 0" class="space-y-4">
-        <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
+    </section>
+
+    <section v-else-if="user.id" class="surface overflow-hidden" aria-labelledby="profile-name">
+      <div class="relative h-36 overflow-hidden bg-primary-soft sm:h-48">
+        <img v-if="user.avatar_link" :src="user.avatar_link" alt=""
+             class="absolute inset-0 h-full w-full scale-125 object-cover opacity-80 blur-3xl saturate-150" aria-hidden="true">
+        <div class="absolute inset-0 bg-gradient-to-t from-card/70 via-transparent to-transparent" aria-hidden="true" />
+        <div class="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(hsl(var(--card))_1px,transparent_1px)] [background-size:14px_14px]" aria-hidden="true" />
       </div>
 
-      <div v-else-if="!loading" class="bg-foreground shadow-md sm:rounded-lg p-6">
-        <div class="text-center">
+      <div class="px-5 pb-6 sm:px-7">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <Avatar :src="user.avatar_link" :name="user.name" :alt="`${user.name}'s profile picture`" size="2xl" ring
+                  class="-mt-14 shadow-lift sm:-mt-16" />
 
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-               stroke="currentColor" class="h-36 w-40 text-purple-600 mx-auto ">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-          </svg>
+          <div class="flex flex-wrap gap-2 sm:pb-1">
+            <template v-if="isOwnProfile">
+              <RouterLink :to="{ name: 'editprofile' }"
+                          class="inline-flex h-10 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-semibold transition hover:bg-muted">
+                <PenLine class="h-4 w-4" aria-hidden="true" /> Edit profile
+              </RouterLink>
+            </template>
 
-          <p class="mt-2 text-xl font-semibold text-desc">{{user.name}} has not published any posts yet
-          </p>
+            <template v-else>
+              <!-- Friends -->
+              <DropdownMenu v-if="isFriends">
+                <DropdownMenuTrigger as-child>
+                  <btn variant="soft">
+                    <UserCheck class="h-4 w-4" aria-hidden="true" /> Friends
+                    <ChevronDown class="h-3.5 w-3.5" aria-hidden="true" />
+                  </btn>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-60 rounded-2xl p-1.5 shadow-lift">
+                  <DropdownMenuItem class="menu-item-danger cursor-pointer gap-3 rounded-xl px-2.5 py-2" @select="deleteFriendshipRequest">
+                    <UserMinus class="h-4 w-4" aria-hidden="true" /> Remove {{ firstName }} as friend
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <!-- Request sent by me -->
+              <DropdownMenu v-else-if="requestSentByMe">
+                <DropdownMenuTrigger as-child>
+                  <btn variant="secondary">
+                    <Clock class="h-4 w-4" aria-hidden="true" /> Request sent
+                    <ChevronDown class="h-3.5 w-3.5" aria-hidden="true" />
+                  </btn>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-56 rounded-2xl p-1.5 shadow-lift">
+                  <DropdownMenuItem class="cursor-pointer gap-3 rounded-xl px-2.5 py-2" @select="handleFriendshipRequest('canceled')">
+                    <X class="h-4 w-4 text-muted-foreground" aria-hidden="true" /> Cancel request
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <!-- Request received -->
+              <template v-else-if="requestSentToMe">
+                <btn :loading="pending === 'accepted'" @click="handleFriendshipRequest('accepted')">
+                  <Check v-if="pending !== 'accepted'" class="h-4 w-4" aria-hidden="true" /> Accept
+                </btn>
+                <btn variant="outline" :loading="pending === 'rejected'" @click="handleFriendshipRequest('rejected')">Decline</btn>
+              </template>
+
+              <btn v-else :loading="pending === 'send'" @click="sendFriendshipRequest()">
+                <UserPlus v-if="pending !== 'send'" class="h-4 w-4" aria-hidden="true" /> Add friend
+              </btn>
+
+              <btn variant="outline" :loading="pending === 'message'" @click="sendDirectMessage">
+                <MessageCircle v-if="pending !== 'message'" class="h-4 w-4" aria-hidden="true" /> Message
+              </btn>
+            </template>
+          </div>
         </div>
+
+        <h1 id="profile-name" class="mt-4 break-words text-[26px] font-extrabold leading-tight sm:text-3xl">{{ user.name }}</h1>
+        <p v-if="requestSentToMe" class="mt-1 text-sm font-medium text-primary-soft-foreground dark:text-primary">
+          {{ firstName }} wants to be your friend
+        </p>
+
+        <dl class="mt-4 flex gap-6 text-sm">
+          <div>
+            <dt class="sr-only">Posts</dt>
+            <dd><span class="font-display text-lg font-bold">{{ user.posts_count }}</span> <span class="text-muted-foreground">posts</span></dd>
+          </div>
+          <div>
+            <dt class="sr-only">Friends</dt>
+            <dd>
+              <RouterLink :to="{ name: 'friends', params: { id: user.id } }" class="group hover:underline underline-offset-2">
+                <span class="font-display text-lg font-bold">{{ user.friends_count }}</span> <span class="text-muted-foreground group-hover:text-foreground">friends</span>
+              </RouterLink>
+            </dd>
+          </div>
+        </dl>
       </div>
-    </div>
+    </section>
 
-    <!-- People you may know -->
-    <div class="main-right space-y-4 col-span-4 md:col-span-1 order-2 md:order-3">
-      <PeopleYouMayKnow />
-      <Trends />
-    </div>
+    <EmptyState v-else :icon="UserX" title="Profile not found" description="This account may have been removed." />
 
-  </div>
+    <template v-if="user.id">
+      <FeedForm :user="user" v-if="isOwnProfile" :posts="posts" />
+
+      <h2 class="eyebrow px-1 pt-2">Posts</h2>
+
+      <div v-if="loading && posts.length === 0" class="space-y-4">
+        <PostSkeleton v-for="n in 2" :key="n" />
+      </div>
+      <div v-else-if="posts.length > 0" class="space-y-4">
+        <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost" />
+      </div>
+      <EmptyState v-else :icon="NotebookPen"
+                  :title="isOwnProfile ? 'Share your first post' : 'No posts yet'"
+                  :description="isOwnProfile ? 'Your posts will appear here for friends to see.' : `${firstName} hasn't shared anything yet.`" />
+
+      <div v-if="loadingMore" class="flex justify-center py-6" role="status">
+        <Loader2 class="h-5 w-5 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span class="sr-only">Loading more posts</span>
+      </div>
+    </template>
+  </PageLayout>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import axios from 'axios';
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
-import Trends from '../components/Trends.vue';
+import {
+  Check, ChevronDown, Clock, Loader2, MessageCircle, NotebookPen, PenLine, UserCheck, UserMinus, UserPlus, UserX, X
+} from 'lucide-vue-next';
 import { useUserStore } from '@/stores/user';
 import FeedItem from '../components/FeedItem.vue';
 import { useToastStore } from '@/stores/toast';
 import { User, Post, FriendshipRequest } from '../interfaces';
 import FeedForm from '@/components/FeedForm.vue';
+import PostSkeleton from '@/components/PostSkeleton.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
+import Avatar from '@/components/ui/Avatar.vue';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -183,10 +150,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import btn from '@/components/ui/Button.vue';
+import { useInfiniteScroll } from '@/lib/infiniteScroll';
 
 export default defineComponent({
   async beforeRouteUpdate(to) {
     this.posts = [];
+    this.currentPage = 1;
+    this.loading = true;
     // react to route changes...
     await this.getFeeds(to.params.id);
   },
@@ -195,19 +165,33 @@ export default defineComponent({
     const toastStore = useToastStore();
     return {
       userStore,
-      toastStore
+      toastStore,
+      NotebookPen,
+      UserX
     };
   },
   components: {
-    PeopleYouMayKnow,
-    Trends,
     FeedItem,
     FeedForm,
+    PostSkeleton,
+    PageLayout,
+    EmptyState,
+    Avatar,
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-    btn
+    btn,
+    Check,
+    ChevronDown,
+    Clock,
+    Loader2,
+    MessageCircle,
+    PenLine,
+    UserCheck,
+    UserMinus,
+    UserPlus,
+    X,
   },
   data() {
     return {
@@ -217,15 +201,28 @@ export default defineComponent({
       isFriends: false,
       currentPage: 1,
       hasNext: true,
-      loading: true
-
+      loading: true,
+      loadingMore: false,
+      pending: '' as string
     };
   },
   computed: {
-
+    isOwnProfile(): boolean {
+      return this.user.id == this.userStore.user.id;
+    },
+    firstName(): string {
+      return (this.user.name || '').split(' ')[0];
+    },
+    requestSentByMe(): boolean {
+      return this.friendship_request?.status === 'sent' && this.friendship_request.created_by?.id == this.userStore.user.id;
+    },
+    requestSentToMe(): boolean {
+      return this.friendship_request?.status === 'sent' && this.friendship_request.created_by?.id == this.user.id;
+    }
   },
   methods: {
     async sendDirectMessage() {
+      this.pending = 'message';
       axios.post(`/api/chat/${this.$route.params.id}/`).then(
         () => {
           this.$router.push({
@@ -237,32 +234,38 @@ export default defineComponent({
         }
       ).catch(error => {
         console.log(error);
+        this.toastStore.showToast(4000, 'Could not open the conversation.', 'bg-red-300');
+      }).finally(() => {
+        this.pending = '';
       });
     },
     async getFeeds(userId: string | string[]) {
       await axios.get(`/api/post/profile/${userId}/?page=${this.currentPage}`).then(response => {
-        if (response.data.next) {
-          this.hasNext = true;
-        }
-        this.loading = false;
+        this.hasNext = !!response.data.next;
         this.posts = [...this.posts, ...response.data.results.posts];
         this.user = response.data.results.user;
         this.friendship_request = response.data.results.friendship_request;
         this.isFriends = response.data.results.friends;
       }).catch(error => {
-        this.loading = false;
         console.log(error);
+      }).finally(() => {
+        this.loading = false;
+        this.loadingMore = false;
       });
     },
     async sendFriendshipRequest() {
+      this.pending = 'send';
       axios.post(`/api/friends/${this.$route.params.id}/request/`, {
       }).then(response => {
         if (response.data.id) {
           this.friendship_request = response.data;
-          this.toastStore.showToast(5000, 'The request was sent!', 'bg-emerald-300');
+          this.toastStore.showToast(5000, 'Friend request sent', 'bg-emerald-300');
         }
       }).catch(error => {
         console.log(error);
+        this.toastStore.showToast(4000, 'The request could not be sent.', 'bg-red-300');
+      }).finally(() => {
+        this.pending = '';
       });
     },
     async deleteFriendshipRequest() {
@@ -272,13 +275,15 @@ export default defineComponent({
           this.isFriends = false;
           this.friendship_request = {} as FriendshipRequest;
           this.user.friends_count -= 1;
-          this.toastStore.showToast(5000, 'Friendship removed!', 'bg-emerald-300');
+          this.toastStore.showToast(5000, 'Friendship removed', 'bg-emerald-300');
         }
       }).catch(error => {
         console.log(error);
+        this.toastStore.showToast(4000, 'Something went wrong. Please try again.', 'bg-red-300');
       });
     },
     async handleFriendshipRequest(status: string) {
+      this.pending = status;
       axios.post(`/api/friends/${this.$route.params.id}/request/${this.friendship_request.id}/`, {
         status
       }).then(response => {
@@ -290,6 +295,9 @@ export default defineComponent({
         }
       }).catch(error => {
         console.log(error);
+        this.toastStore.showToast(4000, 'Something went wrong. Please try again.', 'bg-red-300');
+      }).finally(() => {
+        this.pending = '';
       });
     },
     deletePost(postId: string) {
@@ -300,17 +308,14 @@ export default defineComponent({
     }
   },
   mounted() {
-    const onScroll = () => {
-      const bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight;
-      if (bottomOfWindow && this.hasNext) {
+    this.getFeeds(this.$route.params.id);
+    useInfiniteScroll(() => {
+      if (this.hasNext && !this.loading && !this.loadingMore) {
         this.currentPage += 1;
-        this.hasNext = false;
+        this.loadingMore = true;
         this.getFeeds(this.$route.params.id);
       }
-    };
-    this.getFeeds(this.$route.params.id);
-    window.onscroll = onScroll;
-    window.ontouchmove = onScroll;
+    });
   }
 });
 </script>

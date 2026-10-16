@@ -1,48 +1,37 @@
-<template lang="">
-  <div class="grid-cols-4 gap-4 hidden md:grid">
-    <div class="main-center col-span-3 space-y-4">
-      <FeedForm :user="null" :posts="posts" />
-      <div v-if="posts.length > 0" class="space-y-4">
-        <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"
-          />
-      </div>
-      <div v-else-if="!loading" class="bg-foreground shadow-md sm:rounded-lg p-6">
-        <div class="text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-               stroke="currentColor" class="h-36 w-40 text-purple-600 mx-auto ">
-            <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-          </svg>
-          <p class="mt-2 text-xl font-semibold text-desc">You don't have any posts yet and no friends
-            either. Create a new post or add friends to see new feeds</p>
-        </div>
-      </div>
-    </div>
-    <div class="main-right col-span-1 space-y-4">
-      <PeopleYouMayKnow />
-      <Trends />
-    </div>
-  </div>
-  <div class="md:hidden space-y-4">
+<template>
+  <PageLayout>
+    <PageHeader :eyebrow="greeting" title="Your feed" />
+
     <FeedForm :user="null" :posts="posts" />
-    <PeopleYouMayKnow />
-    <Trends />
-    <div v-if="posts.length > 0" class="space-y-4">
-      <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost"/>
-    </div>
-    <div v-else-if="!loading" class="bg-foreground shadow-md sm:rounded-lg p-6">
-      <div class="text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
-             stroke="currentColor" class="h-36 w-40 text-purple-600 mx-auto ">
-          <path strokeLinecap="round" strokeLinejoin="round"
-                d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z" />
-        </svg>
-        <p class="mt-2 text-xl font-semibold text-desc">You don't have any posts yet and no friends
-          either. Create a new post or add friends to see new feeds</p>
-      </div>
+
+    <PeopleYouMayKnow variant="strip" />
+
+    <div v-if="loading && posts.length === 0" class="space-y-4" aria-busy="true" aria-label="Loading posts">
+      <PostSkeleton v-for="n in 3" :key="n" />
     </div>
 
-  </div>
+    <EmptyState v-else-if="error && posts.length === 0" :icon="WifiOff" title="Couldn't load your feed"
+                description="Check your connection and try again.">
+      <btn variant="outline" @click="retry">Try again</btn>
+    </EmptyState>
+
+    <div v-else-if="posts.length > 0" class="space-y-4">
+      <FeedItem v-for="post in posts" :post="post" :key="post.id" @deletePost="deletePost" />
+    </div>
+
+    <EmptyState v-else :icon="Sparkles" title="Your feed is quiet"
+                description="Share your first post or find friends to see what they're up to.">
+      <RouterLink :to="{ name: 'search' }"
+                  class="inline-flex h-10 items-center gap-2 rounded-full bg-foreground px-5 text-sm font-semibold text-background transition hover:bg-foreground/85">
+        <Search class="h-4 w-4" aria-hidden="true" /> Find people
+      </RouterLink>
+    </EmptyState>
+
+    <div v-if="loadingMore" class="flex justify-center py-6" role="status">
+      <Loader2 class="h-5 w-5 animate-spin text-muted-foreground" aria-hidden="true" />
+      <span class="sr-only">Loading more posts</span>
+    </div>
+  </PageLayout>
 </template>
 
 <script lang="ts">
@@ -50,41 +39,73 @@ import {
   defineComponent
 } from 'vue';
 import axios from 'axios';
+import { Loader2, Search, Sparkles, WifiOff } from 'lucide-vue-next';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue';
-import Trends from '../components/Trends.vue';
 import FeedItem from '../components/FeedItem.vue';
 import FeedForm from '@/components/FeedForm.vue';
+import PostSkeleton from '@/components/PostSkeleton.vue';
+import PageLayout from '@/components/layout/PageLayout.vue';
+import PageHeader from '@/components/layout/PageHeader.vue';
+import EmptyState from '@/components/ui/EmptyState.vue';
+import btn from '@/components/ui/Button.vue';
+import { useInfiniteScroll } from '@/lib/infiniteScroll';
+import { useUserStore } from '@/stores/user';
 import {
   Post
 } from '../interfaces.ts';
+
 export default defineComponent({
   components: {
     PeopleYouMayKnow,
-    Trends,
     FeedItem,
-    FeedForm
+    FeedForm,
+    PostSkeleton,
+    PageLayout,
+    PageHeader,
+    EmptyState,
+    btn,
+    Loader2,
+    Search,
+  },
+  setup() {
+    const userStore = useUserStore();
+    return { userStore, Sparkles, WifiOff };
   },
   data() {
     return {
       posts: [] as Post[],
-      body: '',
       currentPage: 1,
       hasNext: true,
-      loading: true
+      loading: true,
+      loadingMore: false,
+      error: false
     };
+  },
+  computed: {
+    greeting(): string {
+      const hour = new Date().getHours();
+      const part = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+      const firstName = (this.userStore.user.name || '').split(' ')[0];
+      return firstName ? `${part}, ${firstName}` : part;
+    }
   },
   methods: {
     async getFeeds() {
+      this.error = false;
       await axios.get(`/api/post/?page=${this.currentPage}`).then(response => {
-        if (response.data.next) {
-          this.hasNext = true;
-        }
-        this.loading = false;
+        this.hasNext = !!response.data.next;
         this.posts = [...this.posts, ...response.data.results];
       }).catch(error => {
-        this.loading = false;
+        this.error = true;
         console.log(error);
+      }).finally(() => {
+        this.loading = false;
+        this.loadingMore = false;
       });
+    },
+    retry() {
+      this.loading = true;
+      this.getFeeds();
     },
     deletePost(postId: string) {
       this.posts = this.posts.filter(
@@ -93,19 +114,14 @@ export default defineComponent({
     }
   },
   mounted() {
-    const onScroll = () => {
-      const bottomOfWindow = parseInt(`${document.documentElement.scrollTop + window.innerHeight}`) === document.documentElement.offsetHeight;
-      if (bottomOfWindow && this.hasNext) {
+    this.getFeeds();
+    useInfiniteScroll(() => {
+      if (this.hasNext && !this.loading && !this.loadingMore) {
         this.currentPage += 1;
-        this.hasNext = false;
+        this.loadingMore = true;
         this.getFeeds();
       }
-    };
-    this.getFeeds();
-    window.onscroll = onScroll;
-    window.ontouchmove = onScroll;
+    });
   }
 });
 </script>
-
-<style lang=""></style>
