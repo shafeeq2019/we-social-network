@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.forms import ModelForm
+from backend.validators import IMAGE_VALIDATORS
 from .models import User
 
 
@@ -29,6 +30,11 @@ class EditProfileForm(ModelForm):
     class Meta:
         model = User
         fields = ('email', 'name', 'avatar')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only runs for newly uploaded avatars, not for the existing one
+        self.fields['avatar'].validators += IMAGE_VALIDATORS
 
     def clean_email(self):
         return clean_unique_email(self)

@@ -1,4 +1,9 @@
-from django.test import TestCase
+import io
+import tempfile
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
+from PIL import Image
 from rest_framework.test import APIClient
 
 from account.models import User
@@ -223,3 +228,48 @@ class InvalidPostRequestTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Post.objects.filter(id=self.post.id).exists())
+
+
+def make_image(name='photo.png', size=(10, 10)):
+    buffer = io.BytesIO()
+    Image.new('RGB', size).save(buffer, format='PNG')
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type='image/png')
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class PostImageUploadTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            name='Test', email='test@example.com', password='secret', is_active=True)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+
+    def create_post(self, image):
+        return self.client.post('/api/post/create/', {'body': 'hello', 'image': image}, format='multipart')
+
+    def test_upload_image(self):
+        response = self.create_post(make_image())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['post_attachments']), 1)
+
+    def test_reject_invalid_files(self):
+        invalid_files = [
+            SimpleUploadedFile('evil.html', b'<script>alert(1)</script>', content_type='text/html'),
+            SimpleUploadedFile('fake.png', b'not an image', content_type='image/png'),
+            make_image(name='image.svg'),
+        ]
+        for image in invalid_files:
+            self.assertEqual(self.create_post(image).status_code, 400, image.name)
+
+        self.assertFalse(Post.objects.exists())
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.posts_count, 0)
+
+    def test_reject_too_large_image(self):
+        from unittest import mock
+        with mock.patch('backend.validators.MAX_IMAGE_SIZE', 10):
+            response = self.create_post(make_image())
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Post.objects.exists())

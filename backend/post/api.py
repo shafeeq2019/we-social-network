@@ -10,7 +10,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from .serializers import PostSerializer, PostDetailSerializer, TrendSerializer
-from .forms import PostForm
+from .forms import PostForm, PostAttachmentForm
 
 # Create your views here.
 
@@ -56,17 +56,25 @@ def post_create(request):
         'is_private': data.get('is_private'),
     })
 
+    # Validate the image before saving anything, so an invalid file
+    # doesn't leave a post without its image behind
+    attachment_form = None
+    if request.FILES.get('image'):
+        attachment_form = PostAttachmentForm(files=request.FILES)
+        if not attachment_form.is_valid():
+            return JsonResponse({'error': attachment_form.errors.as_json()}, status=400)
+
     if form.is_valid():
         post = form.save()
         user.posts_count += 1
         user.save()
-        if data.get('image'):
-            user.post_attachments.create(image=data.get('image'), post=post)
+        if attachment_form:
+            user.post_attachments.create(image=attachment_form.cleaned_data['image'], post=post)
         serializer = PostSerializer(post)
         return JsonResponse(serializer.data, safe=False)
     else:
         message = form.errors.as_json()
-        return JsonResponse({'error': message})
+        return JsonResponse({'error': message}, status=400)
 
 
 @api_view(['GET'])

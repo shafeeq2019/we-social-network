@@ -1,8 +1,13 @@
-from django.test import TestCase
+import tempfile
+from unittest import mock
+
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
 from account.models import FriendshipRequest, User
 from post.models import Post
+from post.tests import make_image
 
 
 class UserEmailPrivacyTests(TestCase):
@@ -233,3 +238,31 @@ class EmailCaseTests(TestCase):
         self.assertEqual(response['message'], 'success')
         bob.refresh_from_db()
         self.assertEqual(bob.email, 'bob@example.com')
+
+
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp())
+class AvatarUploadTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            name='Alice', email='alice@example.com', password='secret', is_active=True)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+
+    def edit_profile(self, avatar):
+        return self.client.post('/api/editprofile/', {
+            'name': 'Alice', 'email': 'alice@example.com', 'avatar': avatar}, format='multipart').json()
+
+    def test_upload_avatar(self):
+        self.assertEqual(self.edit_profile(make_image())['message'], 'success')
+
+    def test_reject_invalid_avatar(self):
+        invalid_files = [
+            SimpleUploadedFile('evil.html', b'<script>alert(1)</script>', content_type='text/html'),
+            make_image(name='image.svg'),
+        ]
+        for avatar in invalid_files:
+            self.assertNotEqual(self.edit_profile(avatar)['message'], 'success', avatar.name)
+
+    def test_reject_too_large_avatar(self):
+        with mock.patch('backend.validators.MAX_IMAGE_SIZE', 10):
+            self.assertNotEqual(self.edit_profile(make_image())['message'], 'success')
