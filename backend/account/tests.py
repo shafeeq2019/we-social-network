@@ -180,3 +180,56 @@ class ActivateEmailTests(TestCase):
 
         self.user.refresh_from_db()
         self.assertFalse(self.user.is_active)
+
+
+class EmailCaseTests(TestCase):
+    password = 'Xyz-12345abc'
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def signup(self, email):
+        return self.client.post('/api/signup/', {
+            'email': email, 'name': 'Bob', 'password1': self.password, 'password2': self.password}).json()
+
+    def test_signup_stores_lowercase_email(self):
+        self.assertEqual(self.signup('Bob@Example.com')['message'], 'success')
+        self.assertTrue(User.objects.filter(email='bob@example.com').exists())
+
+    def test_signup_with_email_in_other_case(self):
+        self.signup('bob@example.com')
+
+        response = self.signup('BOB@example.com')
+
+        self.assertNotEqual(response['message'], 'success')
+        self.assertEqual(User.objects.count(), 1)
+
+    def test_login_with_email_in_other_case(self):
+        self.signup('bob@example.com')
+
+        response = self.client.post('/api/login/', {'email': 'Bob@Example.com', 'password': self.password})
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_profile_to_existing_email_in_other_case(self):
+        User.objects.create_user(name='Alice', email='alice@example.com', password='secret', is_active=True)
+        bob = User.objects.create_user(name='Bob', email='bob@example.com', password='secret', is_active=True)
+        self.client.force_authenticate(bob)
+
+        response = self.client.post('/api/editprofile/', {
+            'name': 'Bob', 'email': 'Alice@example.com'}, format='multipart').json()
+
+        self.assertNotEqual(response['message'], 'success')
+        bob.refresh_from_db()
+        self.assertEqual(bob.email, 'bob@example.com')
+
+    def test_edit_profile_keeps_own_email(self):
+        bob = User.objects.create_user(name='Bob', email='bob@example.com', password='secret', is_active=True)
+        self.client.force_authenticate(bob)
+
+        response = self.client.post('/api/editprofile/', {
+            'name': 'Bob New', 'email': 'BOB@example.com'}, format='multipart').json()
+
+        self.assertEqual(response['message'], 'success')
+        bob.refresh_from_db()
+        self.assertEqual(bob.email, 'bob@example.com')
