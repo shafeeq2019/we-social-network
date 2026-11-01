@@ -6,7 +6,7 @@ I built it as a hands-on project for learning Python Django and practising real-
 
 **Live:** https://we-social-network.web.app/
 
-![We – feed in light mode](screenshots/feed-light.webp)
+![We – feed](screenshots/feed.webp)
 
 ## Features
 
@@ -23,21 +23,18 @@ I built it as a hands-on project for learning Python Django and practising real-
 
 ### Desktop
 
-| Light | Dark |
+| | |
 |---|---|
-| ![Feed](screenshots/feed-light.webp) | ![Feed (dark)](screenshots/feed-dark.webp) |
-| ![Profile](screenshots/profile-light.webp) | ![Profile (dark)](screenshots/profile-dark.webp) |
-| ![Messages](screenshots/messages-light.webp) | ![Messages (dark)](screenshots/messages-dark.webp) |
-| ![Notifications](screenshots/notifications-light.webp) | ![Explore (dark)](screenshots/explore-dark.webp) |
+| ![Profile](screenshots/profile.webp) | ![Messages](screenshots/messages.webp) |
+| ![Notifications](screenshots/notifications.webp) | ![Explore](screenshots/explore.webp) |
 
-![Login](screenshots/login-light.webp)
+![Login](screenshots/login.webp)
 
 ### Mobile
 
 <p>
-  <img src="screenshots/mobile-feed-light.webp" width="260" alt="Feed on mobile">
-  <img src="screenshots/mobile-feed-dark.webp" width="260" alt="Feed on mobile (dark)">
-  <img src="screenshots/mobile-messages-dark.webp" width="260" alt="Messages on mobile (dark)">
+  <img src="screenshots/mobile-feed.webp" width="300" alt="Feed on mobile">
+  <img src="screenshots/mobile-messages.webp" width="300" alt="Messages on mobile">
 </p>
 
 ## Tech stack
