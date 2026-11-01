@@ -6,7 +6,7 @@ I built it as a hands-on project for learning Python Django and practising real-
 
 **Live:** https://we-social-network.web.app/
 
-![We – feed](screenshots/feed.webp)
+![We – feed](screenshots/feed-light.webp)
 
 ## Features
 
@@ -25,16 +25,16 @@ I built it as a hands-on project for learning Python Django and practising real-
 
 | | |
 |---|---|
-| ![Profile](screenshots/profile.webp) | ![Messages](screenshots/messages.webp) |
-| ![Notifications](screenshots/notifications.webp) | ![Explore](screenshots/explore.webp) |
+| ![Profile](screenshots/profile-light.webp) | ![Messages](screenshots/messages-light.webp) |
+| ![Notifications](screenshots/notifications-light.webp) | ![Explore](screenshots/explore-light.webp) |
 
-![Login](screenshots/login.webp)
+![Login](screenshots/login-light.webp)
 
 ### Mobile
 
 <p>
-  <img src="screenshots/mobile-feed.webp" width="300" alt="Feed on mobile">
-  <img src="screenshots/mobile-messages.webp" width="300" alt="Messages on mobile">
+  <img src="screenshots/mobile-feed-light.webp" width="300" alt="Feed on mobile">
+  <img src="screenshots/mobile-messages-light.webp" width="300" alt="Messages on mobile">
 </p>
 
 ## Tech stack
