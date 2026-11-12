@@ -2,6 +2,9 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { State, Token, LoginUser } from '../interfaces.ts';
 
+// Shared promise so parallel 401s trigger only one refresh request
+let refreshPromise: Promise<string> | null = null;
+
 export const useUserStore = defineStore('user', {
   state: (): State => ({
     user: {
@@ -17,10 +20,7 @@ export const useUserStore = defineStore('user', {
 
   actions: {
     initStore() {
-      console.log('initStore', localStorage.getItem('user.access'));
-
       if (localStorage.getItem('user.access')) {
-        console.log('User has access!');
         this.user.access = localStorage.getItem('user.access') || '';
         this.user.refresh = localStorage.getItem('user.refresh') || '';
         this.user.id = localStorage.getItem('user.id') || '';
@@ -28,29 +28,22 @@ export const useUserStore = defineStore('user', {
         this.user.email = localStorage.getItem('user.email') || '';
         this.user.avatar_link = localStorage.getItem('user.avatar_link') || '';
         this.user.isAuthenticated = true;
-        console.log(this.user.id);
-        this.refreshToken();
-
-        console.log('Initialized user:', this.user);
+        this.refreshToken().catch(() => {
+          // removeToken() already ran; the 401 interceptor handles redirects
+        });
       }
     },
 
     setToken(data: Token) {
-      console.log('setToken', data);
-
       this.user.access = data.access;
       this.user.refresh = data.refresh;
       this.user.isAuthenticated = true;
 
       localStorage.setItem('user.access', data.access);
       localStorage.setItem('user.refresh', data.refresh);
-
-      console.log('user.access: ', localStorage.getItem('user.access'));
     },
 
     removeToken() {
-      console.log('removeToken');
-
       this.user.refresh = '';
       this.user.access = '';
       this.user.isAuthenticated = false;
@@ -68,8 +61,6 @@ export const useUserStore = defineStore('user', {
     },
 
     setUserInfo(user: LoginUser) {
-      console.log('setUserInfo', user);
-
       this.user.id = user.id;
       this.user.name = user.name;
       this.user.email = user.email;
@@ -79,26 +70,37 @@ export const useUserStore = defineStore('user', {
       localStorage.setItem('user.name', this.user.name);
       localStorage.setItem('user.email', this.user.email);
       localStorage.setItem('user.avatar_link', this.user.avatar_link);
-
-      console.log('User', this.user);
     },
 
-    refreshToken() {
-      axios.post('/api/refresh/', {
-        refresh: this.user.refresh
-      })
-        .then((response) => {
-          this.user.access = response.data.access;
-
-          localStorage.setItem('user.access', response.data.access);
-
-          axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access;
+    /**
+     * Gets a new access token with the refresh token and resolves with it.
+     * Logs the user out when the refresh token is invalid or expired.
+     */
+    refreshToken(): Promise<string> {
+      if (!refreshPromise) {
+        refreshPromise = axios.post('/api/refresh/', {
+          refresh: this.user.refresh
         })
-        .catch((error) => {
-          console.log(error);
+          .then((response) => {
+            this.user.access = response.data.access;
+            localStorage.setItem('user.access', response.data.access);
 
-          this.removeToken();
-        });
+            // ROTATE_REFRESH_TOKENS: the backend also returns a new refresh token
+            if (response.data.refresh) {
+              this.user.refresh = response.data.refresh;
+              localStorage.setItem('user.refresh', response.data.refresh);
+            }
+            return response.data.access as string;
+          })
+          .catch((error) => {
+            this.removeToken();
+            throw error;
+          })
+          .finally(() => {
+            refreshPromise = null;
+          });
+      }
+      return refreshPromise;
     },
   }
 });

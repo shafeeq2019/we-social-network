@@ -76,7 +76,6 @@ export default defineComponent({
         await axios.post('/api/login/', this.form)
           .then(async response => {
             this.userStore.setToken(response.data);
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access;
 
             await axios.get('/api/me/')
               .then(response => {

@@ -12,6 +12,7 @@ import TrendsView from '../views/TrendsView.vue';
 import EditProfileView from '../views/EditProfileView.vue';
 import EditPasswordView from '../views/EditPasswordView.vue';
 import NotificationsView from '../views/NotificationsView.vue';
+import NotFoundView from '../views/NotFoundView.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -121,29 +122,31 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
       },
+    },
+    {
+      // Must stay last: catches every URL no other route matches
+      path: '/:pathMatch(.*)*',
+      name: 'notfound',
+      component: NotFoundView,
     }
   ]
 });
 
-router.beforeEach(async (to, from, next) => {
+// Return-based guard: every path through it resolves the navigation,
+// so routes without meta (e.g. the 404 page) no longer hang
+router.beforeEach((to) => {
   const userStore = useUserStore();
+  const isAuthenticated = userStore.user.isAuthenticated;
 
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!userStore.user.isAuthenticated) {
-      next({ name: 'login', query: { redirect: to.fullPath } });
-    } else {
-      next();
-    }
+  if (to.matched.some((record) => record.meta.requiresAuth) && !isAuthenticated) {
+    return { name: 'login', query: { redirect: to.fullPath } };
   }
 
-  if (to.matched.some((record) => record.meta.hideForAuth)) {
-    if (userStore.user.isAuthenticated) {
-      next({ path: '/feed' });
-    } else {
-      next();
-    }
+  if (to.matched.some((record) => record.meta.hideForAuth) && isAuthenticated) {
+    return { path: '/feed' };
   }
 
+  return true;
 });
 
 export default router;

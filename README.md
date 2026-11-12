@@ -108,7 +108,19 @@ The API URL comes from `VITE_API_URL` in `frontend/.env` for development and in 
 
 ## Deployment
 
-- **Backend:** any Python host works. I use [PythonAnywhere](https://www.pythonanywhere.com/). Add your domain to `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS` and `CSRF_TRUSTED_ORIGINS` in `backend/backend/settings.py`.
+- **Backend:** any Python host works. I use [PythonAnywhere](https://www.pythonanywhere.com/). Configure it with environment variables (on PythonAnywhere, set them at the top of the WSGI file):
+
+  | Variable | Example | Default |
+  | --- | --- | --- |
+  | `DJANGO_DEBUG` | `False` | `True` |
+  | `DJANGO_SECRET_KEY` | output of `python -c "from django.core.management.utils import get_random_secret_key as k; print(k())"` | dev key, **required** when debug is off |
+  | `DJANGO_ALLOWED_HOSTS` | `api.example.com` | empty |
+  | `DJANGO_WEBSITE_URL` | `https://api.example.com` | `http://127.0.0.1:8000` |
+  | `DJANGO_CORS_ALLOWED_ORIGINS` | `https://example.web.app` | `http://localhost:5173` |
+  | `DJANGO_CSRF_TRUSTED_ORIGINS` | `https://example.web.app` | `http://localhost:5173` |
+  | `DJANGO_AUTH_THROTTLE_RATE` | `10/minute` | `10/minute` (login/signup per IP) |
+
+  Lists are comma separated.
 - **Frontend:** set your API URL in `frontend/.env.production`. Then log in with the [Firebase CLI](https://firebase.google.com/docs/cli) (`firebase login`), select your project (`firebase use <project-id>`) and run:
 
   ```bash

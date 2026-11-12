@@ -1,22 +1,35 @@
+import os
 from datetime import timedelta
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
+def env_list(name, default=''):
+    # Comma separated environment variable -> list without empty entries
+    return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
+
+
+# Security-relevant settings come from environment variables.
+# The defaults only suit local development.
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v*=4ctfyl&pe37%c8rs7oa4hoj3h_4w--q9nxw1j=ebd%91865'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY when DJANGO_DEBUG is off.')
+    SECRET_KEY = 'django-insecure-dev-only-key-do-not-use-in-production'
 
-WEBSITE_URL = 'http://127.0.0.1:8000'
+ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS')
+
+WEBSITE_URL = os.environ.get('DJANGO_WEBSITE_URL', 'http://127.0.0.1:8000')
 
 
 # Application definition
@@ -26,9 +39,11 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 AUTH_USER_MODEL = 'account.User'
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=180),
-    'ROTATE_REFRESH_TOKENS': False,
+    # Short-lived access token; the frontend renews it with the refresh token
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+    # Every refresh returns a new refresh token, so active users stay logged in
+    'ROTATE_REFRESH_TOKENS': True,
 }
 
 REST_FRAMEWORK = {
@@ -37,16 +52,16 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    # Used by backend.throttles.AuthRateThrottle on login and signup
+    'DEFAULT_THROTTLE_RATES': {
+        'auth': os.environ.get('DJANGO_AUTH_THROTTLE_RATE', '10/minute'),
+    },
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
+CORS_ALLOWED_ORIGINS = env_list('DJANGO_CORS_ALLOWED_ORIGINS', 'http://localhost:5173')
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-]
+CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS', 'http://localhost:5173')
 
 INSTALLED_APPS = [
     'django.contrib.admin',

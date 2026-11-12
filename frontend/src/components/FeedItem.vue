@@ -245,7 +245,7 @@ export default defineComponent({
     },
     async deletePost() {
       this.deleting = true;
-      axios.delete(`/api/post/${this.post.id}`).then(
+      axios.delete(`/api/post/${this.post.id}/`).then(
         () => {
           this.openDeleteModal = false;
           this.$emit('deletePost', this.post.id);

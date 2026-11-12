@@ -2,8 +2,9 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 # To override the settings in setting.py
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, throttle_classes
 from django.conf import settings
+from backend.throttles import AuthRateThrottle
 from .forms import SignupForm, EditProfileForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -29,6 +30,7 @@ def me(request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
+@throttle_classes([AuthRateThrottle])
 def signup(request):
     data = request.data
     message = 'success'

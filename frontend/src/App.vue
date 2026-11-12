@@ -123,7 +123,6 @@
 
 <script lang="ts">
 import { defineComponent, h } from 'vue';
-import axios from 'axios';
 import { MoreHorizontal, Moon, Sun } from 'lucide-vue-next';
 import Toast from '@/components/Toast.vue';
 import Avatar from '@/components/ui/Avatar.vue';
@@ -215,13 +214,8 @@ export default defineComponent({
   },
   created() {
     this.theme = getCurrentThem();
+    // The Authorization header is added per request in main.ts
     this.userStore.initStore();
-    const token = this.userStore.user.access;
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-    } else {
-      axios.defaults.headers.common['Authorization'] = '';
-    }
   }
 });
 </script>
