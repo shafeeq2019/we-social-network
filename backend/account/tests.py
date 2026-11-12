@@ -1,11 +1,15 @@
 import tempfile
 from unittest import mock
 
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework.test import APIClient
 
 from account.models import FriendshipRequest, User
+from account.tokens import activation_token
 from post.models import Post
 from post.tests import make_image
 
@@ -165,26 +169,60 @@ class ActivateEmailTests(TestCase):
     def activate(self, params):
         return self.client.get('/activateemail/', params)
 
+    def valid_params(self, user=None):
+        user = user or self.user
+        return {'uid': urlsafe_base64_encode(force_bytes(user.pk)), 'token': activation_token.make_token(user)}
+
     def test_activate_user(self):
-        response = self.activate({'email': self.user.email, 'id': self.user.id})
+        response = self.activate(self.valid_params())
 
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
         self.assertTrue(self.user.is_active)
 
+    def test_activation_link_works_only_once(self):
+        params = self.valid_params()
+
+        self.assertEqual(self.activate(params).status_code, 200)
+        # is_active is part of the token hash, so the used link is now invalid
+        self.assertEqual(self.activate(params).status_code, 400)
+
+    def test_email_and_id_are_not_enough(self):
+        # The old, guessable link format must no longer work
+        response = self.activate({'email': self.user.email, 'id': self.user.id})
+
+        self.assertEqual(response.status_code, 400)
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.is_active)
+
     def test_invalid_parameters(self):
+        other = User.objects.create_user(name='Bob', email='bob@example.com', password='secret')
+        valid = self.valid_params()
         invalid_params = [
             {},
-            {'email': self.user.email},
-            {'id': self.user.id},
-            {'email': 'wrong@example.com', 'id': self.user.id},
-            {'email': self.user.email, 'id': 'not-a-uuid'},
+            {'uid': valid['uid']},
+            {'token': valid['token']},
+            {'uid': valid['uid'], 'token': 'wrong-token'},
+            # token of another user
+            {'uid': valid['uid'], 'token': self.valid_params(other)['token']},
+            {'uid': 'not-base64!', 'token': valid['token']},
+            {'uid': urlsafe_base64_encode(b'not-a-uuid'), 'token': valid['token']},
         ]
         for params in invalid_params:
             self.assertEqual(self.activate(params).status_code, 400, params)
 
         self.user.refresh_from_db()
         self.assertFalse(self.user.is_active)
+
+    def test_signup_sends_token_link(self):
+        self.client.post('/api/signup/', {
+            'email': 'carol@example.com', 'name': 'Carol',
+            'password1': 'Xyz-12345abc', 'password2': 'Xyz-12345abc'})
+
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('/activateemail/?uid=', mail.outbox[0].body)
+        self.assertIn('&token=', mail.outbox[0].body)
+        self.assertNotIn('carol@example.com', mail.outbox[0].body)
 
 
 class EmailCaseTests(TestCase):

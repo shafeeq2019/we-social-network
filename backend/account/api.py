@@ -10,6 +10,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from .models import FriendshipRequest, User
+from .tokens import build_activation_url
 from notification.models import Notification
 from .serializers import UserSerializer, PrivateUserSerializer, FriendshipRequestSerializer
 import logging
@@ -44,14 +45,16 @@ def signup(request):
 
     if form.is_valid():
         user = form.save()
-        # Temporary
+        # Temporary: accounts are activated right away until real e-mail
+        # sending is set up. Remove these lines to require the activation link.
         user.is_active = True
         user.save()
 
-        url = f'{settings.WEBSITE_URL}/activateemail/?email={user.email}&id={user.id}'
+        # Signed, expiring link instead of guessable email + id parameters
+        url = build_activation_url(user)
         send_mail(
             "Please verify your email",
-            f"The url for activating your accout is: {url}",
+            f"The url for activating your account is: {url}",
             settings.EMAIL_HOST_USER,
             [user.email],
             fail_silently=False,
