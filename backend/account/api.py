@@ -61,7 +61,7 @@ def signup(request):
         )
     else:
         message = form.errors.as_json()
-    print(message)
+        logger.info(f'Signup failed: {message}')
 
     return JsonResponse({'message': message})
 
@@ -174,8 +174,7 @@ def edit_profile(request):
         logger.info(f"Profile edited successfully for user {user.id}")
     else:
         response['message'] = form.errors.as_json()
-        logger.error(f"Error editing profile for user {
-                     user.id}: {response['message']}")
+        logger.info(f"Error editing profile for user {user.id}: {response['message']}")
 
     return JsonResponse(response)
 
@@ -190,7 +189,7 @@ def edit_password(request):
         return JsonResponse({"message": "success"})
     else:
         message = form.errors.as_json()
-        print(message)
+        logger.info(f'Password change failed for user {user.id}: {message}')
         return JsonResponse({'message': message}, safe=False)
 
 

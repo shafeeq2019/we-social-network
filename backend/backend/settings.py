@@ -31,6 +31,10 @@ ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS')
 
 WEBSITE_URL = os.environ.get('DJANGO_WEBSITE_URL', 'http://127.0.0.1:8000')
 
+# Send the session/CSRF cookies (Django admin) only over HTTPS in production
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 
 # Application definition
 

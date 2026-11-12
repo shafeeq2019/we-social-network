@@ -99,7 +99,7 @@ export default defineComponent({
     async readNotification(notification: Notification) {
       this.openingId = notification.id;
       axios
-        .get(`/api/notification/read/${notification.id}/`)
+        .post(`/api/notification/read/${notification.id}/`)
         .then(() => {
           this.notificationStore.markOneRead();
           if (

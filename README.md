@@ -41,7 +41,7 @@ I built it as a hands-on project for learning Python Django and practising real-
 
 | Part | Technologies |
 |---|---|
-| Backend | Python, Django 4.2, Django REST Framework, Simple JWT, SQLite |
+| Backend | Python, Django 5.2 LTS, Django REST Framework, Simple JWT, SQLite |
 | Frontend | Vue.js 3, TypeScript, Vite, Pinia, Vue Router, Tailwind CSS, Radix Vue, Lucide icons |
 | Hosting | PythonAnywhere (API), Firebase Hosting (web app) |
 
@@ -75,7 +75,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-> On Python 3.12 or newer, also run `pip install "setuptools<81"`. The pinned `djangorestframework-simplejwt` still imports `pkg_resources`.
+> Requires Python 3.10 or newer (Django 5.2).
 
 New accounts are activated through an e-mail link. In development, Django prints that e-mail to the console. You can also create an admin with `python manage.py createsuperuser`.
 

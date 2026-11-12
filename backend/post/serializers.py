@@ -44,7 +44,7 @@ class PostDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['id', 'body', 'created_at', 'created_ago', 'created_by',
-                  'likes_count', 'post_liked', 'comments_count', 'comments', 'post_attachments']
+                  'likes_count', 'post_liked', 'comments_count', 'comments', 'post_attachments', 'is_private']
 
 
 class TrendSerializer(serializers.ModelSerializer):
