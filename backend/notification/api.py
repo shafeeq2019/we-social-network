@@ -19,10 +19,10 @@ def notifications(request):
     return paginator.get_paginated_response(serializer.data)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def read_notification(request, id):
     user = request.user
     notification = get_object_or_404(Notification, created_for=user, id=id)
     notification.is_read = True
-    notification.save()
-    return JsonResponse({"message": "test"})
+    notification.save(update_fields=['is_read'])
+    return JsonResponse({"message": "notification read"})

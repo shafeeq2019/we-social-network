@@ -41,7 +41,6 @@ class Notification(models.Model):
         (REJECTEDFRIENDREQUEST, 'Rejected friendrequest'),
         (POST_LIKE, 'Post like'),
         (POST_COMMENT, 'Post comment'),
-        (POST_COMMENT, 'Post comment')
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -18,7 +18,7 @@ class ReadNotificationTests(TestCase):
     def read(self, user, notification_id):
         client = APIClient()
         client.force_authenticate(user)
-        return client.get(f'/api/notification/read/{notification_id}/')
+        return client.post(f'/api/notification/read/{notification_id}/')
 
     def test_read_own_notification(self):
         self.assertEqual(self.read(self.alice, self.notification.id).status_code, 200)
@@ -33,3 +33,13 @@ class ReadNotificationTests(TestCase):
     def test_read_unknown_notification(self):
         unknown_id = '00000000-0000-0000-0000-000000000000'
         self.assertEqual(self.read(self.alice, unknown_id).status_code, 404)
+
+    def test_read_needs_post(self):
+        client = APIClient()
+        client.force_authenticate(self.alice)
+
+        response = client.get(f'/api/notification/read/{self.notification.id}/')
+
+        self.assertEqual(response.status_code, 405)
+        self.notification.refresh_from_db()
+        self.assertFalse(self.notification.is_read)
