@@ -3,10 +3,10 @@ import re
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from django.http import JsonResponse
-from post.models import Post, Trend
+from post.models import Comment, Post, Trend
 from account.models import FriendshipRequest, User
 from account.serializers import FriendshipRequestSerializer, UserSerializer
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.shortcuts import get_object_or_404
 
 from .serializers import PostSerializer, PostDetailSerializer, TrendSerializer
@@ -17,25 +17,15 @@ from .forms import PostForm, PostAttachmentForm
 
 @api_view(['GET'])
 def post_list(request):
-    posts = []
     trend = request.GET.get('trend', '')
+    posts = Post.objects.visible_to(request.user).with_details(request.user)
     if (trend):
-        posts = Post.objects.visible_to(request.user).filter(body__iregex=rf'\B#{re.escape(trend)}\b')
+        posts = posts.filter(body__iregex=rf'\B#{re.escape(trend)}\b')
     else:
-        user_friends = request.user.friends.all()
-        query = Q()
+        # Own posts and posts of friends (friends as a subquery, not a loop)
+        posts = posts.filter(Q(created_by__in=request.user.friends.all()) | Q(created_by=request.user))
 
-        # Add user's friends in the query
-        for friend in user_friends:
-            query |= Q(created_by=friend)
-        # Add request user in the query
-        query |= Q(created_by=request.user)
-
-        posts = Post.objects.visible_to(request.user).filter(query)
-
-    for post in posts:
-        post.post_liked = post.likes.filter(created_by=request.user).exists()
-
+    # Paginate the queryset itself, so only the 10 posts of this page are loaded
     paginator = PageNumberPagination()
     paginator.page_size = 10
     posts = paginator.paginate_queryset(posts, request)
@@ -80,10 +70,7 @@ def post_create(request):
 @api_view(['GET'])
 def post_list_profile(request, id):
     user = get_object_or_404(User, pk=id)
-    posts = Post.objects.visible_to(request.user).filter(created_by=user)
-
-    for post in posts:
-        post.post_liked = post.likes.filter(created_by=request.user).exists()
+    posts = Post.objects.visible_to(request.user).with_details(request.user).filter(created_by=user)
 
     paginator = PageNumberPagination()
     paginator.page_size = 10
@@ -125,8 +112,9 @@ def post_like(request, post_id):
 
 @api_view(['GET'])
 def post_detail(request, post_id):
-    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
-    post.post_liked = post.likes.filter(created_by=request.user).exists()
+    posts = Post.objects.visible_to(request.user).with_details(request.user).prefetch_related(
+        Prefetch('comments', queryset=Comment.objects.select_related('created_by')))
+    post = get_object_or_404(posts, id=post_id)
     return JsonResponse({'post': PostDetailSerializer(post).data}, safe=False)
 
 

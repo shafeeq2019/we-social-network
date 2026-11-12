@@ -2,12 +2,14 @@ import io
 import tempfile
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import connection
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from PIL import Image
 from rest_framework.test import APIClient
 
 from account.models import User
-from post.models import Post
+from post.models import Like, Post
 
 
 class PostCreateTests(TestCase):
@@ -273,3 +275,52 @@ class PostImageUploadTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertFalse(Post.objects.exists())
+
+
+class FeedPerformanceTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            name='Alice', email='alice@example.com', password='secret', is_active=True)
+        self.friend = User.objects.create_user(
+            name='Bob', email='bob@example.com', password='secret', is_active=True)
+        self.user.friends.add(self.friend)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+
+    def create_posts(self, count):
+        for i in range(count):
+            post = Post.objects.create(body=f'post {i}', created_by=self.friend)
+            Like.objects.create(post=post, created_by=self.user)
+
+    def count_queries(self, url):
+        with CaptureQueriesContext(connection) as context:
+            response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        return len(context)
+
+    def test_feed_query_count_does_not_grow_with_posts(self):
+        self.create_posts(2)
+        few = self.count_queries('/api/post/')
+        self.create_posts(8)
+        many = self.count_queries('/api/post/')
+
+        self.assertEqual(few, many)
+
+    def test_profile_query_count_does_not_grow_with_posts(self):
+        url = f'/api/post/profile/{self.friend.id}/'
+        self.create_posts(2)
+        few = self.count_queries(url)
+        self.create_posts(8)
+        many = self.count_queries(url)
+
+        self.assertEqual(few, many)
+
+    def test_post_liked_is_set_per_user(self):
+        liked = Post.objects.create(body='liked', created_by=self.friend)
+        Post.objects.create(body='not liked', created_by=self.friend)
+        Like.objects.create(post=liked, created_by=self.user)
+
+        results = self.client.get('/api/post/').json()['results']
+
+        self.assertEqual({post['body']: post['post_liked'] for post in results},
+                         {'liked': True, 'not liked': False})

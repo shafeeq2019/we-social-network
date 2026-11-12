@@ -12,6 +12,14 @@ class PostQuerySet(models.QuerySet):
         # Private posts are only visible to their author
         return self.filter(models.Q(is_private=False) | models.Q(created_by=user))
 
+    def with_details(self, user):
+        # Loads everything PostSerializer needs in a fixed number of queries:
+        # author via JOIN, attachments in one extra query and post_liked as a
+        # subquery instead of one query per post
+        return self.select_related('created_by').prefetch_related('post_attachments').annotate(
+            post_liked=models.Exists(
+                Like.objects.filter(post=models.OuterRef('pk'), created_by=user)))
+
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

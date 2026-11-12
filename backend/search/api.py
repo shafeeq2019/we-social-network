@@ -5,6 +5,8 @@ from account.serializers import UserSerializer
 from post.models import Post
 from post.serializers import PostSerializer
 
+SEARCH_LIMIT = 50
+
 
 @api_view(['POST'])
 def search(request):
@@ -14,12 +16,10 @@ def search(request):
     posts = []
 
     if query:
-        users = User.objects.filter(name__icontains=query)
-        posts = Post.objects.visible_to(request.user).filter(body__icontains=query)
-
-        for post in posts:
-            post.post_liked = post.likes.filter(
-                created_by=request.user).exists()
+        # Capped so a short query like "a" can't load the whole database
+        users = User.objects.filter(name__icontains=query).order_by('name')[:SEARCH_LIMIT]
+        posts = Post.objects.visible_to(request.user).with_details(
+            request.user).filter(body__icontains=query)[:SEARCH_LIMIT]
 
     return JsonResponse(
         {
