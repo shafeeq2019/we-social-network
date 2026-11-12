@@ -6,7 +6,8 @@ from django.http import JsonResponse
 from post.models import Comment, Post, Trend
 from account.models import FriendshipRequest, User
 from account.serializers import FriendshipRequestSerializer, UserSerializer
-from django.db.models import Prefetch, Q
+from django.db import transaction
+from django.db.models import F, Prefetch, Q
 from django.shortcuts import get_object_or_404
 
 from .serializers import PostSerializer, PostDetailSerializer, TrendSerializer
@@ -55,11 +56,14 @@ def post_create(request):
             return JsonResponse({'error': attachment_form.errors.as_json()}, status=400)
 
     if form.is_valid():
-        post = form.save()
-        user.posts_count += 1
-        user.save()
-        if attachment_form:
-            user.post_attachments.create(image=attachment_form.cleaned_data['image'], post=post)
+        with transaction.atomic():
+            post = form.save()
+            # Atomic increment; user.save() would also overwrite friends_count
+            # and the other fields with the values loaded at request start
+            User.objects.filter(pk=user.pk).update(posts_count=F('posts_count') + 1)
+            if attachment_form:
+                user.post_attachments.create(image=attachment_form.cleaned_data['image'], post=post)
+        user.refresh_from_db(fields=['posts_count'])
         serializer = PostSerializer(post)
         return JsonResponse(serializer.data, safe=False)
     else:

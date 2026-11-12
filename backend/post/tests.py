@@ -1,8 +1,9 @@
 import io
 import tempfile
+from unittest import mock
 
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import connection
+from django.db import IntegrityError, connection
 from django.test import TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from PIL import Image
@@ -324,3 +325,69 @@ class FeedPerformanceTests(TestCase):
 
         self.assertEqual({post['body']: post['post_liked'] for post in results},
                          {'liked': True, 'not liked': False})
+
+
+class CounterTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            name='Alice', email='alice@example.com', password='secret', is_active=True)
+        self.author = User.objects.create_user(
+            name='Bob', email='bob@example.com', password='secret', is_active=True)
+        self.post = Post.objects.create(body='hello', created_by=self.author)
+        self.client = APIClient()
+        self.client.force_authenticate(self.user)
+
+    def like(self):
+        return self.client.post(f'/api/post/{self.post.id}/like/').json()['message']
+
+    def test_like_toggles_and_keeps_count_in_sync(self):
+        self.assertEqual(self.like(), 'post liked successfully')
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.likes_count, 1)
+
+        self.assertEqual(self.like(), 'post disliked successfully')
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.likes_count, 0)
+        self.assertFalse(Like.objects.exists())
+
+    def test_parallel_like_does_not_fail(self):
+        # Simulates a second request that created the like in between
+        with mock.patch.object(Like.objects, 'create', side_effect=IntegrityError):
+            response = self.client.post(f'/api/post/{self.post.id}/like/')
+
+        self.assertEqual(response.status_code, 200)
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.likes_count, 0)
+
+    def test_like_does_not_overwrite_other_counters(self):
+        stale_post = Post.objects.get(pk=self.post.pk)
+        self.post.add_comment(self.author, 'first')
+
+        stale_post.add_like(self.user)
+
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.comments_count, 1)
+        self.assertEqual(self.post.likes_count, 1)
+
+    def test_delete_comment_twice_counts_once(self):
+        self.post.add_comment(self.user, 'hi')
+        comment = self.post.comments.get()
+
+        self.assertTrue(self.post.delete_comment(self.user, comment.id))
+        self.assertFalse(self.post.delete_comment(self.user, comment.id))
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.comments_count, 0)
+
+    def test_create_and_delete_post_update_posts_count(self):
+        # Changed in the DB after the request user was loaded
+        User.objects.filter(pk=self.user.pk).update(friends_count=5)
+
+        post_id = self.client.post('/api/post/create/', {'body': 'new'}, format='multipart').json()['id']
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.posts_count, 1)
+        # post_create must not write back stale values of other fields
+        self.assertEqual(self.user.friends_count, 5)
+
+        self.client.delete(f'/api/post/{post_id}/')
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.posts_count, 0)
