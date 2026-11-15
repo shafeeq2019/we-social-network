@@ -53,14 +53,23 @@
     </RouterLink>
 
     <footer class="flex items-center gap-1 px-3 pb-3 pt-3">
-      <button type="button" @click="likePost" :aria-pressed="post.post_liked"
-              :aria-label="post.post_liked ? 'Unlike post' : 'Like post'"
-              :class="['group inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors',
-                       post.post_liked ? 'text-like hover:bg-like/10' : 'text-muted-foreground hover:bg-like/10 hover:text-like']">
-        <Heart :key="likeAnimKey" :class="['h-5 w-5', likeAnimKey > 0 && post.post_liked ? 'animate-pop' : '']"
-               :fill="post.post_liked ? 'currentColor' : 'none'" aria-hidden="true" />
-        <span class="tabular-nums">{{ post.likes_count }}</span>
-      </button>
+      <div class="inline-flex items-center">
+        <button type="button" @click="likePost" :aria-pressed="post.post_liked"
+                :aria-label="post.post_liked ? 'Unlike post' : 'Like post'"
+                :class="['group inline-flex h-10 w-10 items-center justify-center rounded-full transition-colors',
+                         post.post_liked ? 'text-like hover:bg-like/10' : 'text-muted-foreground hover:bg-like/10 hover:text-like']">
+          <Heart :key="likeAnimKey" :class="['h-5 w-5', likeAnimKey > 0 && post.post_liked ? 'animate-pop' : '']"
+                 :fill="post.post_liked ? 'currentColor' : 'none'" aria-hidden="true" />
+        </button>
+        <!-- The count opens the list of people who liked the post -->
+        <button v-if="post.likes_count > 0" type="button" @click="openLikesModal = true"
+                :aria-label="`${post.likes_count} ${post.likes_count === 1 ? 'like' : 'likes'}, show who liked this post`"
+                :class="['-ml-1 inline-flex h-10 min-w-[2rem] items-center rounded-full px-2 text-sm font-semibold tabular-nums transition-colors hover:bg-muted hover:underline underline-offset-2',
+                         post.post_liked ? 'text-like' : 'text-muted-foreground hover:text-foreground']">
+          {{ post.likes_count }}
+        </button>
+        <span v-else class="-ml-1 min-w-[2rem] px-2 text-sm font-semibold tabular-nums text-muted-foreground">0</span>
+      </div>
 
       <RouterLink :to="{ name: 'postview', params: { id: post.id } }"
                   class="inline-flex h-10 items-center gap-2 rounded-full px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary-soft-foreground dark:hover:text-primary"
@@ -94,6 +103,8 @@
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    <LikesDialog v-model:open="openLikesModal" :post-id="post.id" />
 
     <Dialog v-model:open="openDeleteModal">
       <DialogContent class="rounded-3xl sm:max-w-[400px]">
@@ -148,6 +159,7 @@ import {
 } from '@/components/ui/dialog';
 import btn from './ui/Button.vue';
 import Avatar from './ui/Avatar.vue';
+import LikesDialog from './LikesDialog.vue';
 import { formatAgo, renderRichText } from '@/lib/utils';
 
 export default defineComponent({
@@ -165,6 +177,7 @@ export default defineComponent({
     DropdownMenuTrigger,
     btn,
     Avatar,
+    LikesDialog,
     Flag,
     Globe2,
     Heart,
@@ -196,6 +209,7 @@ export default defineComponent({
     return {
       openReportModal: false,
       openDeleteModal: false,
+      openLikesModal: false,
       reportText: '',
       reporting: false,
       deleting: false,

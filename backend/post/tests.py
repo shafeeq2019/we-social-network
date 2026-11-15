@@ -391,3 +391,65 @@ class CounterTests(TestCase):
         self.client.delete(f'/api/post/{post_id}/')
         self.user.refresh_from_db()
         self.assertEqual(self.user.posts_count, 0)
+
+
+class PostLikesListTests(TestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(
+            name='Alice', email='alice@example.com', password='secret', is_active=True)
+        self.viewer = User.objects.create_user(
+            name='Bob', email='bob@example.com', password='secret', is_active=True)
+        self.post = Post.objects.create(body='hello', created_by=self.author)
+        self.client = APIClient()
+        self.client.force_authenticate(self.viewer)
+
+    def likes(self, post=None, page=1):
+        post = post or self.post
+        return self.client.get(f'/api/post/{post.id}/likes/?page={page}')
+
+    def test_lists_likers_newest_first(self):
+        carol = User.objects.create_user(name='Carol', email='carol@example.com', password='secret')
+        self.post.add_like(carol)
+        self.post.add_like(self.viewer)
+
+        data = self.likes().json()
+
+        self.assertEqual(data['count'], 2)
+        self.assertEqual([user['name'] for user in data['results']], ['Bob', 'Carol'])
+        # Public user data only, no e-mail addresses
+        self.assertNotIn('email', data['results'][0])
+
+    def test_unliked_users_are_removed(self):
+        self.post.add_like(self.viewer)
+        self.post.add_like(self.viewer)
+
+        self.assertEqual(self.likes().json()['count'], 0)
+
+    def test_paginates_with_20_per_page(self):
+        for i in range(25):
+            user = User.objects.create_user(name=f'User {i}', email=f'user{i}@example.com', password='secret')
+            self.post.add_like(user)
+
+        first = self.likes().json()
+        second = self.likes(page=2).json()
+
+        self.assertEqual(len(first['results']), 20)
+        self.assertIsNotNone(first['next'])
+        self.assertEqual(len(second['results']), 5)
+        self.assertIsNone(second['next'])
+
+    def test_private_post_likes_are_hidden_from_others(self):
+        private = Post.objects.create(body='secret', created_by=self.author, is_private=True)
+
+        self.assertEqual(self.likes(private).status_code, 404)
+
+    def test_author_sees_likes_of_own_private_post(self):
+        private = Post.objects.create(body='secret', created_by=self.author, is_private=True)
+        self.client.force_authenticate(self.author)
+
+        self.assertEqual(self.likes(private).status_code, 200)
+
+    def test_requires_login(self):
+        self.client.force_authenticate(None)
+
+        self.assertEqual(self.likes().status_code, 401)
