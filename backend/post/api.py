@@ -115,6 +115,20 @@ def post_like(request, post_id):
 
 
 @api_view(['GET'])
+def post_likes(request, post_id):
+    # Users who liked a post, newest like first. Private posts stay hidden
+    # from everyone except their author through visible_to().
+    post = get_object_or_404(Post.objects.visible_to(request.user), id=post_id)
+    users = User.objects.filter(likes__post=post).order_by('-likes__created_at')
+
+    paginator = PageNumberPagination()
+    paginator.page_size = 20
+    users = paginator.paginate_queryset(users, request)
+
+    return paginator.get_paginated_response(UserSerializer(users, many=True).data)
+
+
+@api_view(['GET'])
 def post_detail(request, post_id):
     posts = Post.objects.visible_to(request.user).with_details(request.user).prefetch_related(
         Prefetch('comments', queryset=Comment.objects.select_related('created_by')))
